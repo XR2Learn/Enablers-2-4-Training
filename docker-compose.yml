@@ -1,0 +1,13 @@
+version: '3'
+services:
+  ed-training-audio:
+    image: some.registry.com/xr2learn-enablers/ed-training-audio:latest
+    build:
+      context: './ED_Training/Audio_Modality'
+      dockerfile: 'Dockerfile'
+    volumes:
+      - "./ED_Training/Audio_Modality:/app"
+    working_dir: /app
+    environment:
+      - KEY=${KEY}
+#    entrypoint: /bin/sh -c
