@@ -9,6 +9,7 @@ EMOTION_INTENSITY = {1: 'normal', 2: "strong"}
 
 SAMPLE_RATE = 48000
 
-main_folder = pathlib.Path(__file__).parent.parent.absolute()
-DATA_PATH = os.path.join(main_folder, 'datasets', 'RAVDESS', 'audio_speech_actors_01-24')
-RAVDESS_DATA_PATH = os.path.join(main_folder, 'datasets', 'RAVDESS')
+MAIN_FOLDER_DEFAULT = pathlib.Path(__file__).parent.parent.absolute()
+MAIN_FOLDER = config('MAIN_FOLDER', default=MAIN_FOLDER_DEFAULT)
+DATA_PATH = os.path.join(MAIN_FOLDER_DEFAULT, 'datasets', 'RAVDESS', 'audio_speech_actors_01-24')
+RAVDESS_DATA_PATH = os.path.join(MAIN_FOLDER_DEFAULT, 'datasets', 'RAVDESS')
