@@ -66,13 +66,15 @@ def generate_dataset_features(path_dataset):
 
         # creating and adding the new row on the dataframe
         new_row_dict = {'Emotion': row['Emotion'],
+                        'Emotion Intensity': row['Emotion Intensity'],
+                        'Gender': row['Gender'],
                         'Features Path': file_path,
                         'Timestamp': row['Timestamp']
                         }
         df_features = pd.concat([df_features, pd.DataFrame([new_row_dict])], ignore_index=True)
 
         # np_file = np.load(file_path, allow_pickle=True, fix_imports=False)
-        break
+        # break
 
     df_features.to_csv(os.path.join(MAIN_FOLDER, 'datasets', 'ravdess_dataset_features.csv'), index=False)
 
