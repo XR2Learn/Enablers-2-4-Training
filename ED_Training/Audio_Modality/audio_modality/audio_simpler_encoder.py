@@ -1,9 +1,11 @@
+import os
+import glob
+import random
 import numpy as np
 import torch
 import torchaudio
+import librosa
 import pandas as pd
-import os
-import glob
 
 from conf import DATA_PATH, EMOTIONS, EMOTION_INTENSITY, RAVDESS_DATA_PATH, SAMPLE_RATE, MAIN_FOLDER
 
@@ -11,6 +13,7 @@ torch.random.manual_seed(0)
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 bundle = torchaudio.pipelines.WAV2VEC2_BASE
 model = bundle.get_model().to(device)
+DURATION_RAVDESS_AUDIO = 3
 
 
 def create_and_save_dataset_audio_paths():
@@ -57,6 +60,7 @@ def generate_dataset_features(path_dataset):
     if not os.path.exists(dir_path):
         os.makedirs(dir_path)
 
+    i = 0
     for idx, row in path_df.iterrows():
         features_np = generate_features(row['Path'])
         # Using timestamp as file name
@@ -72,11 +76,13 @@ def generate_dataset_features(path_dataset):
                         'Timestamp': row['Timestamp']
                         }
         df_features = pd.concat([df_features, pd.DataFrame([new_row_dict])], ignore_index=True)
+        i += 1
+        if i >= 15:
+            break
 
         # np_file = np.load(file_path, allow_pickle=True, fix_imports=False)
-        # break
 
-    df_features.to_csv(os.path.join(MAIN_FOLDER, 'datasets', 'ravdess_dataset_features.csv'), index=False)
+    df_features.to_csv(os.path.join(MAIN_FOLDER, 'datasets', 'ravdess_dataset_features_v2.csv'), index=False)
 
 
 def generate_features(path_audio_file):
@@ -85,16 +91,36 @@ def generate_features(path_audio_file):
     :param path_audio_file: the path where to find the wav audio file
     :return: nparray representation of the tensors, i.e., features extracted from wav file
     """
+
     waveform, sample_rate = torchaudio.load(path_audio_file)
     waveform = waveform.to(device)
 
     if SAMPLE_RATE != bundle.sample_rate:
         waveform = torchaudio.functional.resample(waveform, sample_rate, bundle.sample_rate)
 
+    waveform = truc_audio_signal(waveform)
+
     # Call wav2vec2 to extract features
     features, _ = model.extract_features(waveform)
     features_np = [f.detach().numpy().astype('float32') for f in features]
     return features_np
+
+
+def truc_audio_signal(waveform):
+    # Making sure all the audio have the same length of duration
+    num_rows, sig_len = waveform.shape
+    max_len = SAMPLE_RATE * DURATION_RAVDESS_AUDIO
+
+    if sig_len < max_len:
+        pad_begin_len = random.randint(0, max_len - sig_len)
+        pad_end_len = max_len - sig_len - pad_begin_len
+
+        # Pad with 0s
+        pad_begin = torch.zeros((num_rows, pad_begin_len))
+        pad_end = torch.zeros((num_rows, pad_end_len))
+
+        sig = torch.cat((pad_begin, waveform, pad_end), 1)
+        return sig
 
 
 if __name__ == '__main__':
