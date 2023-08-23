@@ -1,5 +1,8 @@
+import os
 import torch
 import torch.nn as nn
+import pandas as pd
+from conf import MAIN_FOLDER
 
 
 class MLPClassifier(nn.Module):
@@ -31,4 +34,6 @@ class MLPClassifier(nn.Module):
 
 
 if __name__ == '__main__':
-    pass
+    dataset_path = os.path.join(MAIN_FOLDER, 'datasets', 'ravdess_dataset_features.csv')
+    dataset = pd.read_csv(dataset_path)
+    train, test = torch.utils
