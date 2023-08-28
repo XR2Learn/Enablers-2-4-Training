@@ -158,7 +158,7 @@ cython_debug/
 #  and can be added to the global gitignore or merged into this file.  For a more nuclear
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 .idea/
-/ED_Training/Supervised_Audio_Modality/datasets/
-/Encoder_Training/SSL_Audio_Modality/datasets/
-/ED_Training/Supervised_Audio_Modality/outputs/
-/Encoder_Training/SSL_Audio_Modality/outputs/
+/Supervised_Training/Supervised_Audio_Modality/datasets/
+/SSL_Training/SSL_Audio_Modality/datasets/
+/Supervised_Training/Supervised_Audio_Modality/outputs/
+/SSL_Training/SSL_Audio_Modality/outputs/
