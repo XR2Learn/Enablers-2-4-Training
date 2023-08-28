@@ -7,7 +7,13 @@ from conf import DATA_PATH, EMOTIONS_RAVDESS, EMOTION_INTENSITY_RAVDESS, RAVDESS
 
 def create_and_save_dataset_audio_paths():
     """
-    Function to create and save a dataset in CSV form from the RAVDESS dataset.
+    Function to create and save a dataset in CSV form from the RAVDESS dataset wav files, including labels.
+    It parses the files' names and organise the information into a CSV file. The columns of the CSV includes:
+    Emotion: labels of the data between seven emotions.
+    Emotion Intensity: intensity of the emotion expressed by subject.
+    Gender: the subject's gender.
+    Path: path to the wav audio file.
+    Timestamp: A unique identifier to later synchronise different modalities.
     """
     columns_df = ['Emotion', 'Emotion Intensity', 'Gender', 'Path', 'Timestamp']
     df = pd.DataFrame(columns=columns_df)

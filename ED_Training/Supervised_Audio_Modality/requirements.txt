@@ -6,4 +6,4 @@ numpy==1.24.4
 pandas==2.0.3
 scikit-learn==1.3.0
 librosa==0.10.1
--e file:./#egg=audio_modality
+-e file:./#egg=supervised_audio_modality

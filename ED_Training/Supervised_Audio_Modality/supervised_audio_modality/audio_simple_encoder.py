@@ -16,7 +16,10 @@ model = bundle.get_model().to(device)
 
 def generate_dataset_features(dataset_path):
     """
-    Generates dataset from features extracted from wav2vec2 and save it into a CSV file.
+    Generates dataset of features extracted using wav2vec2.
+    Generated features from wav audio files, save them in npy files and creates a CSV file with
+    labels + path to features file (between other columns).
+
     :param dataset_path: string. The path for CSV file with the dataset containing labels and path to audio files.
     :return: None
     """
