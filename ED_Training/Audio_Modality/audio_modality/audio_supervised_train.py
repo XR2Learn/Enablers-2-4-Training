@@ -6,9 +6,8 @@ from sklearn.preprocessing import LabelEncoder
 from sklearn.metrics import accuracy_score
 from torch.utils.data import Dataset, DataLoader, random_split
 from torch import Tensor
-from torch.nn import Linear, ReLU, Sigmoid, Module, BCELoss
+import torch.nn as nn
 from torch.optim import SGD
-from torch.nn.init import kaiming_uniform_, xavier_uniform_
 
 from conf import MAIN_FOLDER
 
@@ -22,8 +21,6 @@ class CSVDataset(Dataset):
         # store the inputs and outputs
         self.X = df['Features Path']
         self.y = df['Emotion']
-        # ensure input data is floats
-        # self.X = self.X.astype('float32')
         # label encode target and ensure the values are floats
         self.y = LabelEncoder().fit_transform(self.y)
         self.y = self.y.astype('float32')
@@ -37,6 +34,7 @@ class CSVDataset(Dataset):
     def __getitem__(self, idx):
         # Loading the features from file
         example_features = np.load(self.X[idx], allow_pickle=True, fix_imports=False)
+        example_features = example_features.squeeze(axis=1)
         return [example_features, self.y[idx]]
         # return [self.X[idx], self.y[idx]]
 
@@ -49,36 +47,33 @@ class CSVDataset(Dataset):
         return random_split(self, [train_size, test_size])
 
 
-# model definition
-class MLP(Module):
-    # define model elements
-    def __init__(self, n_inputs):
-        super(MLP, self).__init__()
-        # input to first hidden layer
-        self.hidden1 = Linear(n_inputs, 10)
-        kaiming_uniform_(self.hidden1.weight, nonlinearity='relu')
-        self.act1 = ReLU()
-        # second hidden layer
-        self.hidden2 = Linear(10, 8)
-        kaiming_uniform_(self.hidden2.weight, nonlinearity='relu')
-        self.act2 = ReLU()
-        # third hidden layer and output
-        self.hidden3 = Linear(8, 1)
-        xavier_uniform_(self.hidden3.weight)
-        self.act3 = Sigmoid()
+class MLPClassifier(nn.Module):
+    """ MLP for classification
+    """
 
-    # forward propagate input
-    def forward(self, X):
-        # input to first hidden layer
-        X = self.hidden1(X)
-        X = self.act1(X)
-        # second hidden layer
-        X = self.hidden2(X)
-        X = self.act2(X)
-        # third hidden layer and output
-        X = self.hidden3(X)
-        X = self.act3(X)
-        return X
+    def __init__(self, in_size, out_size, hidden=[256, 128]):
+        super(MLPClassifier, self).__init__()
+        self.name = 'MLP'
+        self.relu = nn.ReLU()
+        # TODO: make dropout optional with an argument
+        self.linear1 = nn.Sequential(
+            nn.Linear(in_size, hidden[0]),
+            nn.ReLU(inplace=True),
+            # nn.Dropout(0.2)
+        )
+        self.linear2 = nn.Sequential(
+            nn.Linear(hidden[0], hidden[1]),
+            nn.ReLU(inplace=True),
+            # nn.Dropout(0.2)
+        )
+        self.output = nn.Linear(hidden[1], out_size)
+
+    def forward(self, x):
+        x = x.view(x.shape[0], -1)
+        x = self.linear1(x)
+        x = self.linear2(x)
+        x = self.output(x)
+        return x
 
 
 # prepare the dataset
@@ -96,7 +91,7 @@ def prepare_data(path):
 # train the model
 def train_model(train_dl, model):
     # define the optimization
-    criterion = BCELoss()
+    criterion = nn.CrossEntropyLoss()
     optimizer = SGD(model.parameters(), lr=0.01, momentum=0.9)
     # enumerate epochs
     for epoch in range(100):
@@ -112,6 +107,9 @@ def train_model(train_dl, model):
             loss.backward()
             # update model weights
             optimizer.step()
+        if epoch == 5:
+            break
+        print(f'End of Epoch {epoch}, loss: {loss}')
 
 
 # evaluate the model
@@ -149,11 +147,10 @@ def predict(row, model):
 if __name__ == '__main__':
     # prepare the data
     path = os.path.join(MAIN_FOLDER, 'datasets', 'ravdess_dataset_features_v2.csv')
-    # path = 'https://raw.githubusercontent.com/jbrownlee/Datasets/master/ionosphere.csv'
     train_dl, test_dl = prepare_data(path)
     print(f"Size train set: {len(train_dl.dataset)}, \nSize test set: {len(test_dl.dataset)}")
     # define the network
-    model = MLP(34)
+    model = MLPClassifier(4137984, 1)
     # train the model
     train_model(train_dl, model)
     # evaluate the model

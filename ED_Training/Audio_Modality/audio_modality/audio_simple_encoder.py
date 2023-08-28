@@ -1,59 +1,26 @@
 import os
-import glob
 import random
 import numpy as np
 import torch
 import torchaudio
-import librosa
 import pandas as pd
 
-from conf import DATA_PATH, EMOTIONS, EMOTION_INTENSITY, RAVDESS_DATA_PATH, SAMPLE_RATE, MAIN_FOLDER
+from conf import RAVDESS_DATA_PATH, SAMPLE_RATE_RAVDESS, MAIN_FOLDER, \
+    DURATION_AUDIO_RAVDESS
 
 torch.random.manual_seed(0)
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 bundle = torchaudio.pipelines.WAV2VEC2_BASE
 model = bundle.get_model().to(device)
-DURATION_RAVDESS_AUDIO = 3
 
 
-def create_and_save_dataset_audio_paths():
-    """
-    Function to create and save a dataset in CSV form from the RAVDESS dataset.
-    """
-    columns_df = ['Emotion', 'Emotion Intensity', 'Gender', 'Path', 'Timestamp']
-    df = pd.DataFrame(columns=columns_df)
-
-    path_files = glob.glob(os.path.join(DATA_PATH, '*', '*.wav'))
-
-    for path_file in path_files:
-        file_name = os.path.basename(path_file)
-        file_name = file_name.replace('.wav', '')
-        # This timestamp is not actually the timestamp. It is a placeholder bc this dataset does not have timestamp.
-        timestamp = file_name.replace('-', '')
-        identifiers = file_name.split('-')
-        if int(identifiers[6]) % 2 == 0:
-            gender = 'female'
-        else:
-            gender = 'male'
-        new_row_dict = {'Emotion': EMOTIONS[int(identifiers[2])],
-                        'Emotion Intensity': EMOTION_INTENSITY[int(identifiers[3])],
-                        'Gender': gender,
-                        'Path': path_file,
-                        'Timestamp': timestamp
-                        }
-        df = pd.concat([df, pd.DataFrame([new_row_dict])], ignore_index=True)
-    if not os.path.exists(RAVDESS_DATA_PATH):
-        os.makedirs(RAVDESS_DATA_PATH)
-    df.to_csv(os.path.join(RAVDESS_DATA_PATH, 'ravdess_dataset_with_paths.csv'), index=False)
-
-
-def generate_dataset_features(path_dataset):
+def generate_dataset_features(dataset_path):
     """
     Generates dataset from features extracted from wav2vec2 and save it into a CSV file.
-    :param path_dataset: string. The path for CSV file with the dataset containing labels and path to audio files.
+    :param dataset_path: string. The path for CSV file with the dataset containing labels and path to audio files.
     :return: None
     """
-    path_df = pd.read_csv(path_dataset)
+    path_df = pd.read_csv(dataset_path)
     df_features = pd.DataFrame(columns=['Emotion', 'Features Path', 'Timestamp'])
 
     dir_path = os.path.join(MAIN_FOLDER, 'datasets', 'RAVDESS_features')
@@ -80,8 +47,6 @@ def generate_dataset_features(path_dataset):
         if i >= 15:
             break
 
-        # np_file = np.load(file_path, allow_pickle=True, fix_imports=False)
-
     df_features.to_csv(os.path.join(MAIN_FOLDER, 'datasets', 'ravdess_dataset_features_v2.csv'), index=False)
 
 
@@ -95,7 +60,7 @@ def generate_features(path_audio_file):
     waveform, sample_rate = torchaudio.load(path_audio_file)
     waveform = waveform.to(device)
 
-    if SAMPLE_RATE != bundle.sample_rate:
+    if SAMPLE_RATE_RAVDESS != bundle.sample_rate:
         waveform = torchaudio.functional.resample(waveform, sample_rate, bundle.sample_rate)
 
     waveform = truc_audio_signal(waveform)
@@ -109,13 +74,13 @@ def generate_features(path_audio_file):
 def truc_audio_signal(waveform):
     # Making sure all the audio have the same length of duration
     num_rows, sig_len = waveform.shape
-    max_len = SAMPLE_RATE * DURATION_RAVDESS_AUDIO
+    max_len = SAMPLE_RATE_RAVDESS * DURATION_AUDIO_RAVDESS
 
     if sig_len < max_len:
         pad_begin_len = random.randint(0, max_len - sig_len)
         pad_end_len = max_len - sig_len - pad_begin_len
 
-        # Pad with 0s
+        # Pad with Zeros
         pad_begin = torch.zeros((num_rows, pad_begin_len))
         pad_end = torch.zeros((num_rows, pad_end_len))
 
@@ -124,6 +89,5 @@ def truc_audio_signal(waveform):
 
 
 if __name__ == '__main__':
-    # create_and_save_dataset_audio_paths()
     path_dataset = os.path.join(RAVDESS_DATA_PATH, 'ravdess_dataset_with_paths.csv')
     generate_dataset_features(path_dataset)

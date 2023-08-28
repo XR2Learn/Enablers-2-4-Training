@@ -1,6 +1,7 @@
 version: '3'
 services:
   ed-training-audio:
+    runtime: nvidia
     image: some.registry.com/xr2learn-enablers/ed-training-audio:latest
     build:
       context: './ED_Training/Audio_Modality'
