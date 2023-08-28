@@ -1,8 +1,8 @@
 version: '3'
 services:
   ed-training-audio:
-    runtime: nvidia
     image: some.registry.com/xr2learn-enablers/ed-training-audio:latest
+    runtime: nvidia
     build:
       context: 'Supervised_Training/Supervised_Audio_Modality'
       dockerfile: 'Dockerfile'
@@ -13,8 +13,8 @@ services:
       - KEY=${KEY}
 #    entrypoint: /bin/sh -c
   ssl-audio:
-    runtime: nvidia
     image: some.registry.com/xr2learn-enablers/ssl-audio:latest
+    runtime: nvidia
     build:
       context: 'SSL_Training/SSL_Audio_Modality'
       dockerfile: 'Dockerfile'
