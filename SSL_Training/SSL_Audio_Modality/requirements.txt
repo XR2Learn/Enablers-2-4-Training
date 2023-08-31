@@ -1,2 +1,2 @@
-
+python-decouple==3.6
 -e file:./#egg=ssl_audio_modality
