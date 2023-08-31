@@ -2,13 +2,21 @@
 
 Component to pre-train an ED model using audio data input type. 
 
-`Input`: CSV file with labels + path to features file (.npy files) + timestamp. 
+`Input`: CSV file with labels + path to audio files + timestamp. 
 - CSV Input file should be in the folder `/datasets/<input_CSV_file.CSV>`
 
-`Output`: File with trained weights (Not implemented).
+`Output`: File with trained weights.
 - Output file with trained weights is saved in the folder `/outputs/<file_weights>`
 
 ## Development Environment Setup
+1. Clone the repository
+2. Prepare your virtual environment (e.g. VirtualEnv, Pip env, Conda)
 
+## Development cycle (simplified version)
+1. Crete a new branch to develop the task
+2. Commit to remote to the new branch as needed
+3. After finishing developing test docker image
+4. When is everything done and tested, merge task branch to master branch
 
 ## Development Notes
+- Which configuration do we need to create this component? 
