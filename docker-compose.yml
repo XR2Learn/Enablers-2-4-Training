@@ -21,7 +21,7 @@ services:
       dockerfile: 'Dockerfile'
     volumes:
       - "./SSL_Training/SSL_Audio_Modality:/app"
-      - "./configuration.json:/app/configuration.json"
+#      - "./configuration.json:/app/configuration.json"
     working_dir: /app
     environment:
       # To include environment variables in the format below
