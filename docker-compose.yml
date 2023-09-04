@@ -56,3 +56,17 @@ services:
       - KEY=${KEY}
     #    entrypoint: /bin/sh -c
     command: python ssl_features_extraction_audio_modality/generate_features.py
+
+  handcrafted-features-generation-audio:
+    image: some.registry.com/xr2learn-enablers/handcrafted-features-generation-audio:latest
+    build:
+      context: 'Handcrafted_Features_Extraction/Handcrafted_Features_Extraction_Audio_modality'
+      dockerfile: 'Dockerfile'
+    volumes:
+      - "./Handcrafted_Features_Extraction/Handcrafted_Features_Extraction_Audio_modality:/app"
+    working_dir: /app
+    environment:
+      # To include environment variables in the format below
+      - KEY=${KEY}
+    #    entrypoint: /bin/sh -c
+    command: python handcrafted_features_extraction_audio_modality/generate_features.py
