@@ -1,4 +1,4 @@
-# XR2Learn Training
+# SSL Features Extraction
 
 Repository containing the components for training the models used in XR2Learn, including Encoders (SSL).
 
