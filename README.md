@@ -12,3 +12,16 @@ Dependencies:
 
 ### Quick-start
 `python train.py <arg-list>`
+
+## Docker Commands
+Build a docker image
+
+`docker compose build <service-name>`
+
+Run a docker image
+
+`docker compose run --rm <service-name>`
+
+Run a docker image giving EnvVars
+
+`KEY=VALUE docker compose run --rm <service-name>`
