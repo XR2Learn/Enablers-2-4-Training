@@ -2,5 +2,5 @@
 
 from conf import TESTING
 
-print('Docker image has run!\n')
+print('Docker image for SSL-Pre-train has run!')
 print(TESTING)
