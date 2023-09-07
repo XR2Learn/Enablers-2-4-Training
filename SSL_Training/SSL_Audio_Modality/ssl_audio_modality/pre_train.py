@@ -1,6 +1,16 @@
 # Python code here
 
-from conf import TESTING
+from conf import CUSTOM_SETTINGS
 
-print('Docker image for SSL-Pre-train has run!')
-print(TESTING)
+
+def example_run():
+    """
+    A basic print function to verify if docker is running.
+    :return: None
+    """
+    model_config = CUSTOM_SETTINGS['model']['some_config_model']
+    print(f'Docker for SSL-Pre-Training Audio has run. Conf from configuration.json file: {model_config}')
+
+
+if __name__ == '__main__':
+    example_run()

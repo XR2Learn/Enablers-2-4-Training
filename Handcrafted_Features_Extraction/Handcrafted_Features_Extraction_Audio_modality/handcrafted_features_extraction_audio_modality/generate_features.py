@@ -1,7 +1,17 @@
 # Python code here
 
-from conf import TESTING, KEY
+from conf import CUSTOM_SETTINGS
 
-print('Docker image of handcrafted features generation component has run!\n')
-print(TESTING)
-print(KEY)
+
+def example_run():
+    """
+    A basic print function to verify if docker is running.
+    :return: None
+    """
+    model_config = CUSTOM_SETTINGS['pre_processing']['handcrafted_config']
+    print(
+        f'Docker for handcrafted features generation Audio has run. Conf from configuration.json file: {model_config}')
+
+
+if __name__ == '__main__':
+    example_run()
