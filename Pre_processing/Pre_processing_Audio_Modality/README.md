@@ -1,14 +1,14 @@
 # Pre-processing - Audio Modality
 
-Component to pre-train an ED model using audio data input type.
+Component to pre-process audio data input type for an Emotion Detection (ED) model.
 
-`Input`: CSV file with labels + path to audio files + timestamp.
+`Input`: path to dataset.
 
-- CSV Input file should be in the folder `/datasets/<input_CSV_file.CSV>`
+- Dataset Input files should be in the folder `/datasets/<input_CSV_file.CSV>`
 
-`Output`: File with trained weights.
+`Output`: CSV file with labels + path to audio files + timestamp.
 
-- Output file with trained weights is saved in the folder `/outputs/<file_weights>`
+- CSV Output file should be in the folder `/datasets/<input_CSV_file.CSV>`
 
 # Development
 
