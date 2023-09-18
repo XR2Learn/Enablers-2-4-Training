@@ -3,6 +3,7 @@ import os
 import glob
 import pandas as pd
 import numpy as np
+import pathlib
 from tqdm import tqdm
 #for now i choose scipy as it offers a lot  without having to install additional libraries but maybe librosa can also be an option
 import scipy
@@ -50,6 +51,12 @@ def process_dataset(full_dataset_path,all_subjects_dirs):
 
     splits_phase = {'train':train_split,'val':val_split,'test':test_split}
     subjects_phase = {'train':train_subjects,'val':val_subjects,'test':test_subjects}
+
+    # get the right function to use, and create path to save files to
+    self_functions = {"normalize":normalize,'standardize':standardize,'only_resample':no_preprocessing}
+    preprocessing_to_aply = self_functions[CUSTOM_SETTINGS['pre_processing_config']['process']]
+    pathlib.Path(f"Pre_processing\Pre_processing_Audio_Modality\datasets\preprocessed\{CUSTOM_SETTINGS['pre_processing_config']['process']}").mkdir(parents=True, exist_ok=True)
+
     for phase in ['train','val','test']:
         split = splits_phase[phase]
         subjects = subjects_phase[phase]
@@ -71,18 +78,18 @@ def process_dataset(full_dataset_path,all_subjects_dirs):
 
                 loaded_files.append(audio_path)
 
-            all_subject_audio_standardized = standardize(all_subject_audio)
+            all_subject_audio_standardized = preprocessing_to_aply(all_subject_audio)
 
-            processed_file_names = []
+            processed_file_paths = []
             processed_file_labels = []
             for file_name,processed_audio in zip(loaded_files,all_subject_audio_standardized):
                 filename = '_'.join(file_name.split('\\')[-3:])
                 processed_file_labels.append(CUSTOM_SETTINGS['dataset_config']['label_to_emotion'][file_name.split('-')[2]])
-                filepath = f"Pre_processing\Pre_processing_Audio_Modality\datasets\preprocessed\{filename}"
-                processed_file_names.append(filename)
+                filepath = f"Pre_processing\Pre_processing_Audio_Modality\datasets\preprocessed\{CUSTOM_SETTINGS['pre_processing_config']['process']}\{filename}"
+                processed_file_paths.append(filepath)
                 scipy.io.wavfile.write(filepath, CUSTOM_SETTINGS['pre_processing_config']['target_sr'], processed_audio.astype(np.float32))
 
-            split['files'].extend(processed_file_names)
+            split['files'].extend(processed_file_paths)
             split['labels'].extend(processed_file_labels)
 
     
@@ -90,8 +97,11 @@ def process_dataset(full_dataset_path,all_subjects_dirs):
     
 def normalize(subject_all_audio):
     # normalize : transformed into a range between -1 and 1 by normalization for each speaker
+    #TODO: check if actually works
+    min = np.min(np.hstack(subject_all_audio))
+    max = np.max(np.hstack(subject_all_audio))
 
-    subject_all_normalized_audio = []
+    subject_all_normalized_audio = [2*(au-min)/(max-min)-1 for au in subject_all_audio]
     return subject_all_normalized_audio
 
 def standardize(subject_all_audio):
