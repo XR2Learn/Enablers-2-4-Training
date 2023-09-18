@@ -18,6 +18,9 @@ KEY = config('KEY')
 CUSTOM_SETTINGS = {
     'key': {
         'default': 'value',
+    },
+    'pre_processing':{
+        'some_config_preprocessing': 'values',
     }
 }
 PATH_CUSTOM_SETTINGS = os.path.join(MAIN_FOLDER, 'configuration.json')
