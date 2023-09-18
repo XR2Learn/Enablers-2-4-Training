@@ -3,7 +3,7 @@ import os
 import glob
 import pandas as pd
 import numpy as np
-
+from tqdm import tqdm
 #for now i choose scipy as it offers a lot  without having to install additional libraries but maybe librosa can also be an option
 import scipy
 from conf import CUSTOM_SETTINGS
@@ -25,13 +25,10 @@ def preprocess():
 
     train_split,val_split,test_split = process_dataset(full_dataset_path,all_subject_dirs)
 
-    train_df = pd.DataFrame.from_dict(train_split)
-    train_df.to_csv("Pre_processing\Pre_processing_Audio_Modality\outputs\\train.csv")
+    print ('writing CSV files containing the splits to storage')
+    pd.DataFrame.from_dict(train_split).to_csv("Pre_processing\Pre_processing_Audio_Modality\outputs\\train.csv")
     pd.DataFrame.from_dict(val_split).to_csv('Pre_processing\Pre_processing_Audio_Modality\outputs\\val.csv')
     pd.DataFrame.from_dict(test_split).to_csv('Pre_processing\Pre_processing_Audio_Modality\outputs\\test.csv')
-
-
-    #TODO: write dictionaries to csvs
 
 def process_dataset(full_dataset_path,all_subjects_dirs):
     train_split = {'files':[],'labels':[]}
@@ -51,10 +48,12 @@ def process_dataset(full_dataset_path,all_subjects_dirs):
     print('val: ', val_subjects)
     print('test: ', test_subjects)
 
-    splits = [train_split,val_split,test_split]
-    subjects = [train_subjects,val_subjects,test_subjects]
-    for split,subjects in zip(splits,subjects):
-        for subject_path in subjects:
+    splits_phase = {'train':train_split,'val':val_split,'test':test_split}
+    subjects_phase = {'train':train_subjects,'val':val_subjects,'test':test_subjects}
+    for phase in ['train','val','test']:
+        split = splits_phase[phase]
+        subjects = subjects_phase[phase]
+        for subject_path in tqdm(subjects,desc=f"preprocessing {phase} set"):
             all_subject_audio_files = glob.glob(os.path.join(f"{full_dataset_path}\{subject_path}", '*.wav'))
             all_subject_audio = []
             loaded_files = []
@@ -73,9 +72,6 @@ def process_dataset(full_dataset_path,all_subjects_dirs):
                 loaded_files.append(audio_path)
 
             all_subject_audio_standardized = standardize(all_subject_audio)
-
-            print(len(all_subject_audio_standardized))
-            print(len(loaded_files))
 
             processed_file_names = []
             processed_file_labels = []

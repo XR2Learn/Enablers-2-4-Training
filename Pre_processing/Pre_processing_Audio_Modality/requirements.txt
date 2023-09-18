@@ -2,4 +2,5 @@ python-decouple==3.6
 pandas==1.5.3
 scipy==1.11.1
 numpy<1.28.0,>=1.21.6
+tqdm==4.65.0
 -e file:./#egg=pre_processing_audio_modality
