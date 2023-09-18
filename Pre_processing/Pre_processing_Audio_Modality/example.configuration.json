@@ -1,8 +1,28 @@
 {
   "dataset_config": {
-      "dataset_name": "RAVDESS"
+      "dataset_name": "RAVDESS",
+      "label_to_emotion": {"01":"neutral", 
+                           "02":"calm",
+                           "03":"happy",
+                           "04":"sad",
+                           "05":"angry",
+                           "06":"fearful",
+                           "07":"disgust",
+                           "08":"surprised"
+      },
+      "emotion_to_label": {"neutral":"01",
+                           "calm":"02",
+                           "happy":"03",
+                           "sad":"04",
+                           "angry":"05",
+                           "fearful":"06",
+                           "disgust":"07",
+                           "suprised":"08"
+      }
   },
   "pre_processing_config": {
-      "process": "standardize"
+      "process": "standardize",
+      "create_splits": true,
+      "target_sr": 21500
   }
 }
