@@ -7,7 +7,7 @@ import pathlib
 from tqdm import tqdm
 #for now i choose scipy as it offers a lot  without having to install additional libraries but maybe librosa can also be an option
 import scipy
-from conf import CUSTOM_SETTINGS
+from conf import CUSTOM_SETTINGS,RAVDESS_EMOTION_TO_LABEL,RAVDESS_LABEL_TO_EMOTION
 
 #TODO: add comments and dockstrings etc
 def example_run():
@@ -55,7 +55,7 @@ def process_dataset(full_dataset_path,all_subjects_dirs):
     # get the right function to use, and create path to save files to
     self_functions = {"normalize":normalize,'standardize':standardize,'only_resample':no_preprocessing}
     preprocessing_to_aply = self_functions[CUSTOM_SETTINGS['pre_processing_config']['process']]
-    pathlib.Path(f"Pre_processing\Pre_processing_Audio_Modality\datasets\preprocessed\{CUSTOM_SETTINGS['pre_processing_config']['process']}").mkdir(parents=True, exist_ok=True)
+    pathlib.Path(f"Pre_processing\Pre_processing_Audio_Modality\outputs\preprocessed\{CUSTOM_SETTINGS['pre_processing_config']['process']}").mkdir(parents=True, exist_ok=True)
 
     for phase in ['train','val','test']:
         split = splits_phase[phase]
@@ -84,8 +84,8 @@ def process_dataset(full_dataset_path,all_subjects_dirs):
             processed_file_labels = []
             for file_name,processed_audio in zip(loaded_files,all_subject_audio_standardized):
                 filename = '_'.join(file_name.split('\\')[-3:])
-                processed_file_labels.append(CUSTOM_SETTINGS['dataset_config']['label_to_emotion'][file_name.split('-')[2]])
-                filepath = f"Pre_processing\Pre_processing_Audio_Modality\datasets\preprocessed\{CUSTOM_SETTINGS['pre_processing_config']['process']}\{filename}"
+                processed_file_labels.append(RAVDESS_LABEL_TO_EMOTION[file_name.split('-')[2]])
+                filepath = f"Pre_processing\Pre_processing_Audio_Modality\outputs\preprocessed\{CUSTOM_SETTINGS['pre_processing_config']['process']}\{filename}"
                 processed_file_paths.append(filepath)
                 scipy.io.wavfile.write(filepath, CUSTOM_SETTINGS['pre_processing_config']['target_sr'], processed_audio.astype(np.float32))
 
@@ -108,6 +108,7 @@ def standardize(subject_all_audio):
     # standardize : divided by the standard deviation after the mean has been subtracted
     # 0 mean, unit variance for each speaker
 
+    #as the encoding is float32, could maybe cause under/overflow?
     mean = np.mean(np.hstack(subject_all_audio))
     std = np.std(np.hstack(subject_all_audio))
     subject_all_standardized_audio = [(au-mean)/std for au in subject_all_audio]
