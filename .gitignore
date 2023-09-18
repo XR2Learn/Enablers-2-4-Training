@@ -164,4 +164,5 @@ cython_debug/
 /SSL_Training/SSL_Audio_Modality/outputs/
 /*/*/configuration.json
 /*/*/datasets
+/*/*/outputs
 .vscode/*
