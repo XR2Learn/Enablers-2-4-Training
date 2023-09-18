@@ -8,7 +8,7 @@ import numpy as np
 import scipy
 from conf import CUSTOM_SETTINGS
 
-
+#TODO: add comments and dockstrings etc
 def example_run():
     """
     A basic print function to verify if docker is running.
@@ -77,7 +77,6 @@ def process_dataset(full_dataset_path,all_subjects_dirs):
             print(len(all_subject_audio_standardized))
             print(len(loaded_files))
 
-            # TODO: write to disk
             processed_file_names = []
             processed_file_labels = []
             for file_name,processed_audio in zip(loaded_files,all_subject_audio_standardized):
@@ -85,9 +84,8 @@ def process_dataset(full_dataset_path,all_subjects_dirs):
                 processed_file_labels.append(CUSTOM_SETTINGS['dataset_config']['label_to_emotion'][file_name.split('-')[2]])
                 filepath = f"Pre_processing\Pre_processing_Audio_Modality\datasets\preprocessed\{filename}"
                 processed_file_names.append(filename)
-                #scipy.io.wavfile.write(filepath, CUSTOM_SETTINGS['pre_processing_config']['target_sr'], processed_audio.astype(np.float32))
+                scipy.io.wavfile.write(filepath, CUSTOM_SETTINGS['pre_processing_config']['target_sr'], processed_audio.astype(np.float32))
 
-            # TODO: add to dictionary
             split['files'].extend(processed_file_names)
             split['labels'].extend(processed_file_labels)
 
