@@ -11,6 +11,8 @@ TESTING = 'Importing a variable from conf.py'
 
 MAIN_FOLDER_DEFAULT = pathlib.Path(__file__).parent.parent.absolute()
 MAIN_FOLDER = config('MAIN_FOLDER', default=MAIN_FOLDER_DEFAULT)
+DATASETS_FOLDER = os.path.join(MAIN_FOLDER,'datasets')
+OUTPUTS_FOLDER = os.path.join(MAIN_FOLDER,'outputs')
 KEY = config('KEY')
 
 # Yet to check if this is really necessary, maybe only for cases where passing values as ENV VARS is too cumbersome
