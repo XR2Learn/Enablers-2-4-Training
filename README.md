@@ -24,3 +24,7 @@ Run a docker image
 Run a docker image giving EnvVars
 
 `KEY=VALUE docker compose run --rm <service-name>`
+
+Run a docker image with shell entrypoint
+
+`docker compose run --rm <service-name> \bin\bash`
