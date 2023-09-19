@@ -1,5 +1,8 @@
 # Python code here
 import os
+import requests
+import zipfile
+import io
 import glob
 import pandas as pd
 import numpy as np
@@ -7,7 +10,7 @@ import pathlib
 from tqdm import tqdm
 #for now i choose scipy as it offers a lot  without having to install additional libraries but maybe librosa can also be an option
 import scipy
-from conf import CUSTOM_SETTINGS,RAVDESS_EMOTION_TO_LABEL,RAVDESS_LABEL_TO_EMOTION
+from conf import CUSTOM_SETTINGS,RAVDESS_EMOTION_TO_LABEL,RAVDESS_LABEL_TO_EMOTION,MAIN_FOLDER,DATASETS_FOLDER,OUTPUTS_FOLDER
 
 #TODO: add comments and dockstrings etc
 def example_run():
@@ -19,17 +22,29 @@ def example_run():
 
 def preprocess():
     dataset_name = CUSTOM_SETTINGS['dataset_config']['dataset_name']
-    full_dataset_path = f"Pre_processing\Pre_processing_Audio_Modality\datasets\{dataset_name}"
-    all_subject_dirs = os.listdir(full_dataset_path)
+    full_dataset_path = os.path.join(DATASETS_FOLDER,dataset_name)
 
+    #add check if ravdess folder exist, if not : download and create
+    if not os.path.isdir(full_dataset_path):
+        print(f"no existing {dataset_name} folder found, download will start")
+        zip_file_url = "https://zenodo.org/record/1188976/files/Audio_Speech_Actors_01-24.zip?download=1"
+        r = requests.get(zip_file_url, stream=True)
+        progress_bar = tqdm(total=int(r.headers.get('content-length', 0)), unit='B', unit_scale=True, desc='download progress of RAVDESS dataset')
+        dat = b''.join(x for x in r.iter_content(chunk_size=16384) if progress_bar.update(len(x)) or True)
+        z = zipfile.ZipFile(io.BytesIO(dat))
+        z.extractall(full_dataset_path)
+    else:
+        print(f"{dataset_name} folder exists at {full_dataset_path}, will use available data")
+
+    all_subject_dirs = os.listdir(full_dataset_path)
     print(f"found a total of {len(all_subject_dirs)} subjects inside the {dataset_name} dataset")
 
     train_split,val_split,test_split = process_dataset(full_dataset_path,all_subject_dirs)
 
     print ('writing CSV files containing the splits to storage')
-    pd.DataFrame.from_dict(train_split).to_csv("Pre_processing\Pre_processing_Audio_Modality\outputs\\train.csv")
-    pd.DataFrame.from_dict(val_split).to_csv('Pre_processing\Pre_processing_Audio_Modality\outputs\\val.csv')
-    pd.DataFrame.from_dict(test_split).to_csv('Pre_processing\Pre_processing_Audio_Modality\outputs\\test.csv')
+    pd.DataFrame.from_dict(train_split).to_csv(os.path.join(OUTPUTS_FOLDER,'train.csv'))
+    pd.DataFrame.from_dict(val_split).to_csv(os.path.join(OUTPUTS_FOLDER,'val.csv'))
+    pd.DataFrame.from_dict(test_split).to_csv(os.path.join(OUTPUTS_FOLDER,'test.csv'))
 
 def process_dataset(full_dataset_path,all_subjects_dirs):
     train_split = {'files':[],'labels':[]}
@@ -55,7 +70,7 @@ def process_dataset(full_dataset_path,all_subjects_dirs):
     # get the right function to use, and create path to save files to
     self_functions = {"normalize":normalize,'standardize':standardize,'only_resample':no_preprocessing}
     preprocessing_to_aply = self_functions[CUSTOM_SETTINGS['pre_processing_config']['process']]
-    pathlib.Path(f"Pre_processing\Pre_processing_Audio_Modality\outputs\preprocessed\{CUSTOM_SETTINGS['pre_processing_config']['process']}").mkdir(parents=True, exist_ok=True)
+    pathlib.Path(os.path.join(OUTPUTS_FOLDER,'preprocessed',CUSTOM_SETTINGS['pre_processing_config']['process'])).mkdir(parents=True, exist_ok=True)
 
     for phase in ['train','val','test']:
         split = splits_phase[phase]
@@ -75,6 +90,7 @@ def process_dataset(full_dataset_path,all_subjects_dirs):
                 resampled_audio = resample_audio_signal(audio,sr,CUSTOM_SETTINGS['pre_processing_config']['target_sr'])
                 #TODO check if resampling rate is as desired by looking at ration between origin/target +/- tolerance
                 all_subject_audio.append(resampled_audio)
+                #TODO: padding ?
 
                 loaded_files.append(audio_path)
 
@@ -85,7 +101,7 @@ def process_dataset(full_dataset_path,all_subjects_dirs):
             for file_name,processed_audio in zip(loaded_files,all_subject_audio_standardized):
                 filename = '_'.join(file_name.split('\\')[-3:])
                 processed_file_labels.append(RAVDESS_LABEL_TO_EMOTION[file_name.split('-')[2]])
-                filepath = f"Pre_processing\Pre_processing_Audio_Modality\outputs\preprocessed\{CUSTOM_SETTINGS['pre_processing_config']['process']}\{filename}"
+                filepath = os.path.join(OUTPUTS_FOLDER,'preprocessed',CUSTOM_SETTINGS['pre_processing_config']['process'],filename)
                 processed_file_paths.append(filepath)
                 scipy.io.wavfile.write(filepath, CUSTOM_SETTINGS['pre_processing_config']['target_sr'], processed_audio.astype(np.float32))
 
