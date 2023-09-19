@@ -76,7 +76,7 @@ def process_dataset(full_dataset_path,all_subjects_dirs):
         split = splits_phase[phase]
         subjects = subjects_phase[phase]
         for subject_path in tqdm(subjects,desc=f"preprocessing {phase} set"):
-            all_subject_audio_files = glob.glob(os.path.join(f"{full_dataset_path}\{subject_path}", '*.wav'))
+            all_subject_audio_files = glob.glob(os.path.join(full_dataset_path,subject_path,'*.wav'))
             all_subject_audio = []
             loaded_files = []
             for audio_path in all_subject_audio_files:
