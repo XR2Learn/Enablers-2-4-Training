@@ -89,6 +89,15 @@ def process_dataset(full_dataset_path,all_subjects_dirs):
                 #TODO: check if resampling should happen before or after standardization or not
                 resampled_audio = resample_audio_signal(audio,sr,CUSTOM_SETTINGS['pre_processing_config']['target_sr'])
                 #TODO check if resampling rate is as desired by looking at ration between origin/target +/- tolerance
+                #check if padding or cutting is necessary
+                if CUSTOM_SETTINGS['pre_processing_config']['padding']:
+                    if len(resampled_audio)>(CUSTOM_SETTINGS['pre_processing_config']['target_sr']*CUSTOM_SETTINGS['pre_processing_config']['max_length']):
+                        resampled_audio = resampled_audio[:int(CUSTOM_SETTINGS['pre_processing_config']['target_sr']*CUSTOM_SETTINGS['pre_processing_config']['max_length'])]
+                    elif len(resampled_audio)<(CUSTOM_SETTINGS['pre_processing_config']['target_sr']*CUSTOM_SETTINGS['pre_processing_config']['max_length']):
+                        temp = np.zeros((CUSTOM_SETTINGS['pre_processing_config']['target_sr']*CUSTOM_SETTINGS['pre_processing_config']['max_length'],))
+                        temp[:len(resampled_audio)]=resampled_audio
+                        resampled_audio=temp
+                
                 all_subject_audio.append(resampled_audio)
                 #TODO: padding ?
 

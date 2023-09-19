@@ -5,6 +5,8 @@
   "pre_processing_config": {
       "process": "standardize",
       "create_splits": true,
-      "target_sr": 21500
+      "target_sr": 21500,
+      "padding": true,
+      "max_length": 5
   }
 }
