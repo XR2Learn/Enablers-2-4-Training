@@ -1,14 +1,14 @@
 # Pre-processing - Audio Modality
 
-Component to pre-train an ED model using audio data input type.
+Component to pre-process audio data input type for an Emotion Detection (ED) model.
 
-`Input`: CSV file with labels + path to audio files + timestamp.
+`Input`: path to dataset.
 
-- CSV Input file should be in the folder `/datasets/<input_CSV_file.CSV>`
+- Dataset Input files should be in the folder `/datasets/<input_CSV_file.CSV>`
 
-`Output`: File with trained weights.
+`Output`: CSV file with labels + path to audio files + timestamp.
 
-- Output file with trained weights is saved in the folder `/outputs/<file_weights>`
+- CSV Output file should be in the folder `/datasets/<input_CSV_file.CSV>`
 
 # Development
 
@@ -34,4 +34,9 @@ Component to pre-train an ED model using audio data input type.
 
 1. For local run create `.env` file in the same level as `example.env` to load environment variables.
 2. Add on docker compose the environment variable name under the service `ssl-audio`
+
+
+# Comments / To-Do
+- check influence of outliers in min/max normalization
+- create (jupyter) notebook to check preprocessing/handcrafted features on selected audio files
 
