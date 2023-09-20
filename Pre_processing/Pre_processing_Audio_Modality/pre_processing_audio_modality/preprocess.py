@@ -89,7 +89,7 @@ def process_dataset(full_dataset_path,all_subjects_dirs):
     # get the right function to use, and create path to save files to is doesnt exist
     self_functions = {"normalize":normalize,'standardize':standardize,'only_resample':no_preprocessing}
     preprocessing_to_aply = self_functions[CUSTOM_SETTINGS['pre_processing_config']['process']]
-    pathlib.Path(os.path.join(OUTPUTS_FOLDER,'preprocessed',CUSTOM_SETTINGS['pre_processing_config']['process'])).mkdir(parents=True, exist_ok=True)
+    pathlib.Path(os.path.join(OUTPUTS_FOLDER,'pre-processing-audio',CUSTOM_SETTINGS['pre_processing_config']['process'])).mkdir(parents=True, exist_ok=True)
 
     # go over each phase/split
     for phase in ['train','val','test']:
@@ -132,7 +132,7 @@ def process_dataset(full_dataset_path,all_subjects_dirs):
             for file_name,processed_audio in zip(loaded_files,all_subject_audio_processed):
                 filename = '_'.join(file_name.split(os.sep)[-3:])
                 processed_file_labels.append(RAVDESS_LABEL_TO_EMOTION[file_name.split('-')[2]])
-                filepath = os.path.join(OUTPUTS_FOLDER,'preprocessed',CUSTOM_SETTINGS['pre_processing_config']['process'],filename)
+                filepath = os.path.join(OUTPUTS_FOLDER,'pre-processing-audio',CUSTOM_SETTINGS['pre_processing_config']['process'],filename)
                 processed_file_paths.append(os.path.join(*filepath.split(os.sep)[-4:]))
                 scipy.io.wavfile.write(filepath, CUSTOM_SETTINGS['pre_processing_config']['target_sr'], processed_audio.astype(np.float32))
 
