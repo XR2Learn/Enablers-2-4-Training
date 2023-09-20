@@ -37,5 +37,6 @@ Component to pre-process audio data input type for an Emotion Detection (ED) mod
 
 
 # Comments / To-Do
-
+- check influence of outliers in min/max normalization
+- create (jupyter) notebook to check preprocessing/handcrafted features on selected audio files
 
