@@ -1,8 +1,15 @@
 {
-  "model_config": {
-  },
   "dataset_config": {
+      "dataset_name": "RAVDESS"
   },
   "pre_processing_config": {
+      "process": "standardize",
+      "create_splits": true,
+      "target_sr": 21500,
+      "padding": true,
+      "max_length": 5
+  },
+  "handcrafted_features_config":{
+      "features_to_extract":["MFCC,eGeMAPs"]
   }
 }
