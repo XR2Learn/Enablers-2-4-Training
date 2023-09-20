@@ -35,3 +35,7 @@ Component to pre-process audio data input type for an Emotion Detection (ED) mod
 1. For local run create `.env` file in the same level as `example.env` to load environment variables.
 2. Add on docker compose the environment variable name under the service `ssl-audio`
 
+
+# Comments / To-Do
+
+
