@@ -1,0 +1,2 @@
+python-decouple==3.6
+-e file:./#egg=supervised_body_tracking_modality

@@ -12,6 +12,21 @@ services:
     environment:
       - KEY=${KEY}
   #    entrypoint: /bin/sh -c
+    command: python supervised_audio_modality/train.py
+
+  ed-training-body-tracking:
+    image: some.registry.com/xr2learn-enablers/ed-training-body-tracking:latest
+    #    runtime: nvidia
+    build:
+      context: 'Supervised_Training/Supervised_Body_Tracking_Modality'
+      dockerfile: 'Dockerfile'
+    volumes:
+      - "./Supervised_Training/Supervised_Body_Tracking_Modality:/app"
+    working_dir: /app
+    environment:
+      - KEY=${KEY}
+    #    entrypoint: /bin/sh -c
+    command: python supervised_body_tracking_modality/train.py
 
   ssl-audio:
     image: some.registry.com/xr2learn-enablers/ssl-audio:latest
