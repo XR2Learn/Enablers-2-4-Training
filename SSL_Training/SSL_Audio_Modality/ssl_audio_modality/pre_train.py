@@ -9,7 +9,7 @@ def example_run():
     :return: None
     """
     model_config = CUSTOM_SETTINGS['model']['some_config_model']
-    print(f'Docker for SSL-Pre-Training Audio has run. Conf from configuration.json file: {model_config}')
+    print(f'Docker for SSL-Pre-Training Audio has run (Enabler 2). Conf from configuration.json file: {model_config}')
 
 
 if __name__ == '__main__':

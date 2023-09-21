@@ -9,7 +9,7 @@ def example_run():
     :return: None
     """
     model_config = CUSTOM_SETTINGS['pre_processing']['some_config_preprocessing']
-    print(f'Docker for features generation Audio has run. Conf from configuration.json file: {model_config}')
+    print(f'Docker for features generation Audio has run (Enabler 3). Conf from configuration.json file: {model_config}')
 
 
 if __name__ == '__main__':
