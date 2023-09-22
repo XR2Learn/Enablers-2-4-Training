@@ -6,8 +6,7 @@ from random import sample
 #                                             IEMOCAPTorchDataset)
 #from emorec_toolbox.datasets.wesad import WESADDataModule, WESADTorchDataset
 #from emorec_toolbox.models.mlp import LinearClassifier, MLPClassifier
-from augmentations import \
-    compose_random_augmentations
+from utils.augmentations import compose_random_augmentations
 from pytorch_lightning.loggers import CSVLogger
 from torchvision import transforms
 
@@ -89,13 +88,13 @@ def get_encoders(model_cfg):
 
 
 # Transforms and augmentations
-def init_transforms(modality, transforms_cfg, ssl_random_augmentations=False, random_augmentations_dict={}):
+def init_transforms(transforms_cfg, ssl_random_augmentations=False, random_augmentations_dict={}):
     # TODO: Docstring
     train = []
     test = []
     if transforms_cfg is not None:
         for t in transforms_cfg:
-            module = importlib.import_module(f"emorec_toolbox.utils.{t['from_module']}")
+            module = importlib.import_module(f"utils.{t['from_module']}")
             class_ = getattr(module, t['class_name'])
 
             if "kwargs" in t:
@@ -106,15 +105,18 @@ def init_transforms(modality, transforms_cfg, ssl_random_augmentations=False, ra
             train.append(transform)
             if t['in_test']:
                 test.append(transform)
+                
+            print(f"added {t['class_name']} transformation")
+
     # if ssl_random_augmentations:
     #     train.extend(compose_random_augmentations(modality, random_augmentations_dict))
     composed_train_transform = transforms.Compose(train)
     composed_test_transform = transforms.Compose(test)
 
-    train_transforms = {modality: composed_train_transform }
-    test_transforms = {modality: composed_test_transform }
+    #train_transforms = {modality: composed_train_transform }
+    #test_transforms = {modality: composed_test_transform }
 
-    return train_transforms, test_transforms
+    return composed_train_transform,composed_test_transform
 
 
 def init_augmentations(aug_dict):
