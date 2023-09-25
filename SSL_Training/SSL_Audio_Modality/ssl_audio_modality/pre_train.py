@@ -1,4 +1,5 @@
 # Python code here
+import os
 
 from pytorch_lightning import Trainer, seed_everything
 from conf import CUSTOM_SETTINGS,MAIN_FOLDER
@@ -53,8 +54,8 @@ def run_pre_training():
     #init callbacks  # initialize callbacks
     callbacks = setup_callbacks(
         early_stopping_metric="val_loss",
-        no_ckpt=True,
-        patience=5
+        no_ckpt=False,
+        patience=5,
     )
     # initialize Pytorch-Lightning Training
     trainer = Trainer(
@@ -63,7 +64,7 @@ def run_pre_training():
         #devices=None if args.gpus == 0 else args.gpus,
         #deterministic=True, 
         #max_epochs=num_epochs, 
-        #default_root_dir=args.outputs_path, 
+        default_root_dir=os.path.join(MAIN_FOLDER,'outputs','SSL_Training'),
         callbacks=callbacks,
         max_epochs=5
     )
