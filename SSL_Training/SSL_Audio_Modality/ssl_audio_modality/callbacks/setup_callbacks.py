@@ -42,6 +42,8 @@ def setup_model_checkpoint_callback_last(dirpath=None):
     pytorch_lightning.callbacks.ModelCheckpoint
         initialized callback
     """
+    print("HAHAHAHA BRRRRRRRRRRRRRRRR")
+    print(dirpath)
     return ModelCheckpoint(
         dirpath=dirpath,
         save_last=True,
