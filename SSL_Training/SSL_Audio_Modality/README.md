@@ -36,3 +36,6 @@ Component to pre-train an ED model using audio data input type.
 
 1. For local run create `.env` file in the same level as `example.env` to load environment variables.
 2. Add on docker compose the environment variable name under the service `ssl-audio`
+
+# TODO
+    -   restore/save best checkpoint
