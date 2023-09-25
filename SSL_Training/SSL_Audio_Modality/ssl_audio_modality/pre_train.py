@@ -1,5 +1,6 @@
 # Python code here
 import os
+import torch
 
 from pytorch_lightning import Trainer, seed_everything
 from conf import CUSTOM_SETTINGS,MAIN_FOLDER
@@ -32,7 +33,7 @@ def run_pre_training():
 
     datamodule = SSLDataModule(
         path=MAIN_FOLDER,
-        batch_size=128,
+        batch_size=CUSTOM_SETTINGS['ssl_config']['batch_size'],
         split=splith_paths,
         train_transforms=train_transforms,
         test_transforms=test_transforms,
@@ -48,25 +49,24 @@ def run_pre_training():
                     stride=4
                     )
     #initialise ssl model with configured SLL method
-    ssl_model = SimCLR(encoder=encoder,ssl_batch_size=128)
+    ssl_model = SimCLR(encoder=encoder,ssl_batch_size=CUSTOM_SETTINGS['ssl_config']['batch_size'],**CUSTOM_SETTINGS['ssl_config']['kwargs'])
 
     print(ssl_model)
     #init callbacks  # initialize callbacks
     callbacks = setup_callbacks(
         early_stopping_metric="val_loss",
         no_ckpt=False,
-        patience=5,
+        patience=15,
     )
     # initialize Pytorch-Lightning Training
     trainer = Trainer(
         #logger=loggers,
         #accelerator='cpu' if args.gpus == 0 else 'gpu',
         #devices=None if args.gpus == 0 else args.gpus,
-        #deterministic=True, 
-        #max_epochs=num_epochs, 
+        deterministic=True, 
         default_root_dir=os.path.join(MAIN_FOLDER,'outputs','SSL_Training'),
         callbacks=callbacks,
-        max_epochs=5
+        max_epochs=CUSTOM_SETTINGS['ssl_config']['epochs']
     )
 
     # pre-train and report test loss
@@ -74,9 +74,9 @@ def run_pre_training():
     metrics = trainer.test(ssl_model, datamodule, ckpt_path='best')
     print(metrics)
 
-    #train ssl model
-    #save the encoder weights
-    pass
+    #save weights
+    torch.save(encoder.state_dict(), os.path.join(MAIN_FOLDER,'outputs','SSL_Training','test_encoder.pt'))
+
 
 if __name__ == '__main__':
     run_pre_training()

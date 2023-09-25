@@ -176,7 +176,7 @@ def compose_random_augmentations(config_dict, prob=0.5):
     for key in config_dict:
         if key in augmentations_dict.keys():
             if 'parameters' in config_dict[key]:
-                augmentation = augmentations_dict[key](**config_dict[key]['parameters'])
+                augmentation = augmentations_dict[key](**config_dict[key]['kwargs'])
             else:
                 augmentation = augmentations_dict[key]()
             print(f"added {key} augmentation")
