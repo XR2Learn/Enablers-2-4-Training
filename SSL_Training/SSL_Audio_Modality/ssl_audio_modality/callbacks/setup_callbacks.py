@@ -7,7 +7,8 @@ from pytorch_lightning.callbacks.early_stopping import EarlyStopping
 def setup_callbacks(
         early_stopping_metric,
         no_ckpt, 
-        patience=100
+        patience=100,
+        dirpath=None
     ):
     """ Setup callbacks for pytorch_lightning.Trainer
 
@@ -29,11 +30,11 @@ def setup_callbacks(
     mode = 'min' if 'loss' in early_stopping_metric else 'max'
     callbacks.append(setup_early_stopping_callback(early_stopping_metric, mode=mode, patience=patience))
     if not no_ckpt:
-        callbacks.append(setup_model_checkpoint_callback_last())
+        callbacks.append(setup_model_checkpoint_callback_last(dirpath=dirpath))
     return callbacks
 
 
-def setup_model_checkpoint_callback_last():
+def setup_model_checkpoint_callback_last(dirpath=None):
     """ Setup last epoch model checkpoint
 
     Returns
@@ -41,7 +42,10 @@ def setup_model_checkpoint_callback_last():
     pytorch_lightning.callbacks.ModelCheckpoint
         initialized callback
     """
+    print("HAHAHAHA BRRRRRRRRRRRRRRRR")
+    print(dirpath)
     return ModelCheckpoint(
+        dirpath=dirpath,
         save_last=True,
         filename="{epoch}"
     )	
