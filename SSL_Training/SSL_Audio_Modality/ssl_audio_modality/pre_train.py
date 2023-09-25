@@ -50,7 +50,6 @@ def run_pre_training():
                     )
     #initialise ssl model with configured SLL method
     ssl_model = SimCLR(encoder=encoder,ssl_batch_size=CUSTOM_SETTINGS['ssl_config']['batch_size'],**CUSTOM_SETTINGS['ssl_config']['kwargs'])
-    ssl_model = SimCLR(encoder=encoder,ssl_batch_size=CUSTOM_SETTINGS['ssl_config']['batch_size'],**CUSTOM_SETTINGS['ssl_config']['kwargs'])
 
     print(ssl_model)
     #init callbacks  # initialize callbacks
@@ -67,7 +66,6 @@ def run_pre_training():
         deterministic=True, 
         default_root_dir=os.path.join(MAIN_FOLDER,'outputs','SSL_Training'),
         callbacks=callbacks,
-        max_epochs=CUSTOM_SETTINGS['ssl_config']['epochs']
         max_epochs=CUSTOM_SETTINGS['ssl_config']['epochs']
     )
 
