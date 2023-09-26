@@ -8,6 +8,10 @@ EMOTIONS_RAVDESS = {1: 'neutral', 2: 'calm', 3: 'happy', 4: 'sad',
                     8: 'surprise'}
 EMOTION_INTENSITY_RAVDESS = {1: 'normal', 2: "strong"}
 
+LABEL_TO_ID = {'RAVDESS' : {'neutral':0,'calm':1,'happy':2,'sad':3,
+                    'angry':4,'fear':5, 'disgust':6,
+                    'surprise':7}}
+
 SAMPLE_RATE_RAVDESS = 48000
 DURATION_AUDIO_RAVDESS = 3
 
