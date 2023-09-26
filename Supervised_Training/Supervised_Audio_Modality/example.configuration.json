@@ -13,6 +13,15 @@
   "handcrafted_features_config":{
       "features_to_extract":["MFCC,eGeMAPs"]
   },
+  "encoder_config": {
+      "encoder_name":"cnn1d",
+      "kwargs":{
+          "in_channels":1,
+          "out_channels":[2,2,2],
+          "kernel_sizes":[7,7,7],
+          "stride": 4
+      }
+  },
   "ssl_config":{
       "method":"SimCLR",
       "epochs":20,
