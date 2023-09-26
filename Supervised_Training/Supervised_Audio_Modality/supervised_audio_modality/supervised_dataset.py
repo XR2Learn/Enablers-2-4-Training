@@ -6,6 +6,7 @@ from torch.utils.data import Dataset, DataLoader
 import scipy
 
 from pytorch_lightning import LightningDataModule
+from conf import CUSTOM_SETTINGS,LABEL_TO_ID
 
 class SupervisedTorchDataset(Dataset):
     """ Torch dataset class for WESAD
@@ -68,8 +69,8 @@ class SupervisedTorchDataset(Dataset):
 
         self.data = [self.transforms(frame) if self.transforms else frame for frame in self.data]
 
-        # re-arrange recordings and merge across subjects
-
+        label_mapping = LABEL_TO_ID[CUSTOM_SETTINGS['dataset_config']['dataset_name']]
+        self.labels = [label_mapping[label] for label in self.labels]
         
     def __len__(self):
         return len(self.labels)
@@ -79,7 +80,6 @@ class SupervisedTorchDataset(Dataset):
         if self.augmentations is not None:
             aug1 = {k:self.augmentations(v) for k,v in self.data[idx].items()} 
             aug2 = {k:self.augmentations(v) for k,v in self.data[idx].items()} if self.n_views == 2 else self.data[idx]
-
         output = (
             aug1 if self.augmentations is not None else self.data[idx],
             self.labels[idx],
