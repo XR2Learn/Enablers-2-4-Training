@@ -1,7 +1,8 @@
-import torch
 import torch.nn as nn
+from pytorch_lightning import LightningModule
 
-class MLPClassifier(nn.Module):
+
+class MLPClassifier(LightningModule):
     """ MLP for classification
     """
     def __init__(self, in_size, out_size, hidden=[256, 128]):
