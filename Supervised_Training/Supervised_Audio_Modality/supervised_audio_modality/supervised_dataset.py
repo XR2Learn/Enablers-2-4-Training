@@ -149,7 +149,7 @@ class SupervisedDataModule(LightningDataModule):
         self._init_dataloaders(stage)
         
     def _create_train_dataset(self):
-        print('Reading SSL train data:')
+        print('Reading Supervised train data:')
         return SupervisedTorchDataset(self.path, 
                                  self.split['train'], 
                                  transforms=self.train_transforms,
@@ -157,7 +157,7 @@ class SupervisedDataModule(LightningDataModule):
                                  n_views=self.n_views,)
     
     def _create_val_dataset(self):
-        print('Reading SSL val data:')
+        print('Reading Supervised val data:')
         return SupervisedTorchDataset(self.path, 
                                  self.split['val'],  
                                  transforms=self.test_transforms,
@@ -165,7 +165,7 @@ class SupervisedDataModule(LightningDataModule):
                                  n_views=self.n_views,)
     
     def _create_test_dataset(self):
-        print('Reading SSL test data:')
+        print('Reading Supervised test data:')
         return SupervisedTorchDataset(self.path, 
                                  self.split['test'], 
                                  transforms=self.test_transforms,
