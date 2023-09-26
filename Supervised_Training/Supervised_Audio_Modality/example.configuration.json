@@ -1,6 +1,7 @@
 {
   "dataset_config": {
-      "dataset_name": "RAVDESS"
+      "dataset_name": "RAVDESS",
+      "number_of_labels":8
   },
   "pre_processing_config": {
       "process": "standardize",
@@ -21,6 +22,15 @@
         "n_views":2,
         "temperature":0.05,
         "optimizer_name_ssl":"adam"
+      }
+  },
+  "sup_config":{
+      "epochs":20,
+      "batch_size":128,
+      "kwargs":{
+        "lr":0.0001,
+        "optimizer_name":"adam",
+        "freeze_encoder": true
       }
   },
   "augmentations":{
