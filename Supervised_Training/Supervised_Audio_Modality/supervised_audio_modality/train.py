@@ -44,13 +44,17 @@ def run_supervised_training():
                     len_seq=CUSTOM_SETTINGS["pre_processing_config"]['max_length']*CUSTOM_SETTINGS["pre_processing_config"]['target_sr'],
                     out_channels=[2,2,2],
                     kernel_sizes=[7,7,7],
-                    stride=4
+                    stride=4,
+                    #TODO: find way to integrate path to json config file and use path.os.join()
+                    # or get the infor from the pretraining used
+                    pretrained="Supervised_Training\Supervised_Audio_Modality\outputs\SSL_Training\\test_encoder.pt"
                     )
+    
     #add classification head to encoder
-    classifier = LinearClassifier(encoder.out_size,8) 
-    model = classification_model(encoder=encoder,classifier=classifier)
+    classifier = LinearClassifier(encoder.out_size,CUSTOM_SETTINGS['dataset_config']['number_of_labels']) 
+    model = classification_model(encoder=encoder,classifier=classifier,**CUSTOM_SETTINGS['sup_config']['kwargs'])
 
-    #print(ssl_model)
+    #print(model)
     #init callbacks  # initialize callbacks
     callbacks = setup_callbacks(
         early_stopping_metric="val_loss",

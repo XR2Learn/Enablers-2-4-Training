@@ -8,6 +8,7 @@ class classification_model(LightningModule):
     def __init__(self, encoder, classifier,
             optimizer_name='adam',
             lr=0.001,
+            freeze_encoder=True,
             **kwargs):
         super().__init__()
         self.name = 'classification_model'
@@ -18,6 +19,11 @@ class classification_model(LightningModule):
         self.optimizer_name = optimizer_name
         self.lr = lr
         self.loss = torch.nn.CrossEntropyLoss()
+
+        if freeze_encoder:
+            for param in self.encoder.parameters():
+                param.requires_grad = False
+            print("succesfully froze the parameters for the encoder")
 
     def forward(self, x):
         x = self.encoder(x)
