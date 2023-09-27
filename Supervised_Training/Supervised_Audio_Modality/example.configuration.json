@@ -37,21 +37,24 @@
     "sup_config":{
         "epochs":20,
         "batch_size":128,
+        "use_augmentations_in_sup": true,
         "kwargs":{
           "lr":0.0001,
           "optimizer_name":"adam",
-          "freeze_encoder": true
+          "freeze_encoder": false
         }
     },
     "augmentations":{
             "gaussian_noise":{
-              "kwargs":{
+                "probability":0.33,
+                "kwargs":{
                   "mean":0,
                   "std":0.2
               }
           },
             "scale":{
-              "kwargs":{
+                "probability":0.4,
+                "kwargs":{
                   "max_scale": 1.3
               }
           }
