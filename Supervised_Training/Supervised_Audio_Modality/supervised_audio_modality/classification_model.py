@@ -24,6 +24,8 @@ class classification_model(LightningModule):
             for param in self.encoder.parameters():
                 param.requires_grad = False
             print("succesfully froze the parameters for the encoder")
+        else:
+            print("NO paramaters frozen")
 
     def forward(self, x):
         x = self.encoder(x)

@@ -57,6 +57,8 @@ class CNN1D(LightningModule):
         if pretrained is not None:
             self.load_state_dict(torch.load(pretrained))
             print(f'succesfully loaded weights from {pretrained}')
+        else:
+            print("NO pretrained weights loaded")
 
     @staticmethod
     def _compute_out_size(sample_length, padding, kernel_sizes, stride, num_layers, num_channels, pool_size, pool_padding):
