@@ -26,8 +26,11 @@ def run_supervised_training():
         train_transforms,test_transforms = init_transforms(CUSTOM_SETTINGS['transforms'])
 
     # for now, don't use augmentations during supervised training
-    #if 'augmentations' in CUSTOM_SETTINGS.keys():
-    #    augmentations = init_augmentations(CUSTOM_SETTINGS['augmentations'])
+    if  (CUSTOM_SETTINGS['sup_config']['use_augmentations_in_sup'] == True) and ('augmentations' in CUSTOM_SETTINGS.keys()):
+        augmentations = init_augmentations(CUSTOM_SETTINGS['augmentations'])
+        print("augmentations loaded succesfully")
+    else:
+        print("NO augmentations loaded")
 
     datamodule = SupervisedDataModule(
         path=MAIN_FOLDER,
@@ -37,13 +40,11 @@ def run_supervised_training():
         test_transforms=test_transforms,
         n_views=2,
         num_workers=2,
-        #augmentations=augmentations
+        augmentations=augmentations
     )
     #initialise encoder
     encoder = CNN1D(len_seq=CUSTOM_SETTINGS["pre_processing_config"]['max_length']*CUSTOM_SETTINGS["pre_processing_config"]['target_sr'],
-                    #TODO: find way to integrate path to json config file and use path.os.join()
-                    # or get the infor from the pretraining used
-                    pretrained="Supervised_Training\Supervised_Audio_Modality\outputs\SSL_Training\\test_encoder.pt",
+                    pretrained=CUSTOM_SETTINGS['encoder_config']['pretrained'] if "pretrained" in CUSTOM_SETTINGS['encoder_config'].keys() else None,
                     **CUSTOM_SETTINGS["encoder_config"]['kwargs']
                     )
     
