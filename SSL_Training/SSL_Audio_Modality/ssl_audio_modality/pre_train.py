@@ -77,10 +77,6 @@ def run_pre_training():
     #save weights
     torch.save(encoder.state_dict(), os.path.join(MAIN_FOLDER,'outputs','SSL_Training','test_encoder.pt'))
 
-    pass
-    #save weights
-    torch.save(encoder.state_dict(), os.path.join(MAIN_FOLDER,'outputs','SSL_Training','test_encoder.pt'))
-
 
 if __name__ == '__main__':
     run_pre_training()
