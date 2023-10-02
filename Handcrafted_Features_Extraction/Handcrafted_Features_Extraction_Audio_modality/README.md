@@ -6,9 +6,9 @@ Component to pre-train an ED model using audio data input type.
 
 - CSV Input file should be in the folder `/datasets/<input_CSV_file.CSV>`
 
-`Output`: File with trained weights.
+`Output`: CSV files (train.csv, test.csv, val.csv) with labels + path to features extracted, per features type. 
 
-- Output file with trained weights is saved in the folder `/outputs/<file_weights>`
+- Output files should be saved in the folder `/outputs/handcrafted-features-generation-audio/`
 
 # Development
 
@@ -35,3 +35,5 @@ Component to pre-train an ED model using audio data input type.
 1. For local run create `.env` file in the same level as `example.env` to load environment variables.
 2. Add on docker compose the environment variable name under the service `ssl-audio`
 
+# TODO
+ - change features to extract from listy to keys/dicts with parameters
