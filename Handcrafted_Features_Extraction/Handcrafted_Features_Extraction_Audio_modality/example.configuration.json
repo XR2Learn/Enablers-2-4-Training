@@ -10,6 +10,6 @@
       "max_length": 5
   },
   "handcrafted_features_config":{
-      "features_to_extract":["MFCC,eGeMAPs"]
+      "features_to_extract":["MFCC" ,"eGeMAPs"]
   }
 }
