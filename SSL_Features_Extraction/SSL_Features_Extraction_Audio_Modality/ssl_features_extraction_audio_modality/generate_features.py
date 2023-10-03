@@ -45,10 +45,11 @@ def generate_and_save(encoder,csv_path,out_path):
     for data_path in tqdm(meta_data['files']):
         #TODO : change .wav to .npy and use numpy everywhere for reading in files
         #TODO : find replacement for .replace('\\','/')) to have a seperator that works on all OS
-        x = scipy.io.wavfile.read(os.path.join(MAIN_FOLDER,data_path).replace('\\','/'))[1]
-        x_tensor = torch.tensor(np.expand_dims(x,axis=0))
+        x = np.load(os.path.join(MAIN_FOLDER,data_path).replace('\\','/'))
+        x_tensor = torch.tensor(np.expand_dims(x,axis=0) if len(x.shape)<=1 else x)
         features = encoder(x_tensor)
-        np.save(os.path.join(out_path,data_path.replace('\\','/').split(os.path.sep)[-1][:-3]+'npy'),features.detach().numpy())
+        #print(data_path.split(os.path.sep))
+        np.save(os.path.join(out_path,data_path.split(os.path.sep)[-1]),features.detach().numpy())
 
 
 if __name__ == '__main__':
