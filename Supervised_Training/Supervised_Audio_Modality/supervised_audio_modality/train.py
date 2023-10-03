@@ -41,7 +41,7 @@ def run_supervised_training():
         train_transforms=train_transforms,
         test_transforms=test_transforms,
         n_views=2,
-        num_workers=2,
+        num_workers=0,
         augmentations=augmentations
     )
     # initialise encoder
