@@ -9,7 +9,7 @@ from torch import Tensor
 import torch.nn as nn
 from torch.optim import SGD
 
-from conf import MAIN_FOLDER
+from supervised_audio_modality.conf import MAIN_FOLDER
 
 
 # dataset definition
