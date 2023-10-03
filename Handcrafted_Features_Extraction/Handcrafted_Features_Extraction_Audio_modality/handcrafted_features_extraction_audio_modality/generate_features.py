@@ -2,9 +2,8 @@
 import os
 import numpy as np
 import pathlib
-import scipy
+import torch
 import opensmile
-import torchaudio
 import torchaudio.transforms as transforms
 
 from tqdm import tqdm
@@ -27,7 +26,8 @@ def extract_handcrafted_features():
 
     all_data_paths = os.listdir(processed_data_folder)
     print(f"Found a total of {len(all_data_paths)} files inside the {processed_data_folder} folder.")
-    features_to_extract = CUSTOM_SETTINGS["handcrafted_features_config"]["features_to_extract"]
+    features_to_extract = CUSTOM_SETTINGS["handcrafted_features_config"].keys()
+
     print(f"Features {features_to_extract}, if supported, will be extracted and saved.")
 
     full_data_paths = [os.path.join(processed_data_folder, data_path) for data_path in all_data_paths]
@@ -60,13 +60,12 @@ def extract_and_save_MFCC(all_data_paths, save_folder):
         subject_all_normalized_audio: a list containing the normalized numpy arrays with all the audio data of the subject
     """
     for data_path in tqdm(all_data_paths, desc='Extracting MFCCs'):
-        waveform, sample_rate = torchaudio.load(data_path)
+        waveform = torch.tensor(np.load(data_path))
         transform = transforms.MFCC(
-            sample_rate=sample_rate,
-            n_mfcc=13,
-            melkwargs={"n_fft": 400, "hop_length": 160, "n_mels": 23, "center": False})
+             **CUSTOM_SETTINGS["handcrafted_features_config"]['MFCC']
+        )
         mfcc = transform(waveform).numpy()
-        np.save(os.path.join(save_folder, data_path.split(os.path.sep)[-1][:-4]), mfcc)
+        np.save(os.path.join(save_folder, data_path.split(os.path.sep)[-1]), mfcc)
 
 
 def extract_and_save_spectogram(all_data_paths, save_folder):
@@ -80,24 +79,25 @@ def extract_and_save_spectogram(all_data_paths, save_folder):
         subject_all_normalized_audio: a list containing the normalized numpy arrays with all the audio data of the subject
     """
     for data_path in tqdm(all_data_paths, desc='Extracting Spectograms'):
-        waveform, sample_rate = torchaudio.load(data_path)
+        waveform = torch.tensor(np.load(data_path))
+        #TODO: add custom settings
         transform = transforms.Spectrogram(n_fft=400)
         spectogram = transform(waveform).numpy()
-        np.save(os.path.join(save_folder, data_path.split(os.path.sep)[-1][:-4]), spectogram)
+        np.save(os.path.join(save_folder, data_path.split(os.path.sep)[-1]), spectogram)
 
 
 def extract_and_save_egemaps(all_data_paths, save_folder):
     for data_path in tqdm(all_data_paths, desc='Extracting eGeMAPs'):
-        sr, audio = scipy.io.wavfile.read(data_path)
+        waveform = np.load(data_path)
         smile_egemaps = opensmile.Smile(
             feature_set=opensmile.FeatureSet.eGeMAPSv02,
             feature_level=opensmile.FeatureLevel.Functionals,
         )
         # TODO: double check if the padding actually gets trimmed
         # TODO: check if egemaps need standardized N(mean=0,std=1) or normalized[-1,1] audio
-        audio = np.trim_zeros(audio)
-        egemaps = smile_egemaps.process_signal(audio, sr)
-        np.save(os.path.join(save_folder, data_path.split(os.path.sep)[-1][:-4]), egemaps)
+        waveform = np.trim_zeros(waveform)
+        egemaps = smile_egemaps.process_signal(waveform, **CUSTOM_SETTINGS["handcrafted_features_config"]['eGeMAPs'])
+        np.save(os.path.join(save_folder, data_path.split(os.path.sep)[-1]), egemaps)
 
 
 if __name__ == '__main__':

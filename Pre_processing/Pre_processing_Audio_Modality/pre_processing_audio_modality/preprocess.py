@@ -132,9 +132,9 @@ def process_dataset(full_dataset_path,all_subjects_dirs):
             for file_name,processed_audio in zip(loaded_files,all_subject_audio_processed):
                 filename = '_'.join(file_name.split(os.sep)[-3:])
                 processed_file_labels.append(RAVDESS_LABEL_TO_EMOTION[file_name.split('-')[3]])
-                filepath = os.path.join(OUTPUTS_FOLDER,'pre-processing-audio',CUSTOM_SETTINGS['pre_processing_config']['process'],filename)
+                filepath = os.path.join(OUTPUTS_FOLDER,'pre-processing-audio',CUSTOM_SETTINGS['pre_processing_config']['process'],filename[:-3]+'npy')
                 processed_file_paths.append(os.path.join(*filepath.split(os.sep)[-4:]))
-                scipy.io.wavfile.write(filepath, CUSTOM_SETTINGS['pre_processing_config']['target_sr'], processed_audio.astype(np.float32))
+                np.save(filepath, processed_audio.astype(np.float32))
 
             split['files'].extend(processed_file_paths)
             split['labels'].extend(processed_file_labels)
