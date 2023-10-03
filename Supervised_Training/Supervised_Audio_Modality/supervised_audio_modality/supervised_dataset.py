@@ -3,7 +3,6 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm
 from torch.utils.data import Dataset, DataLoader
-import scipy
 
 from pytorch_lightning import LightningDataModule
 from conf import CUSTOM_SETTINGS,LABEL_TO_ID
@@ -61,7 +60,7 @@ class SupervisedTorchDataset(Dataset):
         self.data=[]
         for p in tqdm(data_paths,total=meta_data.shape[0]):
             #TODO: change the save format of audio files to .npy to have a more generic way to read all sorts of data/modalities
-            sr,audio = scipy.io.wavfile.read(os.path.join(self.data_path,p).replace('\\','/'))
+            audio = np.load(os.path.join(self.data_path,p).replace('\\','/'))
             if len(audio.squeeze().shape)==1:
                 audio = np.expand_dims(audio,axis=-1)
                 #print(np.expand_dims(audio,axis=-1).shape)
