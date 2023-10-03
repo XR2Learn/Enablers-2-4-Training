@@ -54,11 +54,14 @@ class CNN1D(LightningModule):
 
         self.out_size = self._compute_out_size(len_seq, padding, self.kernel_sizes, stride, 3, out_channels[-1], pool_size, pool_padding)
 
-        if pretrained is not None:
-            self.load_state_dict(torch.load(pretrained))
-            print(f'succesfully loaded weights from {pretrained}')
-        else:
-            print("NO pretrained weights loaded")
+        try:
+            if pretrained is not None:
+                self.load_state_dict(torch.load(pretrained.replace('\\','/')))
+                print(f'succesfully loaded weights from {pretrained}')
+            else:
+                print("NO pretrained weights loaded")
+        except:
+            print(f'failed to loaded weights from {pretrained}, encoder initialised with random weights')
 
     @staticmethod
     def _compute_out_size(sample_length, padding, kernel_sizes, stride, num_layers, num_channels, pool_size, pool_padding):
