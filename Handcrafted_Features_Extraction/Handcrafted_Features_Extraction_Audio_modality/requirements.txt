@@ -1,8 +1,8 @@
 python-decouple==3.6
-scipy==1.11.1
 numpy<1.28.0,>=1.21.6
 tqdm==4.65.0
 requests==2.31.0
+torch==2.0.1
 torchaudio==2.0.2
 soundfile==0.12.1
 sox==1.4.1
