@@ -15,7 +15,7 @@ def generate_ssl_features():
 
     #load model
 
-    #iterate oevr data
+    #iterate over data
         # get features
         # save features to disk
         # write to csv
