@@ -16,6 +16,44 @@ from supervised_audio_modality.conf import MAIN_FOLDER
 class CSVDataset(Dataset):
     # load the dataset
     def __init__(self, path):
+        self.X = None
+        self.y = None
+        self.load_x_y_from_csv(path)
+        # load the csv file as a dataframe
+        # df = read_csv(path)
+        # # store the inputs and outputs
+        # self.X = df['Features Path']
+        # self.y = df['Emotion']
+        # # label encode target and ensure the values are floats
+        # self.y = LabelEncoder().fit_transform(self.y)
+        # self.y = self.y.astype('float32')
+        # self.y = self.y.reshape((len(self.y), 1))
+
+    # number of rows in the dataset
+    def __len__(self):
+        return len(self.X)
+
+    # get a row at an index
+    def __getitem__(self, idx):
+        example_features = self.get_example_features(idx)
+        label = self.y[idx]
+        return [example_features, label]
+
+    def get_example_features(self, idx):
+        # Loading the features from file
+        example_features = np.load(self.X[idx], allow_pickle=True, fix_imports=False)
+        example_features = example_features.squeeze(axis=1)
+        return example_features
+
+    # get indexes for train and test rows
+    def get_splits(self, n_test=0.33):
+        # determine sizes
+        test_size = round(n_test * len(self.X))
+        train_size = len(self.X) - test_size
+        # calculate the split
+        return random_split(self, [train_size, test_size])
+
+    def load_x_y_from_csv(self, path):
         # load the csv file as a dataframe
         df = read_csv(path)
         # store the inputs and outputs
@@ -25,26 +63,7 @@ class CSVDataset(Dataset):
         self.y = LabelEncoder().fit_transform(self.y)
         self.y = self.y.astype('float32')
         self.y = self.y.reshape((len(self.y), 1))
-
-    # number of rows in the dataset
-    def __len__(self):
-        return len(self.X)
-
-    # get a row at an index
-    def __getitem__(self, idx):
-        # Loading the features from file
-        example_features = np.load(self.X[idx], allow_pickle=True, fix_imports=False)
-        example_features = example_features.squeeze(axis=1)
-        return [example_features, self.y[idx]]
-        # return [self.X[idx], self.y[idx]]
-
-    # get indexes for train and test rows
-    def get_splits(self, n_test=0.33):
-        # determine sizes
-        test_size = round(n_test * len(self.X))
-        train_size = len(self.X) - test_size
-        # calculate the split
-        return random_split(self, [train_size, test_size])
+        print(self.y)
 
 
 class MLPClassifier(nn.Module):
@@ -146,7 +165,7 @@ def predict(row, model):
 
 if __name__ == '__main__':
     # prepare the data
-    path = os.path.join(MAIN_FOLDER, 'datasets', 'ravdess_dataset_features_v2.csv')
+    path = os.path.join(MAIN_FOLDER, 'datasets', 'ravdess_dataset_features.csv')
     train_dl, test_dl = prepare_data(path)
     print(f"Size train set: {len(train_dl.dataset)}, \nSize test set: {len(test_dl.dataset)}")
     # define the network
