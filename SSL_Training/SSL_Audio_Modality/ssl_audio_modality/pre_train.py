@@ -42,12 +42,11 @@ def run_pre_training():
         augmentations=augmentations
     )
     #initialise encoder
-    encoder = CNN1D(in_channels=1,
-                    len_seq=CUSTOM_SETTINGS["pre_processing_config"]['max_length']*CUSTOM_SETTINGS["pre_processing_config"]['target_sr'],
-                    out_channels=[2,2,2],
-                    kernel_sizes=[7,7,7],
-                    stride=4
-                    )
+    encoder = CNN1D(
+        len_seq=CUSTOM_SETTINGS["pre_processing_config"]['max_length'] * CUSTOM_SETTINGS["pre_processing_config"]['target_sr'],
+        pretrained=CUSTOM_SETTINGS['encoder_config']['pretrained'] if "pretrained" in CUSTOM_SETTINGS['encoder_config'].keys() else None,
+        **CUSTOM_SETTINGS["encoder_config"]['kwargs']
+    )
     #initialise ssl model with configured SLL method
     ssl_model = SimCLR(encoder=encoder,ssl_batch_size=CUSTOM_SETTINGS['ssl_config']['batch_size'],**CUSTOM_SETTINGS['ssl_config']['kwargs'])
 

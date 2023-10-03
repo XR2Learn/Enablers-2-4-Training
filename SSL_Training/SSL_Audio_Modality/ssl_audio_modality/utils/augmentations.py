@@ -179,8 +179,8 @@ def compose_random_augmentations(config_dict, prob=0.5):
                 augmentation = augmentations_dict[key](**config_dict[key]['kwargs'])
             else:
                 augmentation = augmentations_dict[key]()
-            print(f"added {key} augmentation")
-            transforms_list.append(transforms.RandomApply([augmentation], p=prob))
+            print(f"added {key} augmentation with probability {config_dict[key]['probability']}")
+            transforms_list.append(transforms.RandomApply([augmentation], p=config_dict[key]['probability']))
         else:
             print(f"{key} not found in augmentations dict")
             print(f"avalaible options: {augmentations_dict.keys()}")
