@@ -11,7 +11,14 @@
         "max_length": 5
     },
     "handcrafted_features_config":{
-        "features_to_extract":["MFCC,eGeMAPs"]
+        "MFCC":{
+            "sample_rate":16000,
+            "n_mfcc":13,
+            "melkwargs":{"n_fft": 400, "hop_length": 160, "n_mels": 23, "center": false}
+        },
+        "eGeMAPs":{
+            "sampling_rate":16000
+        }
     },
     "encoder_config": {
         "encoder_name":"cnn1d",
