@@ -17,6 +17,7 @@ DURATION_AUDIO_RAVDESS = 3
 
 MAIN_FOLDER_DEFAULT = pathlib.Path(__file__).parent.parent.absolute()
 MAIN_FOLDER = config('MAIN_FOLDER', default=MAIN_FOLDER_DEFAULT)
+OUTPUTS_FOLDER = os.path.join(MAIN_FOLDER,'outputs')
 DATA_PATH = os.path.join(MAIN_FOLDER_DEFAULT, 'datasets', 'RAVDESS', 'audio_speech_actors_01-24')
 RAVDESS_DATA_PATH = os.path.join(MAIN_FOLDER_DEFAULT, 'datasets', 'RAVDESS')
 
