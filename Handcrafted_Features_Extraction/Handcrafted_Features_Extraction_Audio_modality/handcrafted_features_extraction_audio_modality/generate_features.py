@@ -21,7 +21,7 @@ def extract_handcrafted_features():
     Returns:
         none
     """
-    processed_data_folder = os.path.join(OUTPUTS_FOLDER, 'pre-processing-audio',
+    processed_data_folder = os.path.join(OUTPUTS_FOLDER,
                                          CUSTOM_SETTINGS['pre_processing_config']['process'])
 
     all_data_paths = os.listdir(processed_data_folder)
@@ -33,17 +33,17 @@ def extract_handcrafted_features():
     full_data_paths = [os.path.join(processed_data_folder, data_path) for data_path in all_data_paths]
 
     if "MFCC" in features_to_extract:
-        save_folder = os.path.join(OUTPUTS_FOLDER, 'handcrafted-features-generation-audio', 'MFCC')
+        save_folder = os.path.join(OUTPUTS_FOLDER, 'MFCC')
         pathlib.Path(save_folder).mkdir(parents=True, exist_ok=True)
         extract_and_save_MFCC(full_data_paths, save_folder)
 
     if "eGeMAPs" in features_to_extract:
-        save_folder = os.path.join(OUTPUTS_FOLDER, 'handcrafted-features-generation-audio', 'eGeMAPs')
+        save_folder = os.path.join(OUTPUTS_FOLDER, 'eGeMAPs')
         pathlib.Path(save_folder).mkdir(parents=True, exist_ok=True)
         extract_and_save_egemaps(full_data_paths, save_folder)
 
     if "Spectogram" in features_to_extract:
-        save_folder = os.path.join(OUTPUTS_FOLDER, 'handcrafted-features-generation-audio', 'Spectograms')
+        save_folder = os.path.join(OUTPUTS_FOLDER, 'Spectograms')
         pathlib.Path(save_folder).mkdir(parents=True, exist_ok=True)
         extract_and_save_spectogram(full_data_paths, save_folder)
         # extract_and_save_MFCC(all_data_paths)
@@ -87,17 +87,17 @@ def extract_and_save_spectogram(all_data_paths, save_folder):
 
 
 def extract_and_save_egemaps(all_data_paths, save_folder):
-    for data_path in tqdm(all_data_paths, desc='Extracting eGeMAPs'):
-        waveform = np.load(data_path)
-        smile_egemaps = opensmile.Smile(
+    smile_egemaps = opensmile.Smile(
             feature_set=opensmile.FeatureSet.eGeMAPSv02,
             feature_level=opensmile.FeatureLevel.Functionals,
-        )
+    )
+    for data_path in tqdm(all_data_paths, desc='Extracting eGeMAPs'):
+        waveform = np.load(data_path)
         # TODO: double check if the padding actually gets trimmed
         # TODO: check if egemaps need standardized N(mean=0,std=1) or normalized[-1,1] audio
         waveform = np.trim_zeros(waveform)
         egemaps = smile_egemaps.process_signal(waveform, **CUSTOM_SETTINGS["handcrafted_features_config"]['eGeMAPs'])
-        np.save(os.path.join(save_folder, data_path.split(os.path.sep)[-1]), egemaps)
+        np.save(os.path.join(save_folder, data_path.split(os.path.sep)[-1]), egemaps.T)
 
 
 if __name__ == '__main__':
