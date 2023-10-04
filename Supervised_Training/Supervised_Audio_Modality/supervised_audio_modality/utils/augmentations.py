@@ -12,6 +12,12 @@ from torchvision import transforms
 
 class GaussianNoise():
     def __init__(self,mean=0,std=0.2):
+        """
+        adds gaussion noise to the data
+        Args:
+            mean: mean value for the gaussion noise
+            std: standard deviation for the gaussian noise
+        """
         self.mean=mean
         self.std = std
 
@@ -22,6 +28,11 @@ class GaussianNoise():
 
 class HorizontalFlip():
     def __init__(self):
+        """
+        flips data on horizontal axis
+        Args:
+            none
+        """
         pass
 
     def __call__(self,x):
@@ -30,6 +41,11 @@ class HorizontalFlip():
 
 class VerticalFlip():
     def __init__(self):
+        """
+        flips data on vertical axis
+        Args:
+            none
+        """
         pass
 
     def __call__(self,x):
@@ -39,6 +55,11 @@ class VerticalFlip():
 class Scale():
     #change to random scale instead of fixed scale
     def __init__(self,max_scale=1.5):
+        """
+        scales all value by a random amount
+        Args:
+            max_scale: maximum value to scale with
+        """
         self.max_scale=max_scale
 
     def __call__(self,x):
@@ -48,6 +69,11 @@ class Scale():
 
 class ZeroMasking():
     def __init__(self,mask_length=10):
+        """
+        adds a zero mask on a random position to the data
+        Args:
+            mask_length: length of the mask
+        """
         self.mask_length=mask_length
 
     def __call__(self,x):
@@ -61,6 +87,12 @@ class ZeroMasking():
 
 class Permutation():
     def __init__(self, max_segments=5,min_segments=2):
+        """
+        randomly segments the data and permutes the segments
+        Args:
+            max_segments: maximum number of segments
+            min_segments: minimum number of segments
+        """
         self.max_segments = max_segments
         self.min_segments = min_segments
 
@@ -85,6 +117,11 @@ class Permutation():
 
 class Rotation():
     def __init__(self):
+        """
+        rotates the data
+        Args:
+            none
+        """
         pass
 
     def __call__(self, x):
@@ -94,6 +131,12 @@ class Rotation():
 
 class TimeWarping:
     def __init__(self, warp_factor, num_segments):
+        """
+        creates segments and 'warps' some values on the time axis while 'squishing' others
+        Args:
+            warp_factor: factor of warping
+            num_segments: number of segments to make (only half of them are warped)
+        """
         self.warp_factor = warp_factor
         self.num_segments = num_segments
 
@@ -142,6 +185,11 @@ class TimeWarping:
 
 class TimeShifting():
     def __init__(self,max_shift):
+        """
+        shifts data on time axis
+        Args:
+            max_shift: maximum shift to apply
+        """
         self.max_shift = max_shift
 
     def __call__(self, x):
@@ -152,6 +200,11 @@ class TimeShifting():
 
 class no_augmentation():
     def __init__(self):
+        """
+        no augmentation applied
+        Args:
+            none
+        """
         pass
     def __call__(self, x):
         return x 
@@ -171,7 +224,12 @@ augmentations_dict = {
 }
 
 
-def compose_random_augmentations(config_dict, prob=0.5):
+def compose_random_augmentations(config_dict):
+    """
+    composes the augmentations to apply
+    Args:
+        config_dict: dictionary containing the augmentation to add and their parameters
+    """
     transforms_list = []
     for key in config_dict:
         if key in augmentations_dict.keys():

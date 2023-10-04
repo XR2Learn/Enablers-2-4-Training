@@ -14,7 +14,7 @@ from conf import CUSTOM_SETTINGS, OUTPUTS_FOLDER
 
 def extract_handcrafted_features():
     """
- 
+    Main function that extracts handcrafted features defined by/in the json configuration file
     Args:
         none
  
@@ -53,6 +53,8 @@ def extract_and_save_MFCC(all_data_paths, save_folder):
     """
     extract_and_save_MFCC
 
+    extracts the MFCCs and saves them to the output folder
+
     Args:
         all_data_paths: a list containing the paths to all audio subjects
  
@@ -73,6 +75,8 @@ def extract_and_save_spectogram(all_data_paths, save_folder):
     """
     extract_and_save_spectogram
 
+    extracts the spectograms and saves them to the output folder
+
     Args:
         all_data_paths: a list containing the paths to all audio subjects
  
@@ -89,6 +93,17 @@ def extract_and_save_spectogram(all_data_paths, save_folder):
 
 
 def extract_and_save_egemaps(all_data_paths, save_folder):
+    """
+    extract_and_save_egemaps
+
+    extracts the egemaps and saves them to the output folder
+
+    Args:
+        all_data_paths: a list containing the paths to all audio subjects
+ 
+    Returns:
+        subject_all_normalized_audio: a list containing the normalized numpy arrays with all the audio data of the subject
+    """
     smile_egemaps = opensmile.Smile(
             feature_set=opensmile.FeatureSet.eGeMAPSv02,
             feature_level=opensmile.FeatureLevel.Functionals,

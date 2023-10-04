@@ -65,6 +65,7 @@ def process_dataset(full_dataset_path,all_subjects_dirs):
         val_split: a dictionary containing the 'files' and 'labels' for validation
         test_split: a dictionary containing the 'files' and 'labels' for testing
     """
+
     train_split = {'files':[],'labels':[]}
     val_split = {'files':[],'labels':[]}
     test_split = {'files':[],'labels':[]}
@@ -127,6 +128,7 @@ def process_dataset(full_dataset_path,all_subjects_dirs):
                         processed_audio=temp
                     all_subject_audio_processed[i]=processed_audio
 
+            # iterate over files and save them to the outputs folder
             processed_file_paths = []
             processed_file_labels = []
             for file_name,processed_audio in zip(loaded_files,all_subject_audio_processed):
