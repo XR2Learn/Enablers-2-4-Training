@@ -23,17 +23,16 @@ def generate_ssl_features():
     """
 
     print(CUSTOM_SETTINGS)
-    splith_paths = {'train':"outputs/train.csv",'val':"outputs/val.csv",'test':"outputs/test.csv"}
+    splith_paths = {'train':"train.csv",'val':"val.csv",'test':"test.csv"}
 
     encoder = CNN1D(
-        len_seq=CUSTOM_SETTINGS["pre_processing_config"]['max_length'] * CUSTOM_SETTINGS["pre_processing_config"]['target_sr'],
         pretrained=CUSTOM_SETTINGS['encoder_config']['pretrained'] if "pretrained" in CUSTOM_SETTINGS['encoder_config'].keys() else None,
         **CUSTOM_SETTINGS["encoder_config"]['kwargs']
     )
     encoder.eval()
     print(encoder)
 
-    save_folder = os.path.join(OUTPUTS_FOLDER, 'SSL_Features_Exteraction', 'ssl_features')
+    save_folder = os.path.join(OUTPUTS_FOLDER, 'ssl_features')
     pathlib.Path(save_folder).mkdir(parents=True, exist_ok=True)
 
     #TODO: iterate over keys or userspecified csv/files ?
@@ -54,12 +53,12 @@ def generate_and_save(encoder,csv_path,out_path):
         none
     """
 
-    meta_data = pd.read_csv(os.path.join(MAIN_FOLDER,csv_path))
+    meta_data = pd.read_csv(os.path.join(OUTPUTS_FOLDER,csv_path))
     for data_path in tqdm(meta_data['files']):
         #TODO : find replacement for .replace('\\','/')) to have a seperator that works on all OS
-        x = np.load(os.path.join(MAIN_FOLDER,data_path).replace('\\','/'))
+        x = np.load(os.path.join(OUTPUTS_FOLDER,CUSTOM_SETTINGS['encoder_config']['input_type'],data_path).replace('\\','/'))
         x_tensor = torch.tensor(np.expand_dims(x,axis=0) if len(x.shape)<=1 else x)
-        features = encoder(x_tensor)
+        features = encoder(x_tensor.T)
         #print(data_path.split(os.path.sep))
         np.save(os.path.join(out_path,data_path.split(os.path.sep)[-1]),features.detach().numpy())
 
