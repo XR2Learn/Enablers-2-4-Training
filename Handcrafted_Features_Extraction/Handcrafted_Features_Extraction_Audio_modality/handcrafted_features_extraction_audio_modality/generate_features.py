@@ -65,7 +65,8 @@ def extract_and_save_MFCC(all_data_paths, save_folder):
              **CUSTOM_SETTINGS["handcrafted_features_config"]['MFCC']
         )
         mfcc = transform(waveform).numpy()
-        np.save(os.path.join(save_folder, data_path.split(os.path.sep)[-1]), mfcc)
+        #Transpose to have chanels last
+        np.save(os.path.join(save_folder, data_path.split(os.path.sep)[-1]), mfcc.T)
 
 
 def extract_and_save_spectogram(all_data_paths, save_folder):
@@ -83,7 +84,8 @@ def extract_and_save_spectogram(all_data_paths, save_folder):
         #TODO: add custom settings
         transform = transforms.Spectrogram(n_fft=400)
         spectogram = transform(waveform).numpy()
-        np.save(os.path.join(save_folder, data_path.split(os.path.sep)[-1]), spectogram)
+        #Transpose to have chanels last
+        np.save(os.path.join(save_folder, data_path.split(os.path.sep)[-1]), spectogram.T)
 
 
 def extract_and_save_egemaps(all_data_paths, save_folder):
@@ -97,6 +99,7 @@ def extract_and_save_egemaps(all_data_paths, save_folder):
         # TODO: check if egemaps need standardized N(mean=0,std=1) or normalized[-1,1] audio
         waveform = np.trim_zeros(waveform)
         egemaps = smile_egemaps.process_signal(waveform, **CUSTOM_SETTINGS["handcrafted_features_config"]['eGeMAPs'])
+        #Transpose to have chanels last
         np.save(os.path.join(save_folder, data_path.split(os.path.sep)[-1]), egemaps.T)
 
 
