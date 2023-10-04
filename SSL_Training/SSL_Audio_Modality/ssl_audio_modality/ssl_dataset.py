@@ -26,12 +26,14 @@ class SSLTorchDataset(Dataset):
     """
     def __init__(self, 
                  data_path,
+                 input_type,
                  split_path, 
                  transforms=None,
                  augmentations=None,
                  n_views=2,
         ):
         self.data_path = data_path
+        self.input_type = input_type
         # subjects and labels to retrieve
         self.split_path = split_path
         self.transforms = transforms
@@ -58,11 +60,11 @@ class SSLTorchDataset(Dataset):
         data_paths = meta_data['files']
         self.data=[]
         for p in tqdm(data_paths,total=meta_data.shape[0]):
-            audio = np.load(os.path.join(self.data_path,p).replace("\\","/"))
-            if len(audio.squeeze().shape)==1:
-                audio = np.expand_dims(audio,axis=-1)
+            data = np.load(os.path.join(self.data_path,self.input_type,p).replace("\\","/"))
+            if len(data.shape)<=1:
+                data = np.expand_dims(data,axis=-1)
                 #print(np.expand_dims(audio,axis=-1).shape)
-            self.data.append(audio)
+            self.data.append(data)
 
         self.data = [self.transforms(frame) if self.transforms else frame for frame in self.data]
 
@@ -89,6 +91,7 @@ class SSLTorchDataset(Dataset):
 class SSLDataModule(LightningDataModule):
     def __init__(self,
             path,
+            input_type,
             batch_size,
             split,
             train_transforms = {},
@@ -99,6 +102,7 @@ class SSLDataModule(LightningDataModule):
             augmentations = None):
         super().__init__()
         self.path = path
+        self.input_type = input_type
         self.batch_size = batch_size
         self.split = split
         self.train_transforms = train_transforms
@@ -148,7 +152,8 @@ class SSLDataModule(LightningDataModule):
         
     def _create_train_dataset(self):
         print('Reading SSL train data:')
-        return SSLTorchDataset(self.path, 
+        return SSLTorchDataset(self.path,
+                                 self.input_type, 
                                  self.split['train'], 
                                  transforms=self.train_transforms,
                                  augmentations=self.augmentations,
@@ -156,7 +161,8 @@ class SSLDataModule(LightningDataModule):
     
     def _create_val_dataset(self):
         print('Reading SSL val data:')
-        return SSLTorchDataset(self.path, 
+        return SSLTorchDataset(self.path,
+                                 self.input_type, 
                                  self.split['val'],  
                                  transforms=self.test_transforms,
                                  augmentations=self.augmentations,
@@ -164,7 +170,8 @@ class SSLDataModule(LightningDataModule):
     
     def _create_test_dataset(self):
         print('Reading SSL test data:')
-        return SSLTorchDataset(self.path, 
+        return SSLTorchDataset(self.path,
+                                 self.input_type, 
                                  self.split['test'], 
                                  transforms=self.test_transforms,
                                  augmentations=None,
