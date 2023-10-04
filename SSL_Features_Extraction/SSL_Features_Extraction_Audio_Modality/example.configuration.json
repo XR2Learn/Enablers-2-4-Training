@@ -11,23 +11,25 @@
       "max_length": 5
   },
   "handcrafted_features_config":{
-    "MFCC":{
-        "sample_rate":16000,
-        "n_mfcc":13,
-        "melkwargs":{"n_fft": 400, "hop_length": 160, "n_mels": 23, "center": false}
-    },
-    "eGeMAPs":{
-        "sampling_rate":16000
-    }
+      "MFCC":{
+          "sample_rate":16000,
+          "n_mfcc":13,
+          "melkwargs":{"n_fft": 400, "hop_length": 160, "n_mels": 23, "center": false}
+      },
+      "eGeMAPs":{
+          "sampling_rate":16000
+      }
   },
   "encoder_config": {
       "encoder_name":"cnn1d",
-      "pretrained": "SSL_Features_Extraction\\SSL_Features_Extraction_Audio_Modality\\outputs\\SSL_Training\\test_encoder.pt",
+      "input_type":"eGeMAPs",
+      "pretrained": "Supervised_Training\\Supervised_Audio_Modality\\outputs\\SSL_Training\\test_encoder.pt",
       "kwargs":{
           "in_channels":1,
+          "len_seq":88,
           "out_channels":[2,2,2],
-          "kernel_sizes":[7,7,7],
-          "stride": 4
+          "kernel_sizes":[3,3,3],
+          "stride": 2
       }
   },
   "ssl_config":{
