@@ -3,7 +3,7 @@ import os
 import torch
 
 from pytorch_lightning import Trainer, seed_everything
-from conf import CUSTOM_SETTINGS, MAIN_FOLDER
+from conf import CUSTOM_SETTINGS, MAIN_FOLDER,OUTPUTS_FOLDER
 from supervised_dataset import SupervisedDataModule
 from callbacks.setup_callbacks import setup_callbacks
 from utils.init_utils import (init_augmentations, init_datamodule,
@@ -18,7 +18,7 @@ from classifiers.linear import LinearClassifier
 
 def run_supervised_training():
     print(CUSTOM_SETTINGS)
-    splith_paths = {'train': "outputs/train.csv", 'val': "outputs/val.csv", 'test': "outputs/test.csv"}
+    splith_paths = {'train': "train.csv", 'val': "val.csv", 'test': "test.csv"}
 
     train_transforms = {}
     test_transforms = {}
@@ -35,7 +35,8 @@ def run_supervised_training():
         print("NO augmentations loaded")
 
     datamodule = SupervisedDataModule(
-        path=MAIN_FOLDER,
+        path=OUTPUTS_FOLDER,
+        input_type=CUSTOM_SETTINGS['encoder_config']['input_type'],
         batch_size=CUSTOM_SETTINGS['sup_config']['batch_size'],
         split=splith_paths,
         train_transforms=train_transforms,
@@ -46,7 +47,6 @@ def run_supervised_training():
     )
     # initialise encoder
     encoder = CNN1D(
-        len_seq=CUSTOM_SETTINGS["pre_processing_config"]['max_length'] * CUSTOM_SETTINGS["pre_processing_config"]['target_sr'],
         pretrained=CUSTOM_SETTINGS['encoder_config']['pretrained'] if "pretrained" in CUSTOM_SETTINGS['encoder_config'].keys() else None,
         **CUSTOM_SETTINGS["encoder_config"]['kwargs']
     )
