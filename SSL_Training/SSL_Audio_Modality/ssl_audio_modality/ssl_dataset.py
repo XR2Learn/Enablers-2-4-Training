@@ -7,22 +7,22 @@ from torch.utils.data import Dataset, DataLoader
 from pytorch_lightning import LightningDataModule
 
 class SSLTorchDataset(Dataset):
-    """ Torch dataset class for WESAD
+    """ Torch dataset class
 
     arguments
     ----------
     data_path: str
         root folder of the dataset
-    subjects: list
-        subjects to be used (if None all subjects are used)
-    labels: list
-        labels to be used (normally, only 1, 2, 3 and 4 are being used)
-    sample_len_sec: int
-        length of time window for segmentations
-    sensors: list
-        sensor names to be used (if None all sensors are used)
-    normalize: bool
-        if true recordings are normalized for each subject to zero mean and unit variance per channel
+    input_type: str
+        the type of input to load in this dataset
+    split_path: str
+        path to the csv file containing the files and labels associated to the split
+    transforms: str
+        transforms to apply to the input data
+    augmentations: str 
+        augmentations to apply to the input data
+    n_views: int
+        number of views to create for the SSL
     """
     def __init__(self, 
                  data_path,
@@ -89,6 +89,29 @@ class SSLTorchDataset(Dataset):
 
 
 class SSLDataModule(LightningDataModule):
+    """ LightningDataModule
+
+    arguments
+    ----------
+    path: str
+        root folder of the dataset
+    input_type: str
+        the type of input to load in this dataset
+    batch_size: float
+        number of samples to include in a single batch
+    split: str
+        path to the csv files containing the files and labels associated to the split
+    train_transforms: str
+        transforms to apply to the input training data
+    train_transforms: str
+        transforms to apply to the input testing data
+    n_views: int
+        number of views to create for the SSL
+    limited_k: ??
+        ??
+    augmentations: str 
+        augmentations to apply to the input data
+    """
     def __init__(self,
             path,
             input_type,

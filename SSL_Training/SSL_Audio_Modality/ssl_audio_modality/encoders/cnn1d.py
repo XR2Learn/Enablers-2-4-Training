@@ -15,13 +15,21 @@ class CNN1D(LightningModule):
                 padding=1,
                 pool_padding=0, 
                 pool_size=2, 
-                supervised=True,
-                relu_type = 'relu',
                 p_drop=0.2,
                 pretrained = None,
                 **kwargs):
         """
         1D-Convolutional Network with three layers
+        Args:
+            in_channels: number of channels in the input data
+            len_seq: lenght of the input sequence
+            out_channels: list containing the number of channels in the convolutional layers
+            kernel_sizes: list containing the sizes of the convolutional kernels
+            strid: size of the stride
+            padding: unused, just to compute the out size
+            pool_size: size of the maxpooling 
+            p_drop: dropout value
+            pretrained: path to pretrained model
         """
         super(CNN1D, self).__init__()
         self.len_seq = len_seq
@@ -93,12 +101,20 @@ class CNN1D1L(LightningModule):
                 padding=1,
                 pool_padding=0, 
                 pool_size=2, 
-                supervised=True,
-                relu_type = 'relu',
                 p_drop=0.2,
                 **kwargs):
         """
-        1D-Convolutional encoder with one convolutional layer
+        1D-Convolutional Network with three layers
+        Args:
+            in_channels: number of channels in the input data
+            len_seq: lenght of the input sequence
+            out_channels: list containing the number of channels in the convolutional layers
+            kernel_sizes: list containing the sizes of the convolutional kernels
+            strid: size of the stride
+            padding: unused, just to compute the out size
+            pool_size: size of the maxpooling 
+            p_drop: dropout value
+            pretrained: path to pretrained model
         """
         super(CNN1D1L, self).__init__()
         self.in_channels = in_channels

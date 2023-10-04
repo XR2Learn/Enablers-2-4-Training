@@ -15,16 +15,16 @@ from encoders.cnn1d import CNN1D,CNN1D1L
 from ssl_methods.SimCLR import SimCLR
 
 def run_pre_training():
+    """
+    file to pretrain the encoder model
+    Args:
+        None
+    """
     print(CUSTOM_SETTINGS)
     splith_paths = {'train':"train.csv",'val':"val.csv",'test':"test.csv"}
 
     train_transforms = {}
     test_transforms = {}
-    #for modality in  preprocessing_configs['sensors'].keys():
-    #    transform_cfg =  preprocessing_configs['sensors'][modality]['transforms']
-    #    cur_train_transforms, cur_test_transforms = init_transforms(modality, transform_cfg)
-    #    train_transforms.update(cur_train_transforms)
-    #    test_transforms.update(cur_test_transforms)
     if 'transforms' in CUSTOM_SETTINGS.keys():
         train_transforms,test_transforms = init_transforms(CUSTOM_SETTINGS['transforms'])
 
