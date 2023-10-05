@@ -49,8 +49,8 @@ def run_pre_training():
                            CUSTOM_SETTINGS['encoder_config']['pretrained'] if "pretrained" in CUSTOM_SETTINGS['encoder_config'].keys() else None
                         )
     #initialise ssl model with configured SLL method
-    ssl_model = VICReg(encoder=encoder,ssl_batch_size=CUSTOM_SETTINGS['ssl_config']['batch_size'],**CUSTOM_SETTINGS['ssl_config']['kwargs'])
-
+    #ssl_model = VICReg(encoder=encoder,ssl_batch_size=CUSTOM_SETTINGS['ssl_config']['batch_size'],**CUSTOM_SETTINGS['ssl_config']['kwargs'])
+    ssl_model = setup_ssl_model(encoder,model_cfg=CUSTOM_SETTINGS['ssl_config'])
     print(ssl_model)
     #init callbacks  # initialize callbacks
     callbacks = setup_callbacks(

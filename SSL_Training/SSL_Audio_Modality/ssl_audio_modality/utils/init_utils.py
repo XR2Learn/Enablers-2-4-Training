@@ -14,7 +14,7 @@ from torchvision import transforms
 
 
 # Models
-def setup_ssl_model(model_cfg):
+def setup_ssl_model(encoder,model_cfg):
     """ initializes ssl model and encoders from configs
 
     Parameters
@@ -28,19 +28,14 @@ def setup_ssl_model(model_cfg):
     (dict, pytorch_lightning.LightningModule)
         dictionary with encoders and the whole ssl model
     """    
-    # init encoder
-    encoders_dict = get_encoders(model_cfg)
     # init ssl framework
     ssl_model = getattr(importlib.import_module(model_cfg['from_module']), model_cfg['ssl_framework'])(
-        encoders_dict,
-        model_cfg['modalities'],
-        model_cfg['grouped'],
-        ssl_batch_size=model_cfg['experiment']['batch_size_pre_training'],
-        optimizer_name_ssl=model_cfg['ssl_setup']['optimizer_name'],
-        **model_cfg['ssl_setup']['kwargs']
+        encoder,
+        ssl_batch_size=model_cfg['batch_size'],
+        **model_cfg['kwargs']
     )
     
-    return encoders_dict, ssl_model
+    return ssl_model
 
 
 def init_encoder(model_cfg, ckpt_path=None):
