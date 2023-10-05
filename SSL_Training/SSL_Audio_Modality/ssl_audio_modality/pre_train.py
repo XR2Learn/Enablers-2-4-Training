@@ -14,6 +14,8 @@ from utils.utils import copy_file, generate_experiment_id, load_yaml_to_dict
 
 from encoders.cnn1d import CNN1D,CNN1D1L
 from ssl_methods.SimCLR import SimCLR
+from ssl_methods.VICReg import VICReg
+
 
 def run_pre_training():
     """
@@ -48,7 +50,7 @@ def run_pre_training():
                            CUSTOM_SETTINGS['encoder_config']['pretrained'] if "pretrained" in CUSTOM_SETTINGS['encoder_config'].keys() else None
                         )
     #initialise ssl model with configured SLL method
-    ssl_model = SimCLR(encoder=encoder,ssl_batch_size=CUSTOM_SETTINGS['ssl_config']['batch_size'],**CUSTOM_SETTINGS['ssl_config']['kwargs'])
+    ssl_model = VICReg(encoder=encoder,ssl_batch_size=CUSTOM_SETTINGS['ssl_config']['batch_size'],**CUSTOM_SETTINGS['ssl_config']['kwargs'])
 
     print(ssl_model)
     #init callbacks  # initialize callbacks
