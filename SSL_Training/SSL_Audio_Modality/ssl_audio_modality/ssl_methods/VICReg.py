@@ -7,41 +7,32 @@ class VICReg(LightningModule):
     """
     Implementation of VicReg adapted from https://github.com/facebookresearch/vicreg/
     """
-    def __init__(self, encoders_dict,modalities,groups, embedding_size, ssl_batch_size, sim_coeff = 25, std_coeff = 25, cov_coeff = 1, optimizer_name_ssl='adam', ssl_lr=0.005,log_suffix = None, **kwargs):
+    def __init__(self, encoder, ssl_batch_size, sim_coeff = 25, std_coeff = 25, cov_coeff = 1, optimizer_name_ssl='adam', lr=0.005, **kwargs):
 
         super().__init__()
-        self.modalities = modalities
-        self.groups = groups
 
-        self.encoders_dict = nn.ModuleDict(encoders_dict)
-        self.projections_dict = {}
-        for enc in self.encoders_dict:
-            print(enc)
-            self.projections_dict[enc] = nn.Sequential(
-                nn.Linear(self.encoders_dict[enc].out_size,512),
+        self.encoder = encoder
+        # TODO: make projection heads customizable (number of neurons)
+        self.projection = nn.Sequential(
+                nn.Linear(self.encoder.out_size, 512),
                 nn.ReLU(inplace=True),
 
                 nn.Linear(512, 1024),
                 nn.ReLU(inplace=True),
-            )
-        self.projections_dict = nn.ModuleDict(self.projections_dict)
+        )
 
         self.optimizer_name_ssl = optimizer_name_ssl
-        self.lr = ssl_lr
+        self.lr = lr
 
-        self.embedding_size = embedding_size
+        self.embedding_size = self.encoder.out_size
         self.ssl_batch_size = ssl_batch_size
 
         self.sim_coeff = sim_coeff
         self.std_coeff = std_coeff
         self.cov_coeff = cov_coeff
 
-        self.log_suffix = log_suffix
-
-        #self.log_hyperparams()
     def on_fit_start(self):
-        for modality in self.encoders_dict.keys():
-            self.encoders_dict[modality].to(self.device)
+        self.encoder.to(self.device)
 
     def log_hyperparams(self):
        # self.hparams['in_channels'] = self.encoder.in_channels
@@ -53,21 +44,8 @@ class VICReg(LightningModule):
         self.save_hyperparameters(ignore=["batch_size", "num_features"])
 
     def _process_batch(self, batch):
-        aug, _, sub,x = batch[0], batch[1], batch[2], batch[3]
-        ins = []
-        for modality in self.modalities:
-            ins.append(aug[modality])
-            #print(ins.shape)
-            #somehow the below line got deleted?
-        aug = torch.cat(ins,dim=1)
-
-        ins = []
-        for modality in self.modalities:
-            ins.append(x[modality])
-            #print(ins.shape)
-            #somehow the below line got deleted?
-        x = torch.cat(ins,dim=1)
-        return x,aug
+        aug1, aug2 = batch[0].float(), batch[-1].float()
+        return aug1,aug2
 
     def _compute_vicreg_loss(self, x, y, partition):
         repr_loss = F.mse_loss(x, y)
@@ -96,17 +74,11 @@ class VICReg(LightningModule):
         self.log(f"cov_{partition}_loss", cov_loss)
         self.log(f"{partition}_loss", loss)
 
-        if self.log_suffix is not None:
-            self.log(f"repr_{partition}_loss"+f"{self.log_suffix}", repr_loss)
-            self.log(f"std_{partition}_loss"+f"{self.log_suffix}", std_loss)
-            self.log(f"cov_{partition}_loss"+f"{self.log_suffix}", cov_loss)
-            self.log(f"{partition}_loss"+f"{self.log_suffix}", loss)
-
         return loss
     
     def forward(self,x,y):
-        x = self.projections_dict[self.groups[0]](nn.Flatten()(self.encoders_dict[self.groups[0]](x)))
-        y = self.projections_dict[self.groups[0]](nn.Flatten()(self.encoders_dict[self.groups[0]](y)))
+        x = self.projection(nn.Flatten()(self.encoder(x)))
+        y = self.projection(nn.Flatten()(self.encoder(y)))
         return x, y
 
     def training_step(self, batch, batch_idx):
