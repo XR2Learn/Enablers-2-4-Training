@@ -8,16 +8,16 @@ EMOTIONS_RAVDESS = {1: 'neutral', 2: 'calm', 3: 'happy', 4: 'sad',
                     8: 'surprise'}
 EMOTION_INTENSITY_RAVDESS = {1: 'normal', 2: "strong"}
 
-LABEL_TO_ID = {'RAVDESS' : {'neutral' : 0, 'calm' : 1, 'happy' : 2, 'sad' : 3,
-                            'angry' : 4,'fearful' : 5, 'disgust' : 6,
-                            'surprised' : 7}}
+LABEL_TO_ID = {'RAVDESS': {'neutral': 0, 'calm': 1, 'happy': 2, 'sad': 3,
+                           'angry': 4, 'fearful': 5, 'disgust': 6,
+                           'surprised': 7}}
 
 SAMPLE_RATE_RAVDESS = 48000
 DURATION_AUDIO_RAVDESS = 3
 
 MAIN_FOLDER_DEFAULT = pathlib.Path(__file__).parent.parent.absolute()
 MAIN_FOLDER = config('MAIN_FOLDER', default=MAIN_FOLDER_DEFAULT)
-OUTPUTS_FOLDER = os.path.join(MAIN_FOLDER,'outputs')
+OUTPUTS_FOLDER = os.path.join(MAIN_FOLDER, 'outputs')
 DATA_PATH = os.path.join(MAIN_FOLDER_DEFAULT, 'datasets', 'RAVDESS', 'audio_speech_actors_01-24')
 RAVDESS_DATA_PATH = os.path.join(MAIN_FOLDER_DEFAULT, 'datasets', 'RAVDESS')
 

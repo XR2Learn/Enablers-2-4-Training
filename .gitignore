@@ -167,3 +167,6 @@ cython_debug/
 /*/*/outputs
 .vscode/*
 lightning_logs/
+/outputs/
+/datasets/
+/configuration.json
