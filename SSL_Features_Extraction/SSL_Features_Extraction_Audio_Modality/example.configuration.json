@@ -33,16 +33,17 @@
       }
   },
   "ssl_config":{
-      "method":"SimCLR",
-      "epochs":20,
-      "batch_size":128,
-      "kwargs":{
-        "lr":0.0001,
-        "n_views":2,
-        "temperature":0.05,
-        "optimizer_name_ssl":"adam"
-      }
-  },
+    "from_module":"ssl_methods.VICReg",
+    "ssl_framework":"VICReg",
+    "epochs":20,
+    "batch_size":128,
+    "kwargs":{
+      "lr":0.0001,
+      "n_views":2,
+      "temperature":0.05,
+      "optimizer_name_ssl":"adam"
+    }
+},
   "sup_config":{
       "epochs":20,
       "batch_size":128,
