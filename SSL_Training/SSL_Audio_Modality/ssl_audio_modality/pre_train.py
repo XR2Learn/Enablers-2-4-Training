@@ -9,7 +9,7 @@ from ssl_dataset import SSLDataModule
 from callbacks.setup_callbacks import setup_callbacks
 from utils.init_utils import (init_augmentations, init_datamodule,
                               init_loggers, init_random_split, init_transforms,
-                              setup_ssl_model)
+                              setup_ssl_model,init_encoder)
 from utils.utils import copy_file, generate_experiment_id, load_yaml_to_dict
 
 from encoders.cnn1d import CNN1D,CNN1D1L
@@ -44,10 +44,9 @@ def run_pre_training():
         augmentations=augmentations
     )
     #initialise encoder
-    encoder = CNN1D(
-        pretrained=CUSTOM_SETTINGS['encoder_config']['pretrained'] if "pretrained" in CUSTOM_SETTINGS['encoder_config'].keys() else None,
-        **CUSTOM_SETTINGS["encoder_config"]['kwargs']
-    )
+    encoder = init_encoder(CUSTOM_SETTINGS["encoder_config"],
+                           CUSTOM_SETTINGS['encoder_config']['pretrained'] if "pretrained" in CUSTOM_SETTINGS['encoder_config'].keys() else None
+                        )
     #initialise ssl model with configured SLL method
     ssl_model = SimCLR(encoder=encoder,ssl_batch_size=CUSTOM_SETTINGS['ssl_config']['batch_size'],**CUSTOM_SETTINGS['ssl_config']['kwargs'])
 
