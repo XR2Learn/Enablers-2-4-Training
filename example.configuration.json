@@ -1,7 +1,6 @@
 {
     "dataset_config": {
-        "dataset_name": "RAVDESS",
-        "number_of_labels":8
+        "dataset_name": "RAVDESS"
     },
     "pre_processing_config": {
         "process": "standardize",
@@ -11,26 +10,7 @@
         "max_length": 5
     },
     "handcrafted_features_config":{
-        "MFCC":{
-            "sample_rate":16000,
-            "n_mfcc":13,
-            "melkwargs":{"n_fft": 400, "hop_length": 160, "n_mels": 23, "center": false}
-        },
-        "eGeMAPs":{
-            "sampling_rate":16000
-        }
-    },
-    "encoder_config": {
-        "encoder_name":"cnn1d",
-        "input_type":"eGeMAPs",
-        "pretrained": "Supervised_Training\\Supervised_Audio_Modality\\outputs\\SSL_Training\\test_encoder.pt",
-        "kwargs":{
-            "in_channels":1,
-            "len_seq":88,
-            "out_channels":[2,2,2],
-            "kernel_sizes":[3,3,3],
-            "stride": 2
-        }
+        "features_to_extract":["MFCC,eGeMAPs"]
     },
     "ssl_config":{
         "method":"SimCLR",
@@ -43,27 +23,15 @@
           "optimizer_name_ssl":"adam"
         }
     },
-    "sup_config":{
-        "epochs":20,
-        "batch_size":128,
-        "use_augmentations_in_sup": true,
-        "kwargs":{
-          "lr":0.0001,
-          "optimizer_name":"adam",
-          "freeze_encoder": false
-        }
-    },
     "augmentations":{
             "gaussian_noise":{
-                "probability":0.33,
-                "kwargs":{
+              "kwargs":{
                   "mean":0,
                   "std":0.2
               }
           },
             "scale":{
-                "probability":0.4,
-                "kwargs":{
+              "kwargs":{
                   "max_scale": 1.3
               }
           }
@@ -87,5 +55,5 @@
              "transform_name": "to_float",
              "in_test": true
             }
-    ]   
-  }
+    ]
+}

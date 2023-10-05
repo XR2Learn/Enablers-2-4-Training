@@ -3,7 +3,7 @@ import os
 import torch
 
 from pytorch_lightning import Trainer, seed_everything
-from conf import CUSTOM_SETTINGS,MAIN_FOLDER
+from conf import CUSTOM_SETTINGS,MAIN_FOLDER,OUTPUTS_FOLDER
 from ssl_dataset import SSLDataModule
 from callbacks.setup_callbacks import setup_callbacks
 from utils.init_utils import (init_augmentations, init_datamodule,
@@ -15,16 +15,16 @@ from encoders.cnn1d import CNN1D,CNN1D1L
 from ssl_methods.SimCLR import SimCLR
 
 def run_pre_training():
+    """
+    file to pretrain the encoder model
+    Args:
+        None
+    """
     print(CUSTOM_SETTINGS)
-    splith_paths = {'train':"outputs/train.csv",'val':"outputs/val.csv",'test':"outputs/test.csv"}
+    splith_paths = {'train':"train.csv",'val':"val.csv",'test':"test.csv"}
 
     train_transforms = {}
     test_transforms = {}
-    #for modality in  preprocessing_configs['sensors'].keys():
-    #    transform_cfg =  preprocessing_configs['sensors'][modality]['transforms']
-    #    cur_train_transforms, cur_test_transforms = init_transforms(modality, transform_cfg)
-    #    train_transforms.update(cur_train_transforms)
-    #    test_transforms.update(cur_test_transforms)
     if 'transforms' in CUSTOM_SETTINGS.keys():
         train_transforms,test_transforms = init_transforms(CUSTOM_SETTINGS['transforms'])
 
@@ -32,18 +32,18 @@ def run_pre_training():
         augmentations = init_augmentations(CUSTOM_SETTINGS['augmentations'])
 
     datamodule = SSLDataModule(
-        path=MAIN_FOLDER,
+        path=OUTPUTS_FOLDER,
+        input_type=CUSTOM_SETTINGS['encoder_config']['input_type'],
         batch_size=CUSTOM_SETTINGS['ssl_config']['batch_size'],
         split=splith_paths,
         train_transforms=train_transforms,
         test_transforms=test_transforms,
         n_views=2,
-        num_workers=2,
+        num_workers=0,
         augmentations=augmentations
     )
     #initialise encoder
     encoder = CNN1D(
-        len_seq=CUSTOM_SETTINGS["pre_processing_config"]['max_length'] * CUSTOM_SETTINGS["pre_processing_config"]['target_sr'],
         pretrained=CUSTOM_SETTINGS['encoder_config']['pretrained'] if "pretrained" in CUSTOM_SETTINGS['encoder_config'].keys() else None,
         **CUSTOM_SETTINGS["encoder_config"]['kwargs']
     )

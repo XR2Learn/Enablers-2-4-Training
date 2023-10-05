@@ -3,37 +3,38 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm
 from torch.utils.data import Dataset, DataLoader
-import scipy
 
 from pytorch_lightning import LightningDataModule
 from conf import CUSTOM_SETTINGS,LABEL_TO_ID
 
 class SupervisedTorchDataset(Dataset):
-    """ Torch dataset class for WESAD
+    """ Torch dataset class
 
     arguments
     ----------
     data_path: str
         root folder of the dataset
-    subjects: list
-        subjects to be used (if None all subjects are used)
-    labels: list
-        labels to be used (normally, only 1, 2, 3 and 4 are being used)
-    sample_len_sec: int
-        length of time window for segmentations
-    sensors: list
-        sensor names to be used (if None all sensors are used)
-    normalize: bool
-        if true recordings are normalized for each subject to zero mean and unit variance per channel
+    input_type: str
+        the type of input to load in this dataset
+    split_path: str
+        path to the csv file containing the files and labels associated to the split
+    transforms: str
+        transforms to apply to the input data
+    augmentations: str 
+        augmentations to apply to the input data
+    n_views: int
+        number of views to create for the SSL
     """
     def __init__(self, 
                  data_path,
+                 input_type,
                  split_path, 
                  transforms=None,
                  augmentations=None,
                  n_views=2,
         ):
         self.data_path = data_path
+        self.input_type = input_type
         # subjects and labels to retrieve
         self.split_path = split_path
         self.transforms = transforms
@@ -60,12 +61,11 @@ class SupervisedTorchDataset(Dataset):
         data_paths = meta_data['files']
         self.data=[]
         for p in tqdm(data_paths,total=meta_data.shape[0]):
-            #TODO: change the save format of audio files to .npy to have a more generic way to read all sorts of data/modalities
-            sr,audio = scipy.io.wavfile.read(os.path.join(self.data_path,p).replace('\\','/'))
-            if len(audio.squeeze().shape)==1:
-                audio = np.expand_dims(audio,axis=-1)
+            data = np.load(os.path.join(self.data_path,self.input_type,p).replace("\\","/"))
+            if len(data.shape)<=1:
+                data = np.expand_dims(data,axis=-1)
                 #print(np.expand_dims(audio,axis=-1).shape)
-            self.data.append(audio)
+            self.data.append(data)
 
         self.data = [self.transforms(frame) if self.transforms else frame for frame in self.data]
 
@@ -89,8 +89,32 @@ class SupervisedTorchDataset(Dataset):
 
 
 class SupervisedDataModule(LightningDataModule):
+    """ LightningDataModule
+
+    arguments
+    ----------
+    path: str
+        root folder of the dataset
+    input_type: str
+        the type of input to load in this dataset
+    batch_size: float
+        number of samples to include in a single batch
+    split: str
+        path to the csv files containing the files and labels associated to the split
+    train_transforms: str
+        transforms to apply to the input training data
+    train_transforms: str
+        transforms to apply to the input testing data
+    n_views: int
+        number of views to create for the SSL
+    limited_k: ??
+        ??
+    augmentations: str 
+        augmentations to apply to the input data
+    """
     def __init__(self,
             path,
+            input_type,
             batch_size,
             split,
             train_transforms = {},
@@ -101,6 +125,7 @@ class SupervisedDataModule(LightningDataModule):
             augmentations = None):
         super().__init__()
         self.path = path
+        self.input_type = input_type
         self.batch_size = batch_size
         self.split = split
         self.train_transforms = train_transforms
@@ -150,7 +175,8 @@ class SupervisedDataModule(LightningDataModule):
         
     def _create_train_dataset(self):
         print('Reading Supervised train data:')
-        return SupervisedTorchDataset(self.path, 
+        return SupervisedTorchDataset(self.path,
+                                 self.input_type, 
                                  self.split['train'], 
                                  transforms=self.train_transforms,
                                  augmentations=self.augmentations,
@@ -158,7 +184,8 @@ class SupervisedDataModule(LightningDataModule):
     
     def _create_val_dataset(self):
         print('Reading Supervised val data:')
-        return SupervisedTorchDataset(self.path, 
+        return SupervisedTorchDataset(self.path,
+                                 self.input_type, 
                                  self.split['val'],  
                                  transforms=self.test_transforms,
                                  augmentations=self.augmentations,
@@ -166,7 +193,8 @@ class SupervisedDataModule(LightningDataModule):
     
     def _create_test_dataset(self):
         print('Reading Supervised test data:')
-        return SupervisedTorchDataset(self.path, 
+        return SupervisedTorchDataset(self.path,
+                                 self.input_type, 
                                  self.split['test'], 
                                  transforms=self.test_transforms,
                                  augmentations=None,

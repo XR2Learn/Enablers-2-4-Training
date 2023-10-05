@@ -16,21 +16,23 @@ from encoders.cnn1d import CNN1D,CNN1D1L
 def generate_ssl_features():
     """
     Function to extract SSL features and save to disk
-    :return: None
+    Args:
+        None
+    Returns:
+        None
     """
 
     print(CUSTOM_SETTINGS)
-    splith_paths = {'train':"outputs/train.csv",'val':"outputs/val.csv",'test':"outputs/test.csv"}
+    splith_paths = {'train':"train.csv",'val':"val.csv",'test':"test.csv"}
 
     encoder = CNN1D(
-        len_seq=CUSTOM_SETTINGS["pre_processing_config"]['max_length'] * CUSTOM_SETTINGS["pre_processing_config"]['target_sr'],
         pretrained=CUSTOM_SETTINGS['encoder_config']['pretrained'] if "pretrained" in CUSTOM_SETTINGS['encoder_config'].keys() else None,
         **CUSTOM_SETTINGS["encoder_config"]['kwargs']
     )
     encoder.eval()
     print(encoder)
 
-    save_folder = os.path.join(OUTPUTS_FOLDER, 'SSL_Features_Exteraction', 'ssl_features')
+    save_folder = os.path.join(OUTPUTS_FOLDER, 'ssl_features')
     pathlib.Path(save_folder).mkdir(parents=True, exist_ok=True)
 
     #TODO: iterate over keys or userspecified csv/files ?
@@ -40,15 +42,25 @@ def generate_ssl_features():
 
 
 def generate_and_save(encoder,csv_path,out_path):
+    """
+    generate_and_save : given the encoder, extract the features and save to .npy files
 
-    meta_data = pd.read_csv(os.path.join(MAIN_FOLDER,csv_path))
+    Args:
+        encoder: the pytorch encoder model to extract features from
+        csv_path: csv containing the paths to the files for which features have to be extracted and saved
+        out_path: output path to save the features to
+    Returns:
+        none
+    """
+
+    meta_data = pd.read_csv(os.path.join(OUTPUTS_FOLDER,csv_path))
     for data_path in tqdm(meta_data['files']):
-        #TODO : change .wav to .npy and use numpy everywhere for reading in files
         #TODO : find replacement for .replace('\\','/')) to have a seperator that works on all OS
-        x = scipy.io.wavfile.read(os.path.join(MAIN_FOLDER,data_path).replace('\\','/'))[1]
-        x_tensor = torch.tensor(np.expand_dims(x,axis=0))
-        features = encoder(x_tensor)
-        np.save(os.path.join(out_path,data_path.replace('\\','/').split(os.path.sep)[-1][:-3]+'npy'),features.detach().numpy())
+        x = np.load(os.path.join(OUTPUTS_FOLDER,CUSTOM_SETTINGS['encoder_config']['input_type'],data_path).replace('\\','/'))
+        x_tensor = torch.tensor(np.expand_dims(x,axis=0) if len(x.shape)<=1 else x)
+        features = encoder(x_tensor.T)
+        #print(data_path.split(os.path.sep))
+        np.save(os.path.join(out_path,data_path.split(os.path.sep)[-1]),features.detach().numpy())
 
 
 if __name__ == '__main__':
