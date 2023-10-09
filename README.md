@@ -29,6 +29,9 @@ Run a docker image with shell entrypoint
 
 `docker compose run --rm <service-name> \bin\bash`
 
+Run all dockers from the Training Domain
+
+`./run_all_dockers.sh`
 
 ### Folders: /datasets and /output configuration
 By default, to facilitating the development of multiple components, docker-compose.yml is configured to map the dockers images folders 
