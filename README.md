@@ -78,7 +78,7 @@ Then, the docker images will map the `/datasets`, `/outputs` and `configuration.
 │  ├── augmentation name
 │     ├── probability: probability of augmentation to be applies
 │     ├── kwargs: arguments for the augmentation to use
-└── transforms:
+├── transforms:
 │  ├── class_name: name of transform to apply
 │  ├── from_module: where to fidn the transform
 │  ├── transform_name: name of transformation
