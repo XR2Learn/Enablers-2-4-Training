@@ -9,8 +9,8 @@ import pandas as pd
 from tqdm import tqdm
 from conf import CUSTOM_SETTINGS
 from pytorch_lightning import Trainer, seed_everything
-from conf import CUSTOM_SETTINGS,MAIN_FOLDER,OUTPUTS_FOLDER
-from encoders.cnn1d import CNN1D,CNN1D1L
+from conf import CUSTOM_SETTINGS, MAIN_FOLDER, OUTPUTS_FOLDER
+from encoders.cnn1d import CNN1D, CNN1D1L
 
 
 def generate_ssl_features():
@@ -23,10 +23,11 @@ def generate_ssl_features():
     """
 
     print(CUSTOM_SETTINGS)
-    splith_paths = {'train':"train.csv",'val':"val.csv",'test':"test.csv"}
+    splith_paths = {'train': "train.csv", 'val': "val.csv", 'test': "test.csv"}
 
     encoder = CNN1D(
-        pretrained=CUSTOM_SETTINGS['encoder_config']['pretrained'] if "pretrained" in CUSTOM_SETTINGS['encoder_config'].keys() else None,
+        pretrained=CUSTOM_SETTINGS['encoder_config']['pretrained'] if "pretrained" in CUSTOM_SETTINGS[
+            'encoder_config'].keys() else None,
         **CUSTOM_SETTINGS["encoder_config"]['kwargs']
     )
     encoder.eval()
@@ -35,13 +36,13 @@ def generate_ssl_features():
     save_folder = os.path.join(OUTPUTS_FOLDER, 'ssl_features')
     pathlib.Path(save_folder).mkdir(parents=True, exist_ok=True)
 
-    #TODO: iterate over keys or userspecified csv/files ?
-    generate_and_save(encoder,splith_paths['train'],save_folder)
-    generate_and_save(encoder,splith_paths['val'],save_folder)
-    generate_and_save(encoder,splith_paths['test'],save_folder)
+    # TODO: iterate over keys or userspecified csv/files ?
+    generate_and_save(encoder, splith_paths['train'], save_folder)
+    generate_and_save(encoder, splith_paths['val'], save_folder)
+    generate_and_save(encoder, splith_paths['test'], save_folder)
 
 
-def generate_and_save(encoder,csv_path,out_path):
+def generate_and_save(encoder, csv_path, out_path):
     """
     generate_and_save : given the encoder, extract the features and save to .npy files
 
@@ -53,14 +54,15 @@ def generate_and_save(encoder,csv_path,out_path):
         none
     """
 
-    meta_data = pd.read_csv(os.path.join(OUTPUTS_FOLDER,csv_path))
+    meta_data = pd.read_csv(os.path.join(OUTPUTS_FOLDER, csv_path))
     for data_path in tqdm(meta_data['files']):
-        #TODO : find replacement for .replace('\\','/')) to have a seperator that works on all OS
-        x = np.load(os.path.join(OUTPUTS_FOLDER,CUSTOM_SETTINGS['encoder_config']['input_type'],data_path).replace('\\','/'))
-        x_tensor = torch.tensor(np.expand_dims(x,axis=0) if len(x.shape)<=1 else x)
+        # TODO : find replacement for .replace('\\','/')) to have a seperator that works on all OS
+        x = np.load(
+            os.path.join(OUTPUTS_FOLDER, CUSTOM_SETTINGS['encoder_config']['input_type'], data_path).replace('\\', '/'))
+        x_tensor = torch.tensor(np.expand_dims(x, axis=0) if len(x.shape) <= 1 else x)
         features = encoder(x_tensor.T)
-        #print(data_path.split(os.path.sep))
-        np.save(os.path.join(out_path,data_path.split(os.path.sep)[-1]),features.detach().numpy())
+        # print(data_path.split(os.path.sep))
+        np.save(os.path.join(out_path, data_path.split(os.path.sep)[-1]), features.detach().numpy())
 
 
 if __name__ == '__main__':
