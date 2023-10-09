@@ -58,12 +58,9 @@ def init_encoder(model_cfg, ckpt_path=None):
     torch.nn.Module
         initialized encoder
     """    
-    module = importlib.import_module(f"emorec_toolbox.{model_cfg['from_module']}")
+    module = importlib.import_module(f"{model_cfg['from_module']}")
     class_ = getattr(module, model_cfg['class_name'])
-    if ckpt_path is None:
-        return class_(*model_cfg['args'], **model_cfg['kwargs'])
-    else:
-        return class_.load_from_checkpoint(ckpt_path)
+    return class_(**model_cfg['kwargs'],pretrained=ckpt_path)
 
 
 def get_encoders(model_cfg):

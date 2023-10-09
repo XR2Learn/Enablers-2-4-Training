@@ -21,7 +21,8 @@
         }
     },
     "encoder_config": {
-        "encoder_name":"cnn1d",
+        "from_module": "encoders.cnn1d",
+        "class_name":"CNN1D",
         "input_type":"eGeMAPs",
         "pretrained": "Supervised_Training\\Supervised_Audio_Modality\\outputs\\SSL_Training\\test_encoder.pt",
         "kwargs":{
@@ -33,7 +34,8 @@
         }
     },
     "ssl_config":{
-        "method":"SimCLR",
+        "from_module":"ssl_methods.VICReg",
+        "ssl_framework":"VICReg",
         "epochs":20,
         "batch_size":128,
         "kwargs":{

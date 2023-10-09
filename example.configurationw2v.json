@@ -21,15 +21,15 @@
         }
     },
     "encoder_config": {
-        "encoder_name":"cnn1d",
-        "input_type":"eGeMAPs",
-        "pretrained": "Supervised_Training\\Supervised_Audio_Modality\\outputs\\SSL_Training\\test_encoder.pt",
+        "from_module": "encoders.w2v",
+        "class_name":"Wav2Vec2CNN",
+        "input_type":"standardize",
         "kwargs":{
-            "in_channels":1,
-            "len_seq":88,
-            "out_channels":[2,2,2],
-            "kernel_sizes":[3,3,3],
-            "stride": 2
+            "length_samples":10, 
+            "sample_rate":16000, 
+            "w2v2_type":"base",
+            "freeze":"true",
+            "out_channels":128
         }
     },
     "ssl_config":{
