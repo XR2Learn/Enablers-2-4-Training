@@ -1,6 +1,7 @@
 # Python code here
 import os
 import torch
+import pathlib
 
 from pytorch_lightning import Trainer, seed_everything
 from conf import CUSTOM_SETTINGS,MAIN_FOLDER,OUTPUTS_FOLDER
@@ -63,9 +64,10 @@ def run_pre_training():
         #accelerator='cpu' if args.gpus == 0 else 'gpu',
         #devices=None if args.gpus == 0 else args.gpus,
         deterministic=True, 
-        default_root_dir=os.path.join(MAIN_FOLDER,'outputs','SSL_Training'),
+        default_root_dir=os.path.join(OUTPUTS_FOLDER,'SSL_Training'),
         callbacks=callbacks,
-        max_epochs=CUSTOM_SETTINGS['ssl_config']['epochs']
+        max_epochs=CUSTOM_SETTINGS['ssl_config']['epochs'],
+        log_every_n_steps=5
     )
 
     # pre-train and report test loss
@@ -74,7 +76,8 @@ def run_pre_training():
     print(metrics)
 
     #save weights
-    torch.save(encoder.state_dict(), os.path.join(MAIN_FOLDER,'outputs','SSL_Training','test_encoder.pt'))
+    #pathlib.Path(os.path.join(OUTPUTS_FOLDER,'SSL_Training')).mkdir(parents=True, exist_ok=True)
+    torch.save(encoder.state_dict(), os.path.join(OUTPUTS_FOLDER,'SSL_Training','test_encoder.pt'))
 
 
 if __name__ == '__main__':
