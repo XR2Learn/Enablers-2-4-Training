@@ -64,23 +64,23 @@ Then, the docker images will map the `/datasets`, `/outputs` and `configuration.
 │   ├── input_type: specify the input modality
 │   ├── kwargs: arguments for the encoder
 ├── ssl_config
-   ├── from_module: model from which to load the ssl framework
-   ├── ssl_framework: name of the framework to use
-   ├── epochs: number of epochs
-   ├── batch_size: batch size for SSL training
-   ├── kwargs: other arguments for SSL training
+│  ├── from_module: model from which to load the ssl framework
+│  ├── ssl_framework: name of the framework to use
+│  ├── epochs: number of epochs
+│  ├── batch_size: batch size for SSL training
+│  ├── kwargs: other arguments for SSL training
 ├── sup_config
-   ├── epochs: number of epochs to train for
-   ├── batch_size: batch size for supervised trianing
-   ├── use_augmentation_in_sup: weather to use the defined augmentations in sup learning or not
-   ├── kwargs: other supervised learning args
+│  ├── epochs: number of epochs to train for
+│  ├── batch_size: batch size for supervised trianing
+│  ├── use_augmentation_in_sup: weather to use the defined augmentations in sup learning or not
+│  ├── kwargs: other supervised learning args
 ├── augmentations
-   ├── augmentation name
-      ├── probability: probability of augmentation to be applies
-      ├── kwargs: arguments for the augmentation to use
+│  ├── augmentation name
+│     ├── probability: probability of augmentation to be applies
+│     ├── kwargs: arguments for the augmentation to use
 └── transforms:
-   ├── class_name: name of transform to apply
-   ├── from_module: where to fidn the transform
-   ├── transform_name: name of transformation
-   ├── in_test: if transformation is to be applied to test set or not   
+│  ├── class_name: name of transform to apply
+│  ├── from_module: where to fidn the transform
+│  ├── transform_name: name of transformation
+│  ├── in_test: if transformation is to be applied to test set or not   
 ```
