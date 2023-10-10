@@ -88,5 +88,5 @@ Then, the docker images will map the `/datasets`, `/outputs` and `configuration.
 │  ├── class_name: name of transform to apply
 │  ├── from_module: where to fidn the transform
 │  ├── transform_name: name of transformation
-│  ├── in_test: if transformation is to be applied to test set or not   
+│  ├── in_test: if transformation is to be applied to test set or not
 ```
