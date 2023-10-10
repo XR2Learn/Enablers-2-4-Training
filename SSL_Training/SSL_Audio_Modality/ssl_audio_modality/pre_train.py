@@ -4,7 +4,7 @@ import torch
 import pathlib
 
 from pytorch_lightning import Trainer, seed_everything
-from conf import CUSTOM_SETTINGS, OUTPUTS_FOLDER, COMPONENT_OUTPUT_FOLDER
+from conf import CUSTOM_SETTINGS, OUTPUTS_FOLDER, COMPONENT_OUTPUT_FOLDER,EXPERIMENT_ID
 from ssl_dataset import SSLDataModule
 from callbacks.setup_callbacks import setup_callbacks
 from utils.init_utils import (init_augmentations, init_datamodule,
@@ -79,7 +79,7 @@ def run_pre_training():
 
     # save weights
     # pathlib.Path(os.path.join(OUTPUTS_FOLDER,'SSL_Training')).mkdir(parents=True, exist_ok=True)
-    torch.save(encoder.state_dict(), os.path.join(COMPONENT_OUTPUT_FOLDER, 'test_encoder.pt'))
+    torch.save(encoder.state_dict(), os.path.join(COMPONENT_OUTPUT_FOLDER, f'{EXPERIMENT_ID}_encoder.pt'))
 
 
 if __name__ == '__main__':
