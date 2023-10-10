@@ -26,6 +26,7 @@ DATA_PATH = os.path.join(MAIN_FOLDER_DEFAULT, 'datasets', 'RAVDESS', 'audio_spee
 RAVDESS_DATA_PATH = os.path.join(MAIN_FOLDER_DEFAULT, 'datasets', 'RAVDESS')
 
 COMPONENT_OUTPUT_FOLDER = os.path.join(OUTPUTS_FOLDER, 'supervised_training')
+GPUS = config('GPUS', default=0)
 
 # Yet to check if this is really necessary, maybe only for cases where passing values as ENV VARS is too cumbersome
 # e.g. [[1, 'a', ],['789', 'o', 9]] would be very annoying to write and parse.

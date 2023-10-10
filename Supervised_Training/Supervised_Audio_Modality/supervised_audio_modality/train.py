@@ -3,7 +3,7 @@ import os
 import torch
 
 from pytorch_lightning import Trainer, seed_everything
-from conf import CUSTOM_SETTINGS, OUTPUTS_FOLDER, COMPONENT_OUTPUT_FOLDER, EXPERIMENT_ID
+from conf import CUSTOM_SETTINGS, OUTPUTS_FOLDER, COMPONENT_OUTPUT_FOLDER, EXPERIMENT_ID, GPUS
 from supervised_dataset import SupervisedDataModule
 from callbacks.setup_callbacks import setup_callbacks
 from utils.init_utils import (init_augmentations, init_datamodule,
@@ -68,11 +68,12 @@ def run_supervised_training():
         no_ckpt=False,
         patience=50,
     )
+
     # initialize Pytorch-Lightning Training
     trainer = Trainer(
         # logger=loggers,
-        # accelerator='cpu' if args.gpus == 0 else 'gpu',
-        # devices=None if args.gpus == 0 else args.gpus,
+        accelerator='cpu' if int(GPUS) == 0 else 'gpu',
+        devices=None if int(GPUS) == 0 else int(GPUS),
         deterministic=True,
         default_root_dir=os.path.join(COMPONENT_OUTPUT_FOLDER),
         callbacks=callbacks,

@@ -33,6 +33,9 @@ Run all dockers from the Training Domain
 
 `./run_all_dockers.sh`
 
+#### Running on GPU 
+docker compose -f docker-compose.yml -f docker-compose-gpu.yml run --rm <service-name>
+
 ### Folders: /datasets and /output configuration
 By default, to facilitating the development of multiple components, docker-compose.yml is configured to map the dockers images folders 
 `\datasets` `\outputs` and the file `configuration.json` to a single location in the repository root's directory. 

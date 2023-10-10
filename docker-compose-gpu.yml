@@ -1,0 +1,14 @@
+version: '3.8'
+services:
+  ed-training-audio:
+    image: some.registry.com/xr2learn-enablers/ed-training-audio:latest-gpu
+    build:
+      context: 'Supervised_Training/Supervised_Audio_Modality'
+      dockerfile: 'Dockerfile-gpu'
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              device_ids: [ '0' ]
+              capabilities: [ gpu ]
