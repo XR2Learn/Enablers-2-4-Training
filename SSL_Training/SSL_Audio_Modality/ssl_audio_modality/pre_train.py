@@ -77,6 +77,8 @@ def run_pre_training():
     metrics = trainer.test(ssl_model, datamodule, ckpt_path='best')
     print(metrics)
 
+    #load in best weights
+    ssl_model.load_from_checkpoint(callbacks[1].best_model_path)
     # save weights
     # pathlib.Path(os.path.join(OUTPUTS_FOLDER,'SSL_Training')).mkdir(parents=True, exist_ok=True)
     torch.save(encoder.state_dict(), os.path.join(COMPONENT_OUTPUT_FOLDER, f'{EXPERIMENT_ID}_encoder.pt'))
