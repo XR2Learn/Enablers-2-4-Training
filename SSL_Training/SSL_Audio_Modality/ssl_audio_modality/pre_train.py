@@ -58,7 +58,7 @@ def run_pre_training():
     callbacks = setup_callbacks(
         early_stopping_metric="val_loss",
         no_ckpt=False,
-        patience=15,
+        patience=100,
     )
     # initialize Pytorch-Lightning Training
     trainer = Trainer(
@@ -69,7 +69,7 @@ def run_pre_training():
         default_root_dir=os.path.join(COMPONENT_OUTPUT_FOLDER),
         callbacks=callbacks,
         max_epochs=CUSTOM_SETTINGS['ssl_config']['epochs'],
-        log_every_n_steps=5
+        log_every_n_steps=9
     )
 
     # pre-train and report test loss
@@ -78,7 +78,7 @@ def run_pre_training():
     print(metrics)
 
     #load in best weights
-    ssl_model.load_from_checkpoint(callbacks[1].best_model_path)
+    ssl_model.load_from_checkpoint(callbacks[1].best_model_path,encoder=encoder)
     # save weights
     # pathlib.Path(os.path.join(OUTPUTS_FOLDER,'SSL_Training')).mkdir(parents=True, exist_ok=True)
     torch.save(encoder.state_dict(), os.path.join(COMPONENT_OUTPUT_FOLDER, f'{EXPERIMENT_ID}_encoder.pt'))

@@ -27,6 +27,7 @@ def run_supervised_training():
         train_transforms, test_transforms = init_transforms(CUSTOM_SETTINGS['transforms'])
 
     # for now, don't use augmentations during supervised training
+    augmentations=None
     if (CUSTOM_SETTINGS['sup_config']['use_augmentations_in_sup'] == True) and (
             'augmentations' in CUSTOM_SETTINGS.keys()):
         augmentations = init_augmentations(CUSTOM_SETTINGS['augmentations'])
@@ -65,7 +66,7 @@ def run_supervised_training():
     callbacks = setup_callbacks(
         early_stopping_metric="val_loss",
         no_ckpt=False,
-        patience=15,
+        patience=50,
     )
     # initialize Pytorch-Lightning Training
     trainer = Trainer(
@@ -84,7 +85,7 @@ def run_supervised_training():
     print(metrics)
 
     #load in best weights
-    model.load_from_checkpoint(callbacks[1].best_model_path)
+    model.load_from_checkpoint(callbacks[1].best_model_path,encoder=encoder,classifier=classifier)
     # save weights
     torch.save(model.state_dict(), os.path.join(COMPONENT_OUTPUT_FOLDER, f'{EXPERIMENT_ID}_model.pt'))
     torch.save(classifier.state_dict(), os.path.join(COMPONENT_OUTPUT_FOLDER, f'{EXPERIMENT_ID}_classifier.pt'))
