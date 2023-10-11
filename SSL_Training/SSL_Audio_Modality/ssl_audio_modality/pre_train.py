@@ -73,12 +73,16 @@ def run_pre_training():
     )
 
     # pre-train and report test loss
+    #TODO: MAKE SURE BEST WEIGHTS ARE SAVED TO .PT FILE
     trainer.fit(ssl_model, datamodule)
+    #print(ssl_model.encoder.conv_block1.conv1.weight)
     metrics = trainer.test(ssl_model, datamodule, ckpt_path='best')
+    #print(ssl_model.encoder.conv_block1.conv1.weight)
     print(metrics)
 
     #load in best weights
-    ssl_model.load_from_checkpoint(callbacks[1].best_model_path,encoder=encoder)
+    #ssl_model.load_from_checkpoint(callbacks[1].best_model_path,encoder=encoder)
+    #print(ssl_model.encoder.conv_block1.conv1.weight)
     # save weights
     # pathlib.Path(os.path.join(OUTPUTS_FOLDER,'SSL_Training')).mkdir(parents=True, exist_ok=True)
     torch.save(encoder.state_dict(), os.path.join(COMPONENT_OUTPUT_FOLDER, f'{EXPERIMENT_ID}_encoder.pt'))

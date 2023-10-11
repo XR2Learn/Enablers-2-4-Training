@@ -81,11 +81,13 @@ def run_supervised_training():
 
     # pre-train and report test loss
     trainer.fit(model, datamodule)
-    metrics = trainer.test(model, datamodule, ckpt_path='best')
+    #print(model.encoder.conv_block1.conv1.weight)
+    #load in best weights
+    #model.load_from_checkpoint(callbacks[1].best_model_path,encoder=encoder,classifier=classifier)
+    metrics = trainer.test(model,datamodule)
+    #print(model.encoder.conv_block1.conv1.weight)
     print(metrics)
 
-    #load in best weights
-    model.load_from_checkpoint(callbacks[1].best_model_path,encoder=encoder,classifier=classifier)
     # save weights
     torch.save(model.state_dict(), os.path.join(COMPONENT_OUTPUT_FOLDER, f'{EXPERIMENT_ID}_model.pt'))
     torch.save(classifier.state_dict(), os.path.join(COMPONENT_OUTPUT_FOLDER, f'{EXPERIMENT_ID}_classifier.pt'))
