@@ -3,7 +3,7 @@ import os
 import torch
 
 from pytorch_lightning import Trainer, seed_everything
-from conf import CUSTOM_SETTINGS, OUTPUTS_FOLDER, COMPONENT_OUTPUT_FOLDER
+from conf import CUSTOM_SETTINGS, OUTPUTS_FOLDER, COMPONENT_OUTPUT_FOLDER, EXPERIMENT_ID
 from supervised_dataset import SupervisedDataModule
 from callbacks.setup_callbacks import setup_callbacks
 from utils.init_utils import (init_augmentations, init_datamodule,
@@ -27,6 +27,7 @@ def run_supervised_training():
         train_transforms, test_transforms = init_transforms(CUSTOM_SETTINGS['transforms'])
 
     # for now, don't use augmentations during supervised training
+    augmentations=None
     if (CUSTOM_SETTINGS['sup_config']['use_augmentations_in_sup'] == True) and (
             'augmentations' in CUSTOM_SETTINGS.keys()):
         augmentations = init_augmentations(CUSTOM_SETTINGS['augmentations'])
@@ -47,8 +48,9 @@ def run_supervised_training():
     )
     # initialise encoder
     encoder = init_encoder(CUSTOM_SETTINGS["encoder_config"],
-                           CUSTOM_SETTINGS['encoder_config']['pretrained'] if "pretrained" in CUSTOM_SETTINGS[
-                               'encoder_config'].keys() else None
+                           CUSTOM_SETTINGS['encoder_config']['pretrained'] if "pretrained_path" in CUSTOM_SETTINGS[
+                               'encoder_config'].keys()  else f"{OUTPUTS_FOLDER}/SSL_Training/{EXPERIMENT_ID}_encoder.pt" if "pretrained_same_experiment" in CUSTOM_SETTINGS[
+                               'encoder_config'].keys() and CUSTOM_SETTINGS['encoder_config']["pretrained_same_experiment"] else None
                            )
     # CNN1D(
     #    pretrained=CUSTOM_SETTINGS['encoder_config']['pretrained'] if "pretrained" in CUSTOM_SETTINGS['encoder_config'].keys() else None,
@@ -64,7 +66,7 @@ def run_supervised_training():
     callbacks = setup_callbacks(
         early_stopping_metric="val_loss",
         no_ckpt=False,
-        patience=15,
+        patience=50,
     )
     # initialize Pytorch-Lightning Training
     trainer = Trainer(
@@ -79,11 +81,17 @@ def run_supervised_training():
 
     # pre-train and report test loss
     trainer.fit(model, datamodule)
-    metrics = trainer.test(model, datamodule, ckpt_path='best')
+    #print(model.encoder.conv_block1.conv1.weight)
+    #load in best weights
+    #model.load_from_checkpoint(callbacks[1].best_model_path,encoder=encoder,classifier=classifier)
+    metrics = trainer.test(model,datamodule)
+    #print(model.encoder.conv_block1.conv1.weight)
     print(metrics)
 
     # save weights
-    torch.save(encoder.state_dict(), os.path.join(COMPONENT_OUTPUT_FOLDER, 'test_model.pt'))
+    torch.save(model.state_dict(), os.path.join(COMPONENT_OUTPUT_FOLDER, f'{EXPERIMENT_ID}_model.pt'))
+    torch.save(classifier.state_dict(), os.path.join(COMPONENT_OUTPUT_FOLDER, f'{EXPERIMENT_ID}_classifier.pt'))
+
 
 
 if __name__ == '__main__':

@@ -4,7 +4,7 @@ import torch
 import pathlib
 
 from pytorch_lightning import Trainer, seed_everything
-from conf import CUSTOM_SETTINGS, OUTPUTS_FOLDER, COMPONENT_OUTPUT_FOLDER
+from conf import CUSTOM_SETTINGS, OUTPUTS_FOLDER, COMPONENT_OUTPUT_FOLDER,EXPERIMENT_ID
 from ssl_dataset import SSLDataModule
 from callbacks.setup_callbacks import setup_callbacks
 from utils.init_utils import (init_augmentations, init_datamodule,
@@ -58,7 +58,7 @@ def run_pre_training():
     callbacks = setup_callbacks(
         early_stopping_metric="val_loss",
         no_ckpt=False,
-        patience=15,
+        patience=100,
     )
     # initialize Pytorch-Lightning Training
     trainer = Trainer(
@@ -69,17 +69,23 @@ def run_pre_training():
         default_root_dir=os.path.join(COMPONENT_OUTPUT_FOLDER),
         callbacks=callbacks,
         max_epochs=CUSTOM_SETTINGS['ssl_config']['epochs'],
-        log_every_n_steps=5
+        log_every_n_steps=9
     )
 
     # pre-train and report test loss
+    #TODO: MAKE SURE BEST WEIGHTS ARE SAVED TO .PT FILE
     trainer.fit(ssl_model, datamodule)
+    #print(ssl_model.encoder.conv_block1.conv1.weight)
     metrics = trainer.test(ssl_model, datamodule, ckpt_path='best')
+    #print(ssl_model.encoder.conv_block1.conv1.weight)
     print(metrics)
 
+    #load in best weights
+    #ssl_model.load_from_checkpoint(callbacks[1].best_model_path,encoder=encoder)
+    #print(ssl_model.encoder.conv_block1.conv1.weight)
     # save weights
     # pathlib.Path(os.path.join(OUTPUTS_FOLDER,'SSL_Training')).mkdir(parents=True, exist_ok=True)
-    torch.save(encoder.state_dict(), os.path.join(COMPONENT_OUTPUT_FOLDER, 'test_encoder.pt'))
+    torch.save(encoder.state_dict(), os.path.join(COMPONENT_OUTPUT_FOLDER, f'{EXPERIMENT_ID}_encoder.pt'))
 
 
 if __name__ == '__main__':

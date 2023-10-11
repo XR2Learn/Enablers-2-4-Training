@@ -7,7 +7,7 @@ class VICReg(LightningModule):
     """
     Implementation of VicReg adapted from https://github.com/facebookresearch/vicreg/
     """
-    def __init__(self, encoder, ssl_batch_size, sim_coeff = 25, std_coeff = 25, cov_coeff = 1, optimizer_name_ssl='adam', lr=0.005, **kwargs):
+    def __init__(self, encoder, ssl_batch_size=128, sim_coeff = 25, std_coeff = 25, cov_coeff = 1, optimizer_name_ssl='adam', lr=0.005, **kwargs):
 
         super().__init__()
 
@@ -33,15 +33,6 @@ class VICReg(LightningModule):
 
     def on_fit_start(self):
         self.encoder.to(self.device)
-
-    def log_hyperparams(self):
-       # self.hparams['in_channels'] = self.encoder.in_channels
-       # self.hparams['out_channels'] = self.encoder.out_channels
-       # self.hparams['num_head'] = self.encoder.num_head
-       # self.hparams['num_layers'] = self.encoder.num_layers
-       # self.hparams['kernel_size'] = self.encoder.kernel_size
-       # self.hparams['dropout'] = self.encoder.dropout
-        self.save_hyperparameters(ignore=["batch_size", "num_features"])
 
     def _process_batch(self, batch):
         aug1, aug2 = batch[0].float(), batch[-1].float()

@@ -17,7 +17,11 @@ DURATION_AUDIO_RAVDESS = 3
 
 MAIN_FOLDER_DEFAULT = pathlib.Path(__file__).parent.parent.absolute()
 MAIN_FOLDER = config('MAIN_FOLDER', default=MAIN_FOLDER_DEFAULT)
-OUTPUTS_FOLDER = os.path.join(MAIN_FOLDER, 'outputs')
+outputs_folder = os.path.join(MAIN_FOLDER, 'outputs')
+OUTPUTS_FOLDER = config('OUTPUTS_FOLDER', default=outputs_folder)
+EXPERIMENT_ID = config('EXPERIMENT_ID', default='dev_model')
+datasets_folder = os.path.join(MAIN_FOLDER, 'outputs')
+DATASETS_FOLDER = config('DATASETS_FOLDER', default=datasets_folder)
 DATA_PATH = os.path.join(MAIN_FOLDER_DEFAULT, 'datasets', 'RAVDESS', 'audio_speech_actors_01-24')
 RAVDESS_DATA_PATH = os.path.join(MAIN_FOLDER_DEFAULT, 'datasets', 'RAVDESS')
 
@@ -30,7 +34,8 @@ CUSTOM_SETTINGS = {
         'default': 'value',
     }
 }
-PATH_CUSTOM_SETTINGS = os.path.join(MAIN_FOLDER, 'configuration.json')
+path_custom_settings = os.path.join(MAIN_FOLDER, 'configuration.json')
+PATH_CUSTOM_SETTINGS = config('PATH_CUSTOM_SETTINGS', default=path_custom_settings)
 if os.path.exists(PATH_CUSTOM_SETTINGS):
     with open(PATH_CUSTOM_SETTINGS, 'r') as f:
         CUSTOM_SETTINGS = json.load(f)
