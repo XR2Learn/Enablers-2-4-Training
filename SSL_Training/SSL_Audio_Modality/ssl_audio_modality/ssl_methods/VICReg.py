@@ -34,15 +34,6 @@ class VICReg(LightningModule):
     def on_fit_start(self):
         self.encoder.to(self.device)
 
-    def log_hyperparams(self):
-       # self.hparams['in_channels'] = self.encoder.in_channels
-       # self.hparams['out_channels'] = self.encoder.out_channels
-       # self.hparams['num_head'] = self.encoder.num_head
-       # self.hparams['num_layers'] = self.encoder.num_layers
-       # self.hparams['kernel_size'] = self.encoder.kernel_size
-       # self.hparams['dropout'] = self.encoder.dropout
-        self.save_hyperparameters(ignore=["batch_size", "num_features"])
-
     def _process_batch(self, batch):
         aug1, aug2 = batch[0].float(), batch[-1].float()
         return aug1,aug2
