@@ -27,9 +27,11 @@ def generate_ssl_features():
     print(CUSTOM_SETTINGS)
     splith_paths = {'train': "train.csv", 'val': "val.csv", 'test': "test.csv"}
 
+    # TODO refactor the code below to not be hard coded, but use the component output folder as the path to load the
+    #  model
     encoder = init_encoder(CUSTOM_SETTINGS["encoder_config"],
                            CUSTOM_SETTINGS['encoder_config']['pretrained'] if "pretrained_path" in CUSTOM_SETTINGS[
-                               'encoder_config'].keys()  else f"{OUTPUTS_FOLDER}/SSL_Training/{EXPERIMENT_ID}_encoder.pt" if "pretrained_same_experiment" in CUSTOM_SETTINGS[
+                               'encoder_config'].keys()  else f"{OUTPUTS_FOLDER}/ssl_training/{EXPERIMENT_ID}_encoder.pt" if "pretrained_same_experiment" in CUSTOM_SETTINGS[
                                'encoder_config'].keys() and CUSTOM_SETTINGS['encoder_config']["pretrained_same_experiment"] else None
                            )
     encoder.eval()
