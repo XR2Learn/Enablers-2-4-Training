@@ -7,7 +7,7 @@ class VICReg(LightningModule):
     """
     Implementation of VicReg adapted from https://github.com/facebookresearch/vicreg/
     """
-    def __init__(self, encoder, ssl_batch_size, sim_coeff = 25, std_coeff = 25, cov_coeff = 1, optimizer_name_ssl='adam', lr=0.005, **kwargs):
+    def __init__(self, encoder, ssl_batch_size=128, sim_coeff = 25, std_coeff = 25, cov_coeff = 1, optimizer_name_ssl='adam', lr=0.005, **kwargs):
 
         super().__init__()
 
