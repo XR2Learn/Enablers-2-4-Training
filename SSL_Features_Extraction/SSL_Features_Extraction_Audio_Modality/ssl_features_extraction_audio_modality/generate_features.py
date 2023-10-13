@@ -63,8 +63,8 @@ def generate_and_save(encoder, csv_path, out_path):
         # TODO : find replacement for .replace('\\','/')) to have a seperator that works on all OS
         x = np.load(
             os.path.join(OUTPUTS_FOLDER, CUSTOM_SETTINGS['encoder_config']['input_type'], data_path).replace('\\', '/'))
-        x_tensor = torch.tensor(np.expand_dims(x, axis=0) if len(x.shape) <= 1 else x)
-        features = encoder(x_tensor.T)
+        x_tensor = torch.tensor(np.expand_dims(x.T, axis=0) if len(x.shape) <= 1 else x.T)
+        features = encoder(x_tensor)
         # print(data_path.split(os.path.sep))
         np.save(os.path.join(out_path, data_path.split(os.path.sep)[-1]), features.detach().numpy())
 

@@ -67,8 +67,9 @@ Then, the docker images will map the `/datasets`, `/outputs` and `configuration.
 ├── encoder_config
 │   ├── from_module: module where the encoder is to be found
 │   ├── class_name: name of encoder inside module
-│   ├── input_type: specify the input modality
+│   ├── input_type: specify the input modality (e.g. eGeMAPs, 
 │   ├── kwargs: arguments for the encoder
+│       ├── len_seq: for eGeMAPS (88), for standardize (SR * number of seconds)
 ├── ssl_config
 │  ├── from_module: model from which to load the ssl framework
 │  ├── ssl_framework: name of the framework to use
