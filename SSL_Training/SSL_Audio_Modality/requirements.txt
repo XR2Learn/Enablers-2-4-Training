@@ -1,3 +1,4 @@
+--extra-index-url https://download.pytorch.org/whl/cpu
 python-decouple==3.6
 pandas==1.5.3
 scipy==1.11.1
