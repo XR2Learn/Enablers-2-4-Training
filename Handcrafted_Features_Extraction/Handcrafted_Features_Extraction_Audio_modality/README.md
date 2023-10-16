@@ -10,6 +10,10 @@ Component to pre-train an ED model using audio data input type.
 
 - Output files should be saved in the folder `/outputs/handcrafted-features-generation-audio/`
 
+### Support
+- This component does not support macOS with Apple chip because one of its dependency, opensmile,
+does not support it. Check reported [issue](https://github.com/audeering/opensmile-python/issues/79#issuecomment-1614165695).
+
 # Development
 
 ## Development Environment Setup
