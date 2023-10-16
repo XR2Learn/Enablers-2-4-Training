@@ -9,7 +9,7 @@ import pandas as pd
 from tqdm import tqdm
 from conf import CUSTOM_SETTINGS
 from pytorch_lightning import Trainer, seed_everything
-from conf import CUSTOM_SETTINGS, MAIN_FOLDER, OUTPUTS_FOLDER,EXPERIMENT_ID
+from conf import CUSTOM_SETTINGS, MAIN_FOLDER, OUTPUTS_FOLDER, EXPERIMENT_ID
 from utils.init_utils import (init_augmentations, init_datamodule,
                               init_loggers, init_random_split, init_transforms,
                               setup_ssl_model, init_encoder)
@@ -31,8 +31,12 @@ def generate_ssl_features():
     #  model
     encoder = init_encoder(CUSTOM_SETTINGS["encoder_config"],
                            CUSTOM_SETTINGS['encoder_config']['pretrained'] if "pretrained_path" in CUSTOM_SETTINGS[
-                               'encoder_config'].keys()  else f"{OUTPUTS_FOLDER}/ssl_training/{EXPERIMENT_ID}_encoder.pt" if "pretrained_same_experiment" in CUSTOM_SETTINGS[
-                               'encoder_config'].keys() and CUSTOM_SETTINGS['encoder_config']["pretrained_same_experiment"] else None
+                               'encoder_config'].keys() else f"{OUTPUTS_FOLDER}/ssl_training/{EXPERIMENT_ID}_encoder.pt" if "pretrained_same_experiment" in
+                                                                                                                            CUSTOM_SETTINGS[
+                                                                                                                                'encoder_config'].keys() and
+                                                                                                                            CUSTOM_SETTINGS[
+                                                                                                                                'encoder_config'][
+                                                                                                                                "pretrained_same_experiment"] else None
                            )
     encoder.eval()
     print(encoder)
