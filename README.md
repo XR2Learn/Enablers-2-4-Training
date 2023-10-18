@@ -67,20 +67,32 @@ Then, the docker images will map the `/datasets`, `/outputs` and `configuration.
 ├── encoder_config
 │   ├── from_module: module where the encoder is to be found
 │   ├── class_name: name of encoder inside module
-│   ├── input_type: specify the input modality (e.g. eGeMAPs, 
+│   ├── input_type: specify the input modality (e.g. eGeMAPs,
+│   ├── pretrained_same_experiment: use the pretrained encoder of this experiment or not,
 │   ├── kwargs: arguments for the encoder
+├─      ├── in_channels: number of channels in the input data
 │       ├── len_seq: for eGeMAPS (88), for standardize (SR * number of seconds)
+│       ├── out_channels: list containing the number of output channels for each conv block
+│       ├── kernel_sizes: list containing the kernel sizes for each conv block
+│       ├── stride: stire size over all conv blocks
 ├── ssl_config
 │  ├── from_module: model from which to load the ssl framework
 │  ├── ssl_framework: name of the framework to use
 │  ├── epochs: number of epochs
 │  ├── batch_size: batch size for SSL training
 │  ├── kwargs: other arguments for SSL training
+│       ├── lr: learning rate
+│       ├── n_views: number of views, at the moment only 2 supported
+│       ├── temperature: temperature used
+│       ├── optimizer_name_ssl: at the moment only adam supported
 ├── sup_config
 │  ├── epochs: number of epochs to train for
 │  ├── batch_size: batch size for supervised trianing
 │  ├── use_augmentation_in_sup: weather to use the defined augmentations in sup learning or not
 │  ├── kwargs: other supervised learning args
+│       ├── lr: learning rate
+│       ├── optimizer_name: at the moment only adam supported
+│       ├── freeze_encoder: boolean, weather to freeze the encoder in supervised training or not
 ├── augmentations
 │  ├── augmentation name
 │     ├── probability: probability of augmentation to be applies
