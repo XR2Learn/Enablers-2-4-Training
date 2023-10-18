@@ -2,16 +2,12 @@
 import os
 import torch
 
-from pytorch_lightning import Trainer, seed_everything
+from pytorch_lightning import Trainer
 from conf import CUSTOM_SETTINGS, OUTPUTS_FOLDER, COMPONENT_OUTPUT_FOLDER, EXPERIMENT_ID
 from supervised_dataset import SupervisedDataModule
 from callbacks.setup_callbacks import setup_callbacks
-from utils.init_utils import (init_augmentations, init_datamodule,
-                              init_loggers, init_random_split, init_transforms,
-                              setup_ssl_model, init_encoder)
-from utils.utils import copy_file, generate_experiment_id, load_yaml_to_dict
+from utils.init_utils import (init_augmentations,init_transforms, init_encoder)
 
-from encoders.cnn1d import CNN1D, CNN1D1L
 from classification_model import classification_model
 from classifiers.linear import LinearClassifier
 

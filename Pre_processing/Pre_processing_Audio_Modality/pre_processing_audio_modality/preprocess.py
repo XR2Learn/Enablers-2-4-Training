@@ -10,7 +10,7 @@ import pathlib
 from tqdm import tqdm
 # for now i choose scipy as it offers a lot  without having to install additional libraries but maybe librosa can also be an option
 import scipy
-from conf import CUSTOM_SETTINGS, RAVDESS_EMOTION_TO_LABEL, RAVDESS_LABEL_TO_EMOTION, MAIN_FOLDER, DATASETS_FOLDER, \
+from conf import CUSTOM_SETTINGS, RAVDESS_LABEL_TO_EMOTION, DATASETS_FOLDER, \
     OUTPUTS_FOLDER
 
 

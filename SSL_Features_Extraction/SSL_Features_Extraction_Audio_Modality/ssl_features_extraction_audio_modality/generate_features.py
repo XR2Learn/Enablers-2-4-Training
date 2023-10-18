@@ -1,18 +1,14 @@
 # Python code here
 import os
 import torch
-import scipy
 import pathlib
 import numpy as np
 import pandas as pd
 
 from tqdm import tqdm
 from conf import CUSTOM_SETTINGS
-from pytorch_lightning import Trainer, seed_everything
-from conf import CUSTOM_SETTINGS, MAIN_FOLDER, OUTPUTS_FOLDER, EXPERIMENT_ID
-from utils.init_utils import (init_augmentations, init_datamodule,
-                              init_loggers, init_random_split, init_transforms,
-                              setup_ssl_model, init_encoder)
+from conf import CUSTOM_SETTINGS, OUTPUTS_FOLDER, EXPERIMENT_ID
+from utils.init_utils import init_encoder
 
 
 def generate_ssl_features():

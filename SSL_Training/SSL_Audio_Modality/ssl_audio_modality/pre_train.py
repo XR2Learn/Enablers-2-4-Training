@@ -1,20 +1,13 @@
 # Python code here
 import os
 import torch
-import pathlib
 
-from pytorch_lightning import Trainer, seed_everything
+from pytorch_lightning import Trainer
 from conf import CUSTOM_SETTINGS, OUTPUTS_FOLDER, COMPONENT_OUTPUT_FOLDER,EXPERIMENT_ID
 from ssl_dataset import SSLDataModule
 from callbacks.setup_callbacks import setup_callbacks
-from utils.init_utils import (init_augmentations, init_datamodule,
-                              init_loggers, init_random_split, init_transforms,
+from utils.init_utils import (init_augmentations,init_transforms,
                               setup_ssl_model, init_encoder)
-from utils.utils import copy_file, generate_experiment_id, load_yaml_to_dict
-
-from encoders.cnn1d import CNN1D, CNN1D1L
-from ssl_methods.SimCLR import SimCLR
-from ssl_methods.VICReg import VICReg
 
 
 def run_pre_training():
