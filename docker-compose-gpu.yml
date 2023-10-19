@@ -25,3 +25,17 @@ services:
             - driver: nvidia
               device_ids: [ '0' ]
               capabilities: [ gpu ]
+
+
+  ssl-features-generation-audio:
+    image: some.registry.com/xr2learn-enablers/ssl-features-generation-audio:latest-gpu
+    build:
+      context: 'SSL_Features_Extraction/SSL_Features_Extraction_Audio_Modality'
+      dockerfile: 'Dockerfile-gpu'
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              device_ids: [ '0' ]
+              capabilities: [ gpu ]
