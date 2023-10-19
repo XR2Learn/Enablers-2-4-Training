@@ -6,7 +6,6 @@ import numpy as np
 import pandas as pd
 
 from tqdm import tqdm
-from conf import CUSTOM_SETTINGS
 from conf import CUSTOM_SETTINGS, OUTPUTS_FOLDER, EXPERIMENT_ID
 from utils.init_utils import init_encoder
 

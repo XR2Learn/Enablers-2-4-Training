@@ -3,10 +3,10 @@ import os
 import torch
 
 from pytorch_lightning import Trainer
-from conf import CUSTOM_SETTINGS, OUTPUTS_FOLDER, COMPONENT_OUTPUT_FOLDER,EXPERIMENT_ID
+from conf import CUSTOM_SETTINGS, OUTPUTS_FOLDER, COMPONENT_OUTPUT_FOLDER, EXPERIMENT_ID
 from ssl_dataset import SSLDataModule
 from callbacks.setup_callbacks import setup_callbacks
-from utils.init_utils import (init_augmentations,init_transforms,
+from utils.init_utils import (init_augmentations, init_transforms,
                               setup_ssl_model, init_encoder)
 
 
@@ -56,7 +56,7 @@ def run_pre_training():
     # initialize Pytorch-Lightning Training
     trainer = Trainer(
         # logger=loggers,
-        # accelerator='cpu' if args.gpus == 0 else 'gpu',
+        accelerator='gpu' if torch.cuda.is_available() else 'cpu',
         # devices=None if args.gpus == 0 else args.gpus,
         deterministic=True,
         default_root_dir=os.path.join(COMPONENT_OUTPUT_FOLDER),
@@ -66,16 +66,16 @@ def run_pre_training():
     )
 
     # pre-train and report test loss
-    #TODO: MAKE SURE BEST WEIGHTS ARE SAVED TO .PT FILE
+    # TODO: MAKE SURE BEST WEIGHTS ARE SAVED TO .PT FILE
     trainer.fit(ssl_model, datamodule)
-    #print(ssl_model.encoder.conv_block1.conv1.weight)
+    # print(ssl_model.encoder.conv_block1.conv1.weight)
     metrics = trainer.test(ssl_model, datamodule, ckpt_path='best')
-    #print(ssl_model.encoder.conv_block1.conv1.weight)
+    # print(ssl_model.encoder.conv_block1.conv1.weight)
     print(metrics)
 
-    #load in best weights
-    #ssl_model.load_from_checkpoint(callbacks[1].best_model_path,encoder=encoder)
-    #print(ssl_model.encoder.conv_block1.conv1.weight)
+    # load in best weights
+    # ssl_model.load_from_checkpoint(callbacks[1].best_model_path,encoder=encoder)
+    # print(ssl_model.encoder.conv_block1.conv1.weight)
     # save weights
     # pathlib.Path(os.path.join(OUTPUTS_FOLDER,'SSL_Training')).mkdir(parents=True, exist_ok=True)
     torch.save(encoder.state_dict(), os.path.join(COMPONENT_OUTPUT_FOLDER, f'{EXPERIMENT_ID}_encoder.pt'))

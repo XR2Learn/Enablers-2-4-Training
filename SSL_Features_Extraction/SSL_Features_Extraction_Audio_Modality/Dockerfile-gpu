@@ -11,13 +11,13 @@ RUN apt-get update \
         yasm \
         pkg-config \
         vim
-COPY ./requirements-gpu.txt /app/requirements-gpu.txt
+COPY requirements-gpu.txt /app/requirements-gpu.txt
 COPY ./setup.py /app/setup.py
-RUN mkdir -p /app/supervised_audio_modality/ && \
-    touch /app/supervised_audio_modality/__init__.py
+RUN mkdir -p /app/ssl_features_extraction_audio_modality/ && \
+    touch /app/ssl_features_extraction_audio_modality/__init__.py
 WORKDIR /app
 RUN pip install -r requirements-gpu.txt && \
     rm -rf /tmp/pip* /root/.cache/pip
-ADD ./ /app
+ADD .. /app
 RUN pip install -e . && \
     rm -rf /tmp/pip* /root/.cache/pip
