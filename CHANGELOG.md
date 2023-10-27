@@ -8,7 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Information to README files.
-- Refactoring code (PIP8).
+
+### Changed
+- Code refactoring (PIP8).
 
 ## [0.1.0] - 2023-10-19
 ### Added
