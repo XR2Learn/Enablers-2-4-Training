@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Information to README files.
 - Refactoring code (PIP8).
 
-## [0.1.0] - 19-10-2023
+## [0.1.0] - 2023-10-19
 ### Added
 - Basic version of Enablers 2-4 for audio modality using RAVDESS dataset, supporting:
   - Preprocessing with standardize
