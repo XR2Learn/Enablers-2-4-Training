@@ -15,6 +15,9 @@ Repository containing the components for training the models used in XR2Learn.
 - Docker (Nvidia-Docker for CUDA)
 - Python 3.10
 
+## Changelog
+[CHANGELOG.md]
+
 ## Docker Commands
 
 1. Build a docker image
@@ -120,3 +123,5 @@ component.
 │  ├── transform_name: name of transformation
 │  ├── in_test: if transformation is to be applied to test set or not
 ```
+
+[CHANGELOG.md]: https://github.com/um-xr2learn-enablers/XR2Learn-Training/blob/master/CHANGELOG.md
