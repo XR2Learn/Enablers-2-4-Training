@@ -1,15 +1,17 @@
 # Python code here
-import os
-import requests
-import zipfile
-import io
 import glob
-import pandas as pd
-import numpy as np
+import io
+import os
 import pathlib
-from tqdm import tqdm
+import zipfile
+
+import numpy as np
+import pandas as pd
+import requests
 # for now i choose scipy as it offers a lot  without having to install additional libraries but maybe librosa can also be an option
 import scipy
+from tqdm import tqdm
+
 from conf import CUSTOM_SETTINGS, RAVDESS_LABEL_TO_EMOTION, DATASETS_FOLDER, \
     OUTPUTS_FOLDER
 

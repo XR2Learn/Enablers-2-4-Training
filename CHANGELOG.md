@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Information to README files.
+- Refactoring code (PIP8).
+
 ## [0.1.0] - 19-10-2023
 ### Added
 - Basic version of Enablers 2-4 for audio modality using RAVDESS dataset, supporting:
@@ -15,6 +19,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Supervised Training
   - SSL features extraction
 - Changelog
+
+### Known Issues
+- `docker-compose.yml` is mapping outside .env file to docker image, generating an error in some cases.
 
 <!-- 
 Example of Categories to use in each release
