@@ -9,6 +9,7 @@ nav:
   - API:
     - Utils: api/utils.md
     - Augmentations: api/augmentations.md
+    - Encoders: api/encoders.md
   
 theme:
   logo: assets/logo.png
