@@ -1,0 +1,65 @@
+site_name: Internal XR2Learn Emotion Recognition Documentation
+
+nav:
+  - Home: index.md
+  - Emotion Recognition Toolbox: 1_ert.md
+  - Enablers 2/3: 2_enablers23.md
+  - Enablers 4/5: 3_enablers45.md
+  - Enabler 6: 4_enabler6.md
+  - API:
+    - Utils: api/utils.md
+    - Augmentations: api/augmentations.md
+  
+theme:
+  logo: assets/logo.png
+  favicon: assets/favicon.png
+  name: material
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - navigation.tabs.sticky
+    - toc.integrate
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.tabs.link
+    - content.code.annotation
+    - content.code.copy
+  
+  language: en
+
+  palette:
+    - scheme: default
+      toggle:
+        icon: material/toggle-switch-off-outline 
+        name: Switch to dark mode
+      primary: indigo
+      accent: purple 
+    - scheme: slate 
+      toggle:
+        icon: material/toggle-switch
+        name: Switch to light mode    
+      primary: indigo
+      accent: lime
+
+extra_javascript:
+  - javascripts/mathjax.js
+  - https://polyfill.io/v3/polyfill.min.js?features=es6
+  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
+
+markdown_extensions:
+  - pymdownx.details
+  - attr_list
+  - md_in_html
+
+plugins:
+  - mkdocstrings:
+      handlers:
+        python:
+          paths: [..]
+
+
+copyright: |
+  &copy; 2023 <a href="https://github.com/um-xr2learn-enablers"  target="_blank" rel="noopener">Maastricht University: Bulat Khaertdinov, Annanda Sousa, Pedro Jeuris, Enrique Hortal</a>
+    
