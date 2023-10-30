@@ -37,7 +37,7 @@ class GaussianNoise:
 
         Returns
         -------
-        numpy.ndarray
+        : numpy.ndarray
             Noisy data after applying Gaussian noise.
         """
         x_noise = x + np.random.normal(loc=self.mean, scale=self.std, size=x.shape)

@@ -59,6 +59,13 @@ plugins:
       handlers:
         python:
           paths: [..]
+          options:
+            docstring_style: numpy
+            show_docstring_classes: true
+            show_docstring_functions: true
+            show_docstring_attributes: true
+            docstring_section_style: table
+
 
 
 copyright: |
