@@ -1,7 +1,5 @@
 """
-augmentations.py
-====================================
-Module containing all augmentations for self-supervised learning
+Module containing classes for all augmentations for data augmentation
 """
 
 import numpy as np
