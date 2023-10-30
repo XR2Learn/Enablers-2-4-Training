@@ -19,17 +19,30 @@ class CNN1D(LightningModule):
                 pretrained = None,
                 **kwargs):
         """
-        1D-Convolutional Network with three layers
-        Args:
-            in_channels: number of channels in the input data
-            len_seq: lenght of the input sequence
-            out_channels: list containing the number of channels in the convolutional layers
-            kernel_sizes: list containing the sizes of the convolutional kernels
-            strid: size of the stride
-            padding: unused, just to compute the out size
-            pool_size: size of the maxpooling 
-            p_drop: dropout value
-            pretrained: path to pretrained model
+        1D-Convolutional Network with three layers.
+
+        Parameters
+        ----------
+        in_channels : int
+            Number of channels in the input data.
+        len_seq : int
+            Length of the input sequence.
+        out_channels : list of int
+            List containing the number of channels in the convolutional layers.
+        kernel_sizes : list of int
+            List containing the sizes of the convolutional kernels.
+        stride : int
+            Size of the stride.
+        padding : int
+            Unused, just to compute the out size.
+        pool_padding : int
+            Padding for maxpooling.
+        pool_size : int
+            Size of the maxpooling.
+        p_drop : float
+            Dropout value.
+        pretrained : str
+            Path to pretrained model.
         """
         super(CNN1D, self).__init__()
         self.len_seq = len_seq
@@ -80,6 +93,19 @@ class CNN1D(LightningModule):
         return int(num_channels * conv_out_size)
 
     def forward(self, x):
+        """
+        Forward pass of the CNN1D.
+
+        Parameters
+        ----------
+        x : torch.Tensor
+            Input tensor.
+
+        Returns
+        -------
+        torch.Tensor
+            Output tensor after applying CNN layers.
+        """
         x = self.conv_block1(x)
         x = self.dropout(x)
 
