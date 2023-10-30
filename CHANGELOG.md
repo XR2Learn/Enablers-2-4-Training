@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Information to README files.
+- first version of documentation and API with mkdocs+mkdocstrings
 
 ### Changed
 - Code refactoring (PIP8).
