@@ -13,25 +13,21 @@ class SimCLR(LightningModule):
             optimizer_name='adam',
             lr=0.001,
             **kwargs):
-        """ Implementation of SimCLR with Pytorch Lightning. A user needs to provide input encoders for each modality.
+        """ Implementation of SimCLR with Pytorch Lightning. A user needs to provide the input encoder
 
         Parameters
         ----------
-        encoders_dict : dict
-            dictionary of encoders
-        modalities : list
-            list of input modalities
-        groups : list
-            list of input encoding groups (combination of modalities stacked together)
+        encoder : 
+            encoder to train
         ssl_batch_size : int, optional
-           batch size for ssl pre-training, by default 128
+            batch size for ssl pre-training, by default 128
         temperature : float, optional
             temperature hyperparameter value, by default 0.05
         n_views : int, optional
             number of views, by default 2
-        optimizer_name_ssl : str, optional
+        optimizer_name : str, optional
             optimizer, by default 'adam'
-        ssl_lr : float, optional
+        lr : float, optional
             learning rate, by default 0.001
         """        
         super().__init__()

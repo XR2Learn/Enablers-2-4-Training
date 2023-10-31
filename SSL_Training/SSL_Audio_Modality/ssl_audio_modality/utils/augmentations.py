@@ -48,10 +48,6 @@ class HorizontalFlip:
     def __init__(self):
         """
         Flips data on the horizontal axis.
-
-        Parameters
-        ----------
-        None
         """
         pass
 
@@ -77,10 +73,6 @@ class VerticalFlip:
     def __init__(self):
         """
         Flips data on the vertical axis.
-
-        Parameters
-        ----------
-        None
         """
         pass
 
@@ -215,10 +207,6 @@ class Rotation:
     def __init__(self):
         """
         Rotates the data.
-
-        Parameters
-        ----------
-        None
         """
         pass
 
@@ -360,10 +348,6 @@ class NoAugmentation:
     def __init__(self):
         """
         No augmentation applied.
-
-        Parameters
-        ----------
-        None
         """
         pass
 

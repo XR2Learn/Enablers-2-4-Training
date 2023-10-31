@@ -4,11 +4,27 @@ from pytorch_lightning import LightningModule
 from torch import nn
 
 class VICReg(LightningModule):
-    """
-    Implementation of VicReg adapted from https://github.com/facebookresearch/vicreg/
-    """
-    def __init__(self, encoder, ssl_batch_size=128, sim_coeff = 25, std_coeff = 25, cov_coeff = 1, optimizer_name_ssl='adam', lr=0.005, **kwargs):
+    def __init__(self, encoder, ssl_batch_size=128, sim_coeff = 25, std_coeff = 25, cov_coeff = 1, optimizer_name='adam', lr=0.005, **kwargs):
 
+        """ Implementation of VicReg adapted from https://github.com/facebookresearch/vicreg/
+
+        Parameters
+        ----------
+        encoder : 
+            encoder to train
+        ssl_batch_size : int, optional
+            batch size for ssl pre-training, by default 128
+        sim_coeff : float, optional
+            , by default 25
+        std_coeff : float, optional
+            , by default 25
+        cov_coeff : float, optional
+            , by default 1
+        optimizer_name : str, optional
+            optimizer, by default 'adam'
+        lr : float, optional
+            learning rate, by default 0.005
+        """        
         super().__init__()
 
         self.encoder = encoder
@@ -21,7 +37,7 @@ class VICReg(LightningModule):
                 nn.ReLU(inplace=True),
         )
 
-        self.optimizer_name_ssl = optimizer_name_ssl
+        self.optimizer_name_ssl = optimizer_name
         self.lr = lr
 
         self.embedding_size = self.encoder.out_size
