@@ -2,14 +2,18 @@ site_name: Internal XR2Learn Emotion Recognition Documentation
 
 nav:
   - Home: index.md
-  - Emotion Recognition Toolbox: 1_ert.md
-  - Enablers 2/3: 2_enablers23.md
-  - Enablers 4/5: 3_enablers45.md
-  - Enabler 6: 4_enabler6.md
+  #- Emotion Recognition Toolbox: 1_ert.md
+  #- Enablers 2/3: 2_enablers23.md
+  #- Enablers 4/5: 3_enablers45.md
+  #- Enabler 6: 4_enabler6.md
+  - XR2Learn-Training: 1_training.md
+  - Configuration : 2_configuration.md
+  - Folder Structure : 3_folder_structure.md
   - API:
     - Utils: api/utils.md
     - Augmentations: api/augmentations.md
     - Encoders: api/encoders.md
+    - Self-Supervised Learning: api/ssl.md
   
 theme:
   logo: assets/logo.png
