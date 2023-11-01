@@ -4,10 +4,16 @@ import tempfile
 import unittest
 
 import torch
+<<<<<<< HEAD
 from pytorch_lightning import LightningModule, Trainer
 
 from supervised_audio_modality.encoders.cnn1d import CNN1D
 from supervised_audio_modality.encoders.w2v import Wav2Vec2CNN
+=======
+from pytorch_lightning import Trainer
+
+from supervised_audio_modality.encoders.cnn1d import CNN1D
+>>>>>>> 4e7c2b5 (Refactor and cover cnn1d with tests)
 
 
 class CNN1DTestCase(unittest.TestCase):
@@ -83,10 +89,14 @@ class CNN1DTestCase(unittest.TestCase):
 
     def test_forward_pass_shape(self):
         output = self.cnn(self.input)
+<<<<<<< HEAD
         self.assertEqual(
             output.shape,
             (self.batch_size, self.out_channels[-1], self.cnn.out_size // self.out_channels[-1])
         )
+=======
+        self.assertEqual(output.shape, (64, 256, 30))
+>>>>>>> 4e7c2b5 (Refactor and cover cnn1d with tests)
 
     def test_correct_model_load(self):
         test_dir = tempfile.mkdtemp()
@@ -120,6 +130,7 @@ class CNN1DTestCase(unittest.TestCase):
         self.assertTrue(torch.allclose(output_cnn_default, output_cnn_lightning))
 
         shutil.rmtree(test_dir)
+<<<<<<< HEAD
 
 
 class Wav2Vec2CNNTestCase(unittest.TestCase):
@@ -186,3 +197,5 @@ class Wav2Vec2CNNTestCase(unittest.TestCase):
         self.assertTrue(torch.allclose(output_w2v2_default, output_w2v2_lightning))
 
         shutil.rmtree(test_dir)
+=======
+>>>>>>> 4e7c2b5 (Refactor and cover cnn1d with tests)
