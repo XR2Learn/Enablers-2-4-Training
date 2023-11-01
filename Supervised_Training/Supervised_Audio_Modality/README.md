@@ -9,10 +9,21 @@ Component to train an ED model using audio data input type.
 - Output file with trained weights is saved in the folder `/outputs/<file_weights>`
 
 ## Development Environment Setup
-
+Create and activate virtual environment with `venv`. If you wish to use GPU in your environment, install requirements from `requirements-gpu.txt` (line 2):
+``` 
+python -m venv ./venv
+pip install -r requirements{-gpu}.txt
+source ./venv/bin/activate
+```
 
 ## Development Notes
 - Dataset: RAVDESS (audio dataset annotated with seven emotion classes).
 - Encoder to generate features: wav2vec2
 - Features stored as: .npy files (from tensor to ndarray to file)
 - Dataset .CSV file with labels, path to features and timestamps. 
+
+## Tests
+To launch tests:
+```
+sh run_tests.sh
+```
