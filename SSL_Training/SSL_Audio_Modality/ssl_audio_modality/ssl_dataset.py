@@ -76,15 +76,10 @@ class SSLTorchDataset(Dataset):
 
     def __getitem__(self, idx):
         # apply augmentations if available
-        if self.augmentations is not None:
-            aug1 = {k: self.augmentations(v) for k, v in self.data[idx].items()}
-            aug2 = {k: self.augmentations(v) for k, v in self.data[idx].items()} if self.n_views == 2 else self.data[
-                idx]
-
         output = (
-            aug1 if self.augmentations is not None else self.data[idx],
+            self.augmentations(self.data[idx]) if self.augmentations is not None else self.data[idx],
             self.labels[idx],
-            aug2 if self.augmentations is not None else self.data[idx]
+            self.augmentations(self.data[idx]) if (self.augmentations is not None and self.n_views == 2) else self.data[idx]
         )
         return output
 
