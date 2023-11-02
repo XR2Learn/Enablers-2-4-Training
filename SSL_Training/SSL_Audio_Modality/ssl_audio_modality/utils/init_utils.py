@@ -1,20 +1,12 @@
 import importlib
 from random import sample
-
-#from emorec_toolbox.datasets.iemocap import (IEMOCAPDataManager,
-#                                             IEMOCAPDataModule,
-#                                             IEMOCAPTorchDataset)
-#from emorec_toolbox.datasets.wesad import WESADDataModule, WESADTorchDataset
-#from emorec_toolbox.models.mlp import LinearClassifier, MLPClassifier
-from utils.augmentations import compose_random_augmentations
 from pytorch_lightning.loggers import CSVLogger
 from torchvision import transforms
-
-#import models.bm
+from .augmentations import compose_random_augmentations
 
 
 # Models
-def setup_ssl_model(encoder,model_cfg):
+def setup_ssl_model(encoder, model_cfg):
     """ initializes ssl model and encoders from configs
 
     Parameters
@@ -52,7 +44,7 @@ def init_encoder(model_cfg, ckpt_path=None):
     -------
     torch.nn.Module
         initialized encoder
-    """    
+    """
     module = importlib.import_module(f"{model_cfg['from_module']}")
     class_ = getattr(module, model_cfg['class_name'])
     return class_(**model_cfg['kwargs'],pretrained=ckpt_path)
@@ -97,7 +89,7 @@ def init_transforms(transforms_cfg, ssl_random_augmentations=False, random_augme
             train.append(transform)
             if t['in_test']:
                 test.append(transform)
-                
+               
             print(f"added {t['class_name']} transformation")
 
     # if ssl_random_augmentations:
@@ -105,17 +97,17 @@ def init_transforms(transforms_cfg, ssl_random_augmentations=False, random_augme
     composed_train_transform = transforms.Compose(train)
     composed_test_transform = transforms.Compose(test)
 
-    #train_transforms = {modality: composed_train_transform }
-    #test_transforms = {modality: composed_test_transform }
+    # train_transforms = {modality: composed_train_transform }
+    # test_transforms = {modality: composed_test_transform }
 
-    return composed_train_transform,composed_test_transform
+    return composed_train_transform, composed_test_transform
 
 
 def init_augmentations(aug_dict):
-    augmentations = None
-    augmentations = compose_random_augmentations(aug_dict)
-    augmentations = transforms.Compose(augmentations)
-
+    augmentations_to_apply = None
+    augmentations_to_apply = compose_random_augmentations(aug_dict)
+    augmentations_to_apply = transforms.Compose(augmentations_to_apply)
+    return augmentations_to_apply
 
 # Data splits
 def init_random_split(split_pool, num_val=1, num_test=1):
