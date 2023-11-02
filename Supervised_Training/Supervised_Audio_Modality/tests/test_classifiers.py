@@ -6,11 +6,18 @@ import unittest
 import torch
 from pytorch_lightning import Trainer
 
+<<<<<<< HEAD
 from supervised_audio_modality.classifiers.linear import LinearClassifier
 from supervised_audio_modality.classifiers.mlp import MLPClassifier
 
 
 class MLPClassifierTestCase(unittest.TestCase):
+=======
+from supervised_audio_modality.classifiers.mlp import MLPClassifier
+
+
+class CNN1DTestCase(unittest.TestCase):
+>>>>>>> fd3ca0f (Add tests for classifiers and supervised model)
     def setUp(self):
         self.batch_size = 64
         self.input_dim = 512
@@ -70,6 +77,7 @@ class MLPClassifierTestCase(unittest.TestCase):
         self.assertTrue(torch.allclose(output_mlp_default, output_mlp_lightning))
 
         shutil.rmtree(test_dir)
+<<<<<<< HEAD
 
 
 class LinearClassifierTestCase(unittest.TestCase):
@@ -109,3 +117,5 @@ class LinearClassifierTestCase(unittest.TestCase):
         self.assertTrue(torch.allclose(output_mlp_default, output_mlp_lightning))
 
         shutil.rmtree(test_dir)
+=======
+>>>>>>> fd3ca0f (Add tests for classifiers and supervised model)
