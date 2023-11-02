@@ -90,13 +90,19 @@ class CNN1DTestCase(unittest.TestCase):
     def test_forward_pass_shape(self):
         output = self.cnn(self.input)
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 02615e7 (Minor fix)
         self.assertEqual(
             output.shape,
             (self.batch_size, self.out_channels[-1], self.cnn.out_size // self.out_channels[-1])
         )
+<<<<<<< HEAD
 =======
         self.assertEqual(output.shape, (64, 256, 30))
 >>>>>>> 4e7c2b5 (Refactor and cover cnn1d with tests)
+=======
+>>>>>>> 02615e7 (Minor fix)
 
     def test_correct_model_load(self):
         test_dir = tempfile.mkdtemp()
