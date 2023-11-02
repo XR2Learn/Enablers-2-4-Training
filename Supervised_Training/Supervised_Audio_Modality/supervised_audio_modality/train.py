@@ -8,7 +8,7 @@ from supervised_dataset import SupervisedDataModule
 from callbacks.setup_callbacks import setup_callbacks
 from utils.init_utils import (init_augmentations,init_transforms, init_encoder)
 
-from classification_model import classification_model
+from classification_model import SupervisedModel
 from classifiers.linear import LinearClassifier
 
 
@@ -59,7 +59,7 @@ def run_supervised_training():
 
     # add classification head to encoder
     classifier = LinearClassifier(encoder.out_size, CUSTOM_SETTINGS['dataset_config']['number_of_labels'])
-    model = classification_model(encoder=encoder, classifier=classifier, **CUSTOM_SETTINGS['sup_config']['kwargs'])
+    model = SupervisedModel(encoder=encoder, classifier=classifier, **CUSTOM_SETTINGS['sup_config']['kwargs'])
 
     print(model)
     # init callbacks  # initialize callbacks
