@@ -136,7 +136,5 @@ class CNN1D(LightningModule):
         torch.Tensor
             Output tensor after applying CNN layers.
         """
-        for conv_block in self.convolutional_blocks:
-            x = conv_block(x)
-
+        x = self.convolutional_blocks(x)
         return x
