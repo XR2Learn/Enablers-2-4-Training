@@ -26,6 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Known Issues
 - `docker-compose.yml` is mapping outside .env file to docker image, generating an error in some cases.
+- Passing `EXPERIMENT_ID` as an Env VAR is not supported for docker images.
 
 <!-- 
 Example of Categories to use in each release
