@@ -35,6 +35,7 @@
     "ssl_config":{
         "from_module":"ssl_methods.VICReg",
         "ssl_framework":"VICReg",
+        "input_type":"eGeMAPs",
         "epochs":20,
         "batch_size":128,
         "kwargs":{
