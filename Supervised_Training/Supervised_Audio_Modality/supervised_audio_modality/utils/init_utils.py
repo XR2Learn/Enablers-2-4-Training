@@ -5,8 +5,6 @@ from typing import Any, Dict, Optional
 from utils.augmentations.compose_random_augmentations import compose_random_augmentations
 from torchvision import transforms
 
-from .augmentations import compose_random_augmentations
-
 
 def init_encoder(model_cfg: Dict[str, Any], ckpt_path: Optional[str] = None):
     """ Initialize (pre-trained) encoder from model configuration
