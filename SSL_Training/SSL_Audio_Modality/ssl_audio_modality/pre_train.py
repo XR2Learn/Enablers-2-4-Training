@@ -29,7 +29,7 @@ def run_pre_training():
 
     datamodule = SSLDataModule(
         path=OUTPUTS_FOLDER,
-        input_type=CUSTOM_SETTINGS['encoder_config']['input_type'],
+        input_type=CUSTOM_SETTINGS['ssl_config']['input_type'],
         batch_size=CUSTOM_SETTINGS['ssl_config']['batch_size'],
         split=splith_paths,
         train_transforms=train_transforms,
