@@ -6,6 +6,7 @@ import unittest
 import torch
 from pytorch_lightning import Trainer
 
+from supervised_audio_modality.classifiers.linear import LinearClassifier
 from supervised_audio_modality.classifiers.mlp import MLPClassifier
 from supervised_audio_modality.encoders.cnn1d import CNN1D
 from supervised_audio_modality.encoders.w2v import Wav2Vec2CNN
@@ -105,7 +106,12 @@ class SupervisedTestCase(unittest.TestCase):
             "out_size": 4,
             "hidden": [256, 128, 64]
         }
-        self.classifier_configs = [self.mlp_classifier_config]
+
+        self.linear_classifier_config = {
+            "class": LinearClassifier,
+            "out_size": 4,
+        }
+        self.classifier_configs = [self.mlp_classifier_config, self.linear_classifier_config]
 
         # Combinations of encoders and classifiers
         self.supervised_combinations = []
