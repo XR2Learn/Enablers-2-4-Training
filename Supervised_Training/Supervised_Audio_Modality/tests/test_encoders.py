@@ -4,9 +4,10 @@ import tempfile
 import unittest
 
 import torch
-from pytorch_lightning import Trainer
+from pytorch_lightning import LightningModule, Trainer
 
 from supervised_audio_modality.encoders.cnn1d import CNN1D
+from supervised_audio_modality.encoders.w2v import Wav2Vec2CNN
 
 
 class CNN1DTestCase(unittest.TestCase):
@@ -117,5 +118,71 @@ class CNN1DTestCase(unittest.TestCase):
 
         self.assertTrue(torch.allclose(output_cnn_default, output_cnn_from_state_dict))
         self.assertTrue(torch.allclose(output_cnn_default, output_cnn_lightning))
+
+        shutil.rmtree(test_dir)
+
+
+class Wav2Vec2CNNTestCase(unittest.TestCase):
+    def setUp(self):
+        # small batch size to make test less computationally expensive
+        self.batch_size = 2
+        self.length_samples = 10
+        self.sample_rate = 16000
+        self.out_channels = [128, 128]
+        self.kernel_sizes = [1, 1]
+        self.w2v2_model = Wav2Vec2CNN(
+            length_samples=self.length_samples,
+            sample_rate=self.sample_rate,
+            w2v2_type='base',
+            freeze=True,
+            out_channels=self.out_channels,
+            kernel_sizes=self.kernel_sizes,
+        )
+
+        self.input = torch.rand(self.batch_size, self.length_samples * self.sample_rate)
+
+    def test_init_correct(self):
+        self.assertTrue(isinstance(self.w2v2_model.wav2vec2, LightningModule))
+        self.assertTrue(isinstance(self.w2v2_model.cnn, LightningModule))
+
+    def test_forward_pass_shape(self):
+        output = self.w2v2_model(self.input)
+        self.assertEqual(
+            output.shape,
+            (self.batch_size, self.w2v2_model.out_size)
+        )
+
+    def test_correct_model_load(self):
+        test_dir = tempfile.mkdtemp()
+        model_path = os.path.join(test_dir, "test_checkpoint.ckpt")
+
+        trainer = Trainer(default_root_dir=test_dir)
+        trainer.strategy.connect(self.w2v2_model)
+
+        trainer.save_checkpoint(model_path)
+        w2v2_loaded_from_state_dict = Wav2Vec2CNN(
+            length_samples=self.length_samples,
+            sample_rate=self.sample_rate,
+            w2v2_type='base',
+            freeze=True,
+            out_channels=self.out_channels,
+            kernel_sizes=self.kernel_sizes,
+            pretrained=model_path
+        )
+        w2v2_loaded_lightning = Wav2Vec2CNN.load_from_checkpoint(
+            model_path,
+        )
+
+        # one way to check if models are the same is to check if they produce the same output for the same input
+        self.w2v2_model.eval()
+        w2v2_loaded_from_state_dict.eval()
+        w2v2_loaded_lightning.eval()
+
+        output_w2v2_default = self.w2v2_model(self.input)
+        output_w2v2_from_state_dict = w2v2_loaded_from_state_dict(self.input)
+        output_w2v2_lightning = w2v2_loaded_lightning(self.input)
+
+        self.assertTrue(torch.allclose(output_w2v2_default, output_w2v2_from_state_dict))
+        self.assertTrue(torch.allclose(output_w2v2_default, output_w2v2_lightning))
 
         shutil.rmtree(test_dir)

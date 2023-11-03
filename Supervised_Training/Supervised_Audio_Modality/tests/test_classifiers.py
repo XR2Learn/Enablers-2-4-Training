@@ -9,7 +9,7 @@ from pytorch_lightning import Trainer
 from supervised_audio_modality.classifiers.mlp import MLPClassifier
 
 
-class CNN1DTestCase(unittest.TestCase):
+class MLPClassifierTestCase(unittest.TestCase):
     def setUp(self):
         self.batch_size = 64
         self.input_dim = 512
