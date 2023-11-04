@@ -1,3 +1,5 @@
+from typing import Dict, List, Tuple
+
 import pytorch_lightning as pl
 from torch import nn
 import torch
@@ -13,9 +15,11 @@ class LogClassifierMetrics(pl.Callback):
     """
     def __init__(
             self,
-            num_classes,
-            metric_names=['accuracy', 'f1-score-macro', 'f1-score-micro', 'f1-score-weighted', 'precision', 'recall'],
-            average='macro',
+            num_classes: int,
+            metric_names: List[str] = [
+                'accuracy', 'f1-score-macro', 'f1-score-micro', 'f1-score-weighted', 'precision', 'recall'
+            ],
+            average: str = 'macro',
     ):
         self.metric_names = metric_names
         self.task = 'binary' if num_classes <= 2 else 'multiclass'
@@ -43,15 +47,20 @@ class LogClassifierMetrics(pl.Callback):
     def on_validation_epoch_start(self, trainer: pl.Trainer, pl_module: pl.LightningModule) -> None:
         self._reset_state()
 
-    def _cache_preds_labels(self, outputs, batch):
+    def _cache_preds_labels(
+            self,
+            outputs: Tuple[torch.tensor],
+            batch: Dict[str, torch.tensor]
+    ):
         self.labels += batch[1].tolist()
-        self.preds += outputs['preds'].tolist()
+        self.preds += outputs["preds"].tolist()
 
     def on_validation_batch_end(
             self,
             trainer: pl.Trainer,
             pl_module: pl.LightningModule,
-            outputs, batch,
+            outputs: Tuple[torch.tensor],
+            batch: Dict[str, torch.tensor],
             batch_idx,
             dataloader_idx
     ) -> None:
@@ -61,7 +70,8 @@ class LogClassifierMetrics(pl.Callback):
             self,
             trainer: "pl.Trainer",
             pl_module: "pl.LightningModule",
-            outputs, batch,
+            outputs: Tuple[torch.tensor],
+            batch: Tuple[torch.tensor],
             batch_idx,
             dataloader_idx
     ) -> None:
@@ -81,3 +91,10 @@ class LogClassifierMetrics(pl.Callback):
             pl_module: pl.LightningModule
     ) -> None:
         self._shared_eval(trainer, "val")
+
+    def on_test_epoch_end(
+            self,
+            trainer: pl.Trainer,
+            pl_module: pl.LightningModule
+    ) -> None:
+        self._shared_eval(trainer, "test")

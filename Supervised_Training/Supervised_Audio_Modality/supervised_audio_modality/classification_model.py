@@ -56,16 +56,18 @@ class SupervisedModel(LightningModule):
         return loss
 
     def validation_step(self, batch, batch_idx):
-        self._shared_eval(batch, batch_idx, "val_")
+        return self._shared_eval(batch, batch_idx, "val_")
 
     def test_step(self, batch, batch_idx):
-        self._shared_eval(batch, batch_idx, "test_")
+        return self._shared_eval(batch, batch_idx, "test_")
 
     def _shared_eval(self, batch, batch_idx, prefix="val_"):
         X, Y = batch[0], batch[1]
         out = self(X)
         loss = self.loss(out, Y)
         self.log(f"{prefix}loss", loss)
+        preds = torch.argmax(out, dim=1)
+        return {f"{prefix}loss": loss, "preds": preds}
 
     def configure_optimizers(self):
         return self._initialize_optimizer()
