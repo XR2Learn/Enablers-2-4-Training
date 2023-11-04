@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 from typing import Any, Dict, List, Tuple
+=======
+from typing import Dict, List, Tuple
+>>>>>>> ae254a0 (Fix classification performance callback)
 
 import pytorch_lightning as pl
 from torch import nn
@@ -103,11 +107,19 @@ class LogClassifierMetrics(pl.Callback):
             trainer: pl.Trainer,
             pl_module: pl.LightningModule
     ) -> None:
+<<<<<<< HEAD
         self._shared_eval(pl_module, "val")
+=======
+        self._shared_eval(trainer, "val")
+>>>>>>> ae254a0 (Fix classification performance callback)
 
     def on_test_epoch_end(
             self,
             trainer: pl.Trainer,
             pl_module: pl.LightningModule
     ) -> None:
+<<<<<<< HEAD
         self._shared_eval(pl_module, "test")
+=======
+        self._shared_eval(trainer, "test")
+>>>>>>> ae254a0 (Fix classification performance callback)
