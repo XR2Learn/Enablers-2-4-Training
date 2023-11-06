@@ -1,11 +1,17 @@
 import importlib
+from typing import Any, Dict, Optional
 
+<<<<<<< HEAD
 
 from utils.augmentations.compose_random_augmentations import compose_random_augmentations
+=======
+>>>>>>> 5aa5d5e (Refactor init_utils and add unittests)
 from torchvision import transforms
 
+from .augmentations import compose_random_augmentations
 
-def init_encoder(model_cfg, ckpt_path=None):
+
+def init_encoder(model_cfg: Dict[str, Any], ckpt_path: Optional[str] = None):
     """ Initialize (pre-trained) encoder from model configuration
 
     Parameters
@@ -26,7 +32,7 @@ def init_encoder(model_cfg, ckpt_path=None):
 
 
 # Transforms and augmentations
-def init_transforms(transforms_cfg):
+def init_transforms(transforms_cfg: Dict[str, Any]):
     """ Initialize transforms from the provided configs
     """
     train = []
@@ -53,7 +59,8 @@ def init_transforms(transforms_cfg):
     return composed_train_transform, composed_test_transform
 
 
-def init_augmentations(aug_dict):
+def init_augmentations(aug_dict: Dict[str, Any]):
     augmentations = None
     augmentations = compose_random_augmentations(aug_dict)
     augmentations = transforms.Compose(augmentations)
+    return augmentations
