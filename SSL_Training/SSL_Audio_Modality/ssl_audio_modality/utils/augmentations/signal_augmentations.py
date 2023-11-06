@@ -12,7 +12,7 @@ import torch
 # https://arxiv.org/pdf/2206.07656.pdf
 
 class Permutation:
-    def __init__(self, max_segments=5, min_segments=2):
+    def __init__(self, max_segments=5, min_segments=3):
         """
         Randomly segments the data and permutes the segments.
 
@@ -40,9 +40,14 @@ class Permutation:
         torch.Tensor
             Permuted data.
         """
+        #check if given values are possible or not, else replace them.
+        #assumes datapoints last
+        max_segments = min(x.shape[-1],abs(self.max_segments))
+        min_segments = max(1,self.min_segments)
+
         channels, signal = x.shape
         orig_steps = torch.arange(signal)
-        num_segs = np.random.randint(self.min_segments, self.max_segments)
+        num_segs = np.random.randint(min_segments, max_segments)
         ret = torch.zeros_like(x)
 
         if num_segs > 1:
@@ -50,6 +55,8 @@ class Permutation:
             permuted_splits = torch.cat([splits[i] for i in torch.randperm(len(splits))])
 
             # Permute each channel separately
+            # needs to be replaced in the future by a version specifically for this
+            # in case we want independent permutation per channel or not
             for c in range(channels):
                 ret[c] = torch.index_select(x[c], 0, permuted_splits)
         else:
@@ -59,7 +66,7 @@ class Permutation:
 
 
 class TimeWarping:
-    def __init__(self, warp_factor, num_segments):
+    def __init__(self, warp_factor=2, num_segments=4):
         """
         Creates segments and 'warps' some values on the time axis while 'squishing' others.
 
@@ -145,7 +152,7 @@ class TimeWarping:
 
 
 class TimeShifting:
-    def __init__(self, max_shift):
+    def __init__(self, min_shift=1, max_shift=5):
         """
         Shifts data on the time axis.
 
@@ -155,6 +162,7 @@ class TimeShifting:
             Maximum shift to apply.
         """
         self.max_shift = max_shift
+        self.min_shift = min_shift
 
     def __call__(self, x):
         """
@@ -171,5 +179,5 @@ class TimeShifting:
             Data after applying time shifting.
         """
         direction = np.random.choice([-1, 1])
-        shift = int(random.random() * self.max_shift)
+        shift = int(self.max_shift + random.random() * self.max_shift)
         return torch.roll(x, direction * shift, dims=-1)
