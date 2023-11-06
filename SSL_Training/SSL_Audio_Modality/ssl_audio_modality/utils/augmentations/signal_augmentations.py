@@ -11,6 +11,7 @@ import torch
 # https://openreview.net/pdf?id=bSC_xo8VQ1b
 # https://arxiv.org/pdf/2206.07656.pdf
 
+
 class Permutation:
     def __init__(self, max_segments=5, min_segments=3):
         """
@@ -40,10 +41,10 @@ class Permutation:
         torch.Tensor
             Permuted data.
         """
-        #check if given values are possible or not, else replace them.
-        #assumes datapoints last
-        max_segments = min(x.shape[-1],abs(self.max_segments))
-        min_segments = max(1,self.min_segments)
+        # check if given values are possible or not, else replace them.
+        # assumes datapoints last
+        max_segments = min(x.shape[-1], abs(self.max_segments))
+        min_segments = max(1, self.min_segments)
 
         channels, signal = x.shape
         orig_steps = torch.arange(signal)
@@ -52,11 +53,13 @@ class Permutation:
 
         if num_segs > 1:
             splits = torch.tensor_split(orig_steps, num_segs, dim=-1)
-            permuted_splits = torch.cat([splits[i] for i in torch.randperm(len(splits))])
+            permuted_splits = torch.cat(
+                [splits[i] for i in torch.randperm(len(splits))]
+                )
 
             # Permute each channel separately
-            # needs to be replaced in the future by a version specifically for this
-            # in case we want independent permutation per channel or not
+            # needs to be replaced in the future by a version specifically for
+            # this in case we want independent permutation per channel or not
             for c in range(channels):
                 ret[c] = torch.index_select(x[c], 0, permuted_splits)
         else:
@@ -68,7 +71,8 @@ class Permutation:
 class TimeWarping:
     def __init__(self, warp_factor=2, num_segments=4):
         """
-        Creates segments and 'warps' some values on the time axis while 'squishing' others.
+        Creates segments and 'warps' some values on the time axis
+        while 'squishing' others.
 
         Parameters
         ----------
@@ -102,7 +106,9 @@ class TimeWarping:
 
         # Randomly select half of the segments to warp
         num_segments_to_warp = self.num_segments // 2
-        segments_to_warp_indices = torch.randperm(self.num_segments)[:num_segments_to_warp]
+        segments_to_warp_indices = torch.randperm(
+            self.num_segments
+            )[:num_segments_to_warp]
 
         # Apply time warping to the selected segments
         warped_segments = []
@@ -122,7 +128,9 @@ class TimeWarping:
 
         out_signal = torch.zeros((channels, signal_length))
         for channel in range(channels):
-            out_signal[channel] = torch.tensor(scipy.signal.resample(warped_signal[channel, :], signal_length))
+            out_signal[channel] = torch.tensor(
+                scipy.signal.resample(warped_signal[channel, :], signal_length)
+                )
         return out_signal
 
     def time_stretch(self, signal, warp_factor):
@@ -146,7 +154,9 @@ class TimeWarping:
         new_signal = torch.zeros((num_channels, new_length))
 
         for channel in range(num_channels):
-            new_signal[channel] = torch.tensor(scipy.signal.resample(signal[channel, :], new_length))
+            new_signal[channel] = torch.tensor(
+                scipy.signal.resample(signal[channel, :], new_length)
+                )
 
         return new_signal
 
