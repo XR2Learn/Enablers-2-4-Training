@@ -104,7 +104,6 @@ class InitEncodersTestCase(unittest.TestCase):
 
         shutil.rmtree(test_dir)
 
-
 class InitTransformsTestCase(unittest.TestCase):
     def test_init_transforms(self):
         sys.path.append("./supervised_audio_modality/")
