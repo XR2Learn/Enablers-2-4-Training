@@ -56,13 +56,23 @@ def run_supervised_training():
     # add classification head to encoder
     classifier = LinearClassifier(encoder.out_size, CUSTOM_SETTINGS['dataset_config']['number_of_labels'])
     model = SupervisedModel(encoder=encoder, classifier=classifier, **CUSTOM_SETTINGS['sup_config']['kwargs'])
+    
+    checkpoint_filename = f'{EXPERIMENT_ID}_model'
+
+    # by default lightning does not overwrite checkpoints, but rather creates different versions (v1, v2, etc.)
+    # for the sample checkpoint_filename. Thus, in order to enable overwriting, we delete checkpoint if it exists.
+    if os.path.exists(os.path.join(COMPONENT_OUTPUT_FOLDER, checkpoint_filename + '.ckpt')):
+        os.remove(os.path.join(COMPONENT_OUTPUT_FOLDER, checkpoint_filename + '.ckpt'))
 
     # initialize callbacks
     callbacks = setup_callbacks(
         early_stopping_metric="val_loss",
         no_ckpt=False,
+        num_classes=CUSTOM_SETTINGS['dataset_config']['number_of_labels'],
         patience=50,
-        num_classes=CUSTOM_SETTINGS['dataset_config']['number_of_labels']
+        dirpath=COMPONENT_OUTPUT_FOLDER,
+        monitor=CUSTOM_SETTINGS['sup_config']['monitor'] if 'monitor' in CUSTOM_SETTINGS['sup_config'] else "val_loss",
+        checkpoint_filename=checkpoint_filename
     )
 
     # initialize Pytorch-Lightning Trainer
@@ -75,15 +85,18 @@ def run_supervised_training():
     )
 
     # train model and report metrics
+    # the model checkpoints (best and last if provided) will be saved in
+    # /COMPONENT_OUTPUT_FOLDER/{EXPERIMENT_ID}_model_lightning.ckpt
     trainer.fit(model, datamodule)
 
-    # load in best weights
-    metrics = trainer.test(model, datamodule)
-    print(metrics)
+    # evaluate model on the test set, by default the best model
+    trainer.test(model, datamodule, ckpt_path="best")
 
-    # save weights
-    torch.save(model.state_dict(), os.path.join(COMPONENT_OUTPUT_FOLDER, f'{EXPERIMENT_ID}_model.pt'))
-    torch.save(classifier.state_dict(), os.path.join(COMPONENT_OUTPUT_FOLDER, f'{EXPERIMENT_ID}_classifier.pt'))
+    # save weights of the classifier independently for future use with SSL features
+    torch.save(
+        classifier.state_dict(),
+        os.path.join(COMPONENT_OUTPUT_FOLDER, f'{EXPERIMENT_ID}_classifier.pt')
+    )
 
 
 if __name__ == '__main__':
