@@ -12,7 +12,7 @@ from ssl_audio_modality.utils.augmentations.signal_augmentations import (
 
 class SupervisedTestCase(unittest.TestCase):
     """ Implements a set of basic tests for augmentations
-    
+
     """
 
     def setUp(self):
@@ -28,12 +28,12 @@ class SupervisedTestCase(unittest.TestCase):
         self.NoAugmentation = NoAugmentation()
 
         # permutation could fail in case min_segments can be equal to 0 or 1
-        self.Pemutation = Permutation(min_segments=35,max_segments=90)
+        self.Pemutation = Permutation(min_segments=35, max_segments=90)
         self.Timeshifting = TimeShifting()
         self.TimeWarping = TimeWarping()
 
-        self.original_data_1D = torch.rand(1,94)
-        self.original_data_2D = torch.rand(3,73)
+        self.original_data_1D = torch.rand(1, 94)
+        self.original_data_2D = torch.rand(3, 73)
         self.base_augmentations = [
             self.GaussianNoise,
             self.Reverse,
@@ -50,44 +50,67 @@ class SupervisedTestCase(unittest.TestCase):
         ]
 
     def test_base_augmentations_1d(self):
-        
+        """ test the base augmentations in case of 1D data
+
+        """
         for i, aug in enumerate(self.base_augmentations):
             with self.subTest(f"{aug.__class__.__name__}", i=i):
                 aug_data = aug(self.original_data_1D)
-                print(aug)
-                self.assertEqual(aug_data.shape,self.original_data_1D.shape)
+                self.assertEqual(aug_data.shape, self.original_data_1D.shape)
                 # channel flip has no effect on the data itself in 1D.
-                if not isinstance(aug,ChannelFlip):
-                    self.assertFalse(torch.equal(aug_data,self.original_data_1D))
+                if not isinstance(aug, ChannelFlip):
+                    self.assertFalse(
+                        torch.equal(
+                            aug_data,
+                            self.original_data_1D
+                        )
+                    )
+                self.assertEqual(type(aug_data), type(self.original_data_1D))
 
     def test_signal_augmentations_1d(self):
-        
+        """ test the signal augmentations in case of 1D data
+
+        """
         for i, aug in enumerate(self.signal_augmentations):
             with self.subTest(f"{aug.__class__.__name__}", i=i):
                 aug_data = aug(self.original_data_1D)
-                print(aug)
-                self.assertEqual(aug_data.shape,self.original_data_1D.shape)
-                self.assertFalse(torch.equal(aug_data,self.original_data_1D))
-    
+                self.assertEqual(aug_data.shape, self.original_data_1D.shape)
+                self.assertFalse(
+                    torch.equal(
+                        aug_data,
+                        self.original_data_1D
+                    )
+                )
+                self.assertEqual(type(aug_data), type(self.original_data_1D))
+
     def test_base_augmentations_2d(self):
-        
+        """ test the base augmentations in case of 2D data
+
+        """
         for i, aug in enumerate(self.base_augmentations):
             with self.subTest(f"{aug.__class__.__name__}", i=i):
                 aug_data = aug(self.original_data_2D)
-                print(aug)
-                self.assertEqual(aug_data.shape,self.original_data_2D.shape)
-                self.assertFalse(torch.equal(aug_data,self.original_data_2D))
+                self.assertEqual(aug_data.shape, self.original_data_2D.shape)
+                self.assertFalse(
+                    torch.equal(
+                        aug_data,
+                        self.original_data_2D
+                    )
+                )
+                self.assertEqual(type(aug_data), type(self.original_data_2D))
 
     def test_signal_augmentations_2d(self):
-        
+        """ test the signal augmentations in case of 2D data
+
+        """
         for i, aug in enumerate(self.signal_augmentations):
             with self.subTest(f"{aug.__class__.__name__}", i=i):
                 aug_data = aug(self.original_data_2D)
-                print(aug)
-                self.assertEqual(aug_data.shape,self.original_data_2D.shape)
-                self.assertFalse(torch.equal(aug_data,self.original_data_2D))
-
-
-
-
-        
+                self.assertEqual(aug_data.shape, self.original_data_2D.shape)
+                self.assertFalse(
+                    torch.equal(
+                        aug_data,
+                        self.original_data_2D
+                        )
+                    )
+                self.assertEqual(type(aug_data), type(self.original_data_2D))

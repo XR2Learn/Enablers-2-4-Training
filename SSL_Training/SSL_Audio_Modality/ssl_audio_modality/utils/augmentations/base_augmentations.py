@@ -35,9 +35,14 @@ class GaussianNoise:
         x_noise : torch.Tensor
             Noisy data after applying Gaussian noise.
         """
-        x_noise = x + np.random.normal(loc=self.mean, scale=self.std, size=x.shape)
+        x_noise = x + np.random.normal(
+            loc=self.mean,
+            scale=self.std,
+            size=x.shape
+            )
         return x_noise
-    
+
+
 class Reverse:
     def __init__(self):
         """
@@ -60,6 +65,7 @@ class Reverse:
             Flipped data along the horizontal axis.
         """
         return torch.tensor(np.fliplr(x).copy())
+
 
 class SignFlip:
     def __init__(self):
@@ -84,10 +90,12 @@ class SignFlip:
         """
         return -1 * x
 
+
 class ChannelFlip:
     def __init__(self):
         """
-        the top channel becomes the bottom channel (and the bottom channel becomes the top channel)
+        the top channel becomes the bottom channel
+        (and the bottom channel becomes the top channel)
         """
     def __call__(self, x):
         """
@@ -104,7 +112,8 @@ class ChannelFlip:
             channel flipped data.
         """
         return torch.tensor(np.flipud(x).copy())
-    
+
+
 class Scale:
     def __init__(self, max_scale=1.5):
         """
@@ -133,7 +142,8 @@ class Scale:
         """
         scale = torch.rand(1) * self.max_scale
         return scale * x
-    
+
+
 class ZeroMasking:
     def __init__(self, mask_length=10):
         """
@@ -166,7 +176,8 @@ class ZeroMasking:
         end_idx = start_idx + self.mask_length
         x[..., start_idx:end_idx] = 0
         return x
-    
+
+
 class NoAugmentation:
     def __init__(self):
         """
