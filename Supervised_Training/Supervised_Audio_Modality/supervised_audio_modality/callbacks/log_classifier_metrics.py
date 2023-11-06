@@ -1,4 +1,4 @@
-from typing import Dict, List, Tuple
+from typing import Any, Dict, List, Tuple
 
 import pytorch_lightning as pl
 from torch import nn
@@ -21,6 +21,14 @@ class LogClassifierMetrics(pl.Callback):
             ],
             average: str = 'macro',
     ):
+        """ Initialization
+
+            Args:
+                num_classes: number of classes
+                metric_names: list of metric names that will be logged
+                    Each metric name should match at least one key name in self.metric_dict
+                average: averaging technique for precision and recall
+        """
         self.metric_names = metric_names
         self.task = 'binary' if num_classes <= 2 else 'multiclass'
         self.metric_dict = nn.ModuleDict({
@@ -77,24 +85,29 @@ class LogClassifierMetrics(pl.Callback):
     ) -> None:
         self._cache_preds_labels(outputs, batch)
 
-    def _shared_eval(self, trainer, prefix):
+    def _shared_eval(self, pl_module, prefix):
         labels_tensor = torch.Tensor(self.labels).int()
         preds_tensor = torch.Tensor(self.preds).int()
+        metrics_dict: Dict[str, Any] = {}
         for metric_name in self.metric_names:
             if metric_name in self.metric_dict:
                 metric_val = self.metric_dict[metric_name](preds_tensor, labels_tensor)
-                self.log(f"{prefix}_{metric_name}", metric_val)
+                pl_module.log(f"{prefix}_{metric_name}", metric_val)
+                metrics_dict[f"{prefix}_{metric_name}"] = metric_val
+        # return metrics_dict for testing purposes
+        # during training it will be logged using pl_module.log(...)
+        return metrics_dict
 
     def on_validation_epoch_end(
             self,
             trainer: pl.Trainer,
             pl_module: pl.LightningModule
     ) -> None:
-        self._shared_eval(trainer, "val")
+        self._shared_eval(pl_module, "val")
 
     def on_test_epoch_end(
             self,
             trainer: pl.Trainer,
             pl_module: pl.LightningModule
     ) -> None:
-        self._shared_eval(trainer, "test")
+        self._shared_eval(pl_module, "test")

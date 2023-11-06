@@ -11,7 +11,11 @@ def setup_callbacks(
         no_ckpt: bool,
         num_classes: int = 3,
         patience: int = 100,
-        dirpath: Optional[str] = None
+        dirpath: Optional[str] = None,
+        monitor: str = "val_loss",
+        save_last: Optional[bool] = None,
+        save_top_k: int = 1,
+        checkpoint_filename: Optional[str] = None,
 ):
     """ Setup callbacks for pytorch_lightning.Trainer
 
@@ -30,15 +34,30 @@ def setup_callbacks(
         list of callbacks
     """
     callbacks = []
-    mode = 'min' if 'loss' in early_stopping_metric else 'max'
-    callbacks.append(setup_early_stopping_callback(early_stopping_metric, mode=mode, patience=patience))
+    mode_early_stopping = 'min' if 'loss' in early_stopping_metric else 'max'
+    mode_checkpoint = 'min' if 'loss' in monitor else 'max'
+    callbacks.append(setup_early_stopping_callback(early_stopping_metric, mode=mode_early_stopping, patience=patience))
     callbacks.append(setup_classifier_metrics_logger(num_classes=num_classes))
     if not no_ckpt:
-        callbacks.append(setup_model_checkpoint_callback_last(dirpath=dirpath))
+        callbacks.append(setup_model_checkpoint_callback(
+            dirpath=dirpath,
+            monitor=monitor,
+            save_last=save_last,
+            save_top_k=save_top_k,
+            checkpoint_filename=checkpoint_filename,
+            mode=mode_checkpoint,
+        ))
     return callbacks
 
 
-def setup_model_checkpoint_callback_last(dirpath: Optional[str] = None):
+def setup_model_checkpoint_callback(
+        dirpath: Optional[str] = None,
+        monitor: str = "val_loss",
+        save_last: Optional[bool] = None,
+        save_top_k: int = 1,
+        checkpoint_filename: Optional[str] = None,
+        mode: str = "min",
+):
     """ Setup last epoch model checkpoint
 
     Returns
@@ -48,8 +67,11 @@ def setup_model_checkpoint_callback_last(dirpath: Optional[str] = None):
     """
     return ModelCheckpoint(
         dirpath=dirpath,
-        save_last=True,
-        filename="{epoch}"
+        monitor=monitor,
+        save_last=save_last,
+        save_top_k=save_top_k,
+        filename=checkpoint_filename,
+        mode=mode
     )
 
 
