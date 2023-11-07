@@ -168,8 +168,8 @@ class TestInitAugTestCase(unittest.TestCase):
 
         augmentations = init_augmentations(aug_dict=augmentations_cfg["augmentations"])
 
-        rand_input = torch.rand(128, 10).float()
-        augmented = augmentations(rand_input).float()
+        rand_input = torch.rand(128, 10)
+        augmented = augmentations(rand_input)
 
         self.assertEqual(augmented.shape, rand_input.shape)
         self.assertFalse(torch.allclose(

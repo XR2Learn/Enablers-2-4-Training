@@ -43,7 +43,7 @@ def run_supervised_training():
         test_transforms=test_transforms,
         augmentations=augmentations,
     )
-    
+
     # initialise encoder
     encoder = init_encoder(
         model_cfg=CUSTOM_SETTINGS["encoder_config"],
@@ -58,7 +58,7 @@ def run_supervised_training():
     # add classification head to encoder
     classifier = LinearClassifier(encoder.out_size, CUSTOM_SETTINGS['dataset_config']['number_of_labels'])
     model = SupervisedModel(encoder=encoder, classifier=classifier, **CUSTOM_SETTINGS['sup_config']['kwargs'])
-    
+
     checkpoint_filename = f'{EXPERIMENT_ID}_model'
 
     # by default lightning does not overwrite checkpoints, but rather creates different versions (v1, v2, etc.)

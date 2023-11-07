@@ -1,11 +1,8 @@
 import importlib
 from typing import Any, Dict, Optional
 
-<<<<<<< HEAD
 
 from utils.augmentations.compose_random_augmentations import compose_random_augmentations
-=======
->>>>>>> 5aa5d5e (Refactor init_utils and add unittests)
 from torchvision import transforms
 
 from .augmentations import compose_random_augmentations

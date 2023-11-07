@@ -35,7 +35,7 @@ class Wav2Vec2Wrapper(LightningModule):
 
 
 class Wav2Vec2CNN(LightningModule):
-    """ CNN applied on top of the wav2vec 2.0 features and weighted average 
+    """ CNN applied on top of the wav2vec 2.0 features and weighted average
         applied to different transformer layers from wav2vec.
         Adapted from: https://arxiv.org/pdf/2104.03502.pdf
     """

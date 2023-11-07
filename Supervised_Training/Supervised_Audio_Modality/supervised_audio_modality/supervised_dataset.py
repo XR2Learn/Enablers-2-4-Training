@@ -28,7 +28,7 @@ class SupervisedTorchDataset(Dataset):
             split_path: str,
             label_mapping: Dict[Union[str, int], int],
             transforms: Optional[transforms.Compose] = None,
-            augmentations: Optional[transforms.Compose] = None,       
+            augmentations: Optional[transforms.Compose] = None,
     ):
         self.data_path = data_path
         self.input_type = input_type
@@ -64,7 +64,7 @@ class SupervisedTorchDataset(Dataset):
     def __getitem__(self, idx):
         # apply augmentations if available
         output = (
-            self.augmentations(self.data[idx]).float() if self.augmentations is not None else self.data[idx].float(),
+            self.augmentations(self.data[idx]) if self.augmentations is not None else self.data[idx],
             self.labels[idx],
         )
         return output
@@ -93,8 +93,7 @@ class SupervisedDataModule(LightningDataModule):
             train_transforms: Optional[transforms.Compose] = None,
             test_transforms: Optional[transforms.Compose] = None,
             num_workers: int = 1,
-            augmentations: Optional[transforms.Compose] = None,
-         
+            augmentations: Optional[transforms.Compose] = None, 
     ):
         super().__init__()
         self.path = path
