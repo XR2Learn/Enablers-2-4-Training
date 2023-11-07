@@ -45,7 +45,8 @@ class SSLTorchDataset(Dataset):
         self._process_recordings()
 
     def _process_recordings(self, normalize=False):
-        """ Function (i) iterates through all subjects' data in the data_path and processes them one by one (normalization, sampling);
+        """ Function (i) iterates through all subjects' data in the data_path
+                         and processes them one by one (normalization, sampling);
                     (ii) merges time windows, subjects and labels from different subjects
 
         Parameters
@@ -67,7 +68,7 @@ class SSLTorchDataset(Dataset):
                 # print(np.expand_dims(audio,axis=-1).shape)
             self.data.append(data)
 
-        self.data = [self.transforms(frame) if self.transforms else frame for frame in self.data]
+        self.data = [self.transforms(frame) if self.transforms is not None else frame for frame in self.data]
 
         # re-arrange recordings and merge across subjects
 
@@ -79,7 +80,9 @@ class SSLTorchDataset(Dataset):
         output = (
             self.augmentations(self.data[idx]) if self.augmentations is not None else self.data[idx],
             self.labels[idx],
-            self.augmentations(self.data[idx]) if (self.augmentations is not None and self.n_views == 2) else self.data[idx]
+            self.augmentations(self.data[idx]) if (
+                self.augmentations is not None and self.n_views == 2
+                ) else self.data[idx]
         )
         return output
 
