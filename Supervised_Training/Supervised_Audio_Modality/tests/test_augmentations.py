@@ -1,15 +1,15 @@
 import unittest
 import torch
 from torchvision import transforms
-from ssl_audio_modality.utils.augmentations.base_augmentations import (
+from supervised_audio_modality.utils.augmentations.base_augmentations import (
     GaussianNoise, Reverse, SignFlip, ChannelFlip, Scale, ZeroMasking,
     NoAugmentation
 )
-from ssl_audio_modality.utils.augmentations.signal_augmentations import (
+from supervised_audio_modality.utils.augmentations.signal_augmentations import (
     Permutation, TimeShifting, TimeWarping
 )
 
-from ssl_audio_modality.utils.augmentations import compose_random_augmentations
+from supervised_audio_modality.utils.augmentations import compose_random_augmentations
 
 
 class SupervisedTestCase(unittest.TestCase):
