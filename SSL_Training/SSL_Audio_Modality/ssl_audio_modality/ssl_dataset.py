@@ -20,7 +20,7 @@ class SSLTorchDataset(Dataset):
         path to the csv file containing the files and labels associated to the split
     transforms: str
         transforms to apply to the input data
-    augmentations: str 
+    augmentations: str
         augmentations to apply to the input data
     n_views: int
         number of views to create for the SSL
@@ -108,7 +108,7 @@ class SSLDataModule(LightningDataModule):
         number of views to create for the SSL
     limited_k: ??
         ??
-    augmentations: str 
+    augmentations: str
         augmentations to apply to the input data
     """
 
