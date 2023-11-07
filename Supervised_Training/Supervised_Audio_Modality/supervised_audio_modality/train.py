@@ -3,7 +3,7 @@ import os
 import torch
 
 from pytorch_lightning import Trainer
-from conf import CUSTOM_SETTINGS, OUTPUTS_FOLDER, COMPONENT_OUTPUT_FOLDER, EXPERIMENT_ID
+from conf import CUSTOM_SETTINGS, OUTPUTS_FOLDER, COMPONENT_OUTPUT_FOLDER, EXPERIMENT_ID, LABEL_TO_ID
 from supervised_dataset import SupervisedDataModule
 from callbacks.setup_callbacks import setup_callbacks
 from utils.init_utils import (init_augmentations, init_transforms, init_encoder)
@@ -31,17 +31,19 @@ def run_supervised_training():
     else:
         print("No augmentations loaded")
 
+    label_mapping = LABEL_TO_ID[CUSTOM_SETTINGS['dataset_config']['dataset_name']]
+
     datamodule = SupervisedDataModule(
         path=OUTPUTS_FOLDER,
         input_type=CUSTOM_SETTINGS['sup_config']['input_type'],
         batch_size=CUSTOM_SETTINGS['sup_config']['batch_size'],
         split=splith_paths,
+        label_mapping=label_mapping,
         train_transforms=train_transforms,
         test_transforms=test_transforms,
-        n_views=2,
-        num_workers=0,
-        augmentations=augmentations
+        augmentations=augmentations,
     )
+    
     # initialise encoder
     encoder = init_encoder(
         model_cfg=CUSTOM_SETTINGS["encoder_config"],

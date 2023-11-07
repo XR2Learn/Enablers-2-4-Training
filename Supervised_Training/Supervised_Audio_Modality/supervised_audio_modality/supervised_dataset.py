@@ -1,128 +1,101 @@
 import os
+from typing import Dict, Optional, Union
+
 import numpy as np
 import pandas as pd
 from tqdm import tqdm
 from torch.utils.data import Dataset, DataLoader
-
+from torchvision.transforms import transforms
 from pytorch_lightning import LightningDataModule
-from conf import CUSTOM_SETTINGS,LABEL_TO_ID
+
 
 class SupervisedTorchDataset(Dataset):
-    """ Torch dataset class
+    """ Torch Dataset class for supervised learning. The dataset is expected to be stored as a
+        numpy array with metadata in csv with the following structure.
 
-    arguments
-    ----------
-    data_path: str
-        root folder of the dataset
-    input_type: str
-        the type of input to load in this dataset
-    split_path: str
-        path to the csv file containing the files and labels associated to the split
-    transforms: str
-        transforms to apply to the input data
-    augmentations: str 
-        augmentations to apply to the input data
-    n_views: int
-        number of views to create for the SSL
+    Arguments:
+        data_path: root folder of the dataset
+        input_type: the type of input to load in this dataset
+        split_path: path to the csv file containing the files and labels associated to the split
+        transforms: transforms to apply to the input data
+        augmentations: augmentations to apply to the input data
+        n_views: number of views to create for the SSL
     """
-    def __init__(self, 
-                 data_path,
-                 input_type,
-                 split_path, 
-                 transforms=None,
-                 augmentations=None,
-                 n_views=2,
-        ):
+    def __init__(
+            self,
+            data_path: str,
+            input_type: str,
+            split_path: str,
+            label_mapping: Dict[Union[str, int], int],
+            transforms: Optional[transforms.Compose] = None,
+            augmentations: Optional[transforms.Compose] = None,       
+    ):
         self.data_path = data_path
         self.input_type = input_type
+        self.label_mapping = label_mapping
         # subjects and labels to retrieve
         self.split_path = split_path
         self.transforms = transforms
         self.augmentations = augmentations
-        self.n_views = n_views
 
         self._process_recordings()
-                
-    def _process_recordings(self, normalize=False):
-        """ Function (i) iterates through all subjects' data in the data_path and processes them one by one (normalization, sampling);
-                    (ii) merges time windows, subjects and labels from different subjects
 
-        Parameters
-        ----------
-        normalize : bool, optional
-            flag for using normalization, by default False and assumes preprocessed data
+    def _process_recordings(self):
+        """ Parse recording from the file structure of a dataset.
         """
-
-        
-        # read, normalize and sample recordings
-        print(os.path.join(self.data_path,self.split_path))
-        meta_data = pd.read_csv(os.path.join(self.data_path,self.split_path),index_col=0)
-        self.labels=meta_data['labels']
+        print(os.path.join(self.data_path, self.split_path))
+        meta_data = pd.read_csv(os.path.join(self.data_path, self.split_path), index_col=0)
+        self.labels = meta_data['labels']
         data_paths = meta_data['files']
-        self.data=[]
-        for p in tqdm(data_paths,total=meta_data.shape[0]):
-            data = np.load(os.path.join(self.data_path,self.input_type,p).replace("\\","/"))
-            if len(data.shape)<=1:
-                data = np.expand_dims(data,axis=-1)
-                #print(np.expand_dims(audio,axis=-1).shape)
+        self.data = []
+        for p in tqdm(data_paths, total=meta_data.shape[0]):
+            data = np.load(os.path.join(self.data_path, self.input_type, p).replace("\\", "/"))
+            if len(data.shape) <= 1:
+                data = np.expand_dims(data, axis=-1)
             self.data.append(data)
 
-        self.data = [self.transforms(frame) if self.transforms else frame for frame in self.data]
+        self.data = [self.transforms(frame) if self.transforms is not None else frame for frame in self.data]
 
-        label_mapping = LABEL_TO_ID[CUSTOM_SETTINGS['dataset_config']['dataset_name']]
-        self.labels = [label_mapping[label] for label in self.labels]
-        
+        self.labels = [self.label_mapping[label] for label in self.labels]
+
     def __len__(self):
         return len(self.labels)
-    
+
     def __getitem__(self, idx):
         # apply augmentations if available
-        if self.augmentations is not None:
-            aug1 = {k:self.augmentations(v) for k,v in self.data[idx].items()} 
-            aug2 = {k:self.augmentations(v) for k,v in self.data[idx].items()} if self.n_views == 2 else self.data[idx]
         output = (
-            aug1 if self.augmentations is not None else self.data[idx],
+            self.augmentations(self.data[idx]).float() if self.augmentations is not None else self.data[idx].float(),
             self.labels[idx],
-            aug2 if self.augmentations is not None else self.data[idx]
         )
         return output
 
 
 class SupervisedDataModule(LightningDataModule):
-    """ LightningDataModule
+    """ LightningDataModule wrapper for SupervisedDataset
 
-    arguments
-    ----------
-    path: str
-        root folder of the dataset
-    input_type: str
-        the type of input to load in this dataset
-    batch_size: float
-        number of samples to include in a single batch
-    split: str
-        path to the csv files containing the files and labels associated to the split
-    train_transforms: str
-        transforms to apply to the input training data
-    train_transforms: str
-        transforms to apply to the input testing data
-    n_views: int
-        number of views to create for the SSL
-    limited_k: ??
-        ??
-    augmentations: str 
-        augmentations to apply to the input data
+    Arguments:
+        path: root folder of the dataset
+        input_type: the type of input to load in this dataset
+        batch_size: number of samples to include in a single batch
+        split: path to the csv files containing the files and labels associated to the split
+        train_transforms: transforms to apply to the input training data
+        train_transforms: transforms to apply to the input testing data
+        num_workers: number of workers for dataloaders
+        augmentations: augmentations to apply to the input data
     """
-    def __init__(self,
-            path,
-            input_type,
-            batch_size,
-            split,
-            train_transforms = {},
-            test_transforms = {},
-            n_views = 2,
-            num_workers = 1,
-            limited_k=None,
-            augmentations = None):
+    def __init__(
+            self,
+            path: str,
+            input_type: str,
+            batch_size: int,
+            split: str,
+            label_mapping: Dict[Union[str, int], int],
+            train_transforms: Optional[transforms.Compose] = None,
+            test_transforms: Optional[transforms.Compose] = None,
+            num_workers: int = 1,
+            augmentations: Optional[transforms.Compose] = None,
+         
+    ):
         super().__init__()
         self.path = path
         self.input_type = input_type
@@ -130,76 +103,86 @@ class SupervisedDataModule(LightningDataModule):
         self.split = split
         self.train_transforms = train_transforms
         self.test_transforms = test_transforms
-        self.n_views = n_views
         self.num_workers = num_workers
-        self.limited_k = limited_k
         self.augmentations = augmentations
+        self.label_mapping = label_mapping
 
     def _init_dataloaders(self, stage):
         if str(stage) == "TrainerFn.FITTING":
             train_dataset = self._create_train_dataset()
-            self.train = DataLoader(train_dataset, 
-                                    batch_size=self.batch_size, 
-                                    shuffle=True, 
-                                    drop_last=True, 
-                                    num_workers=self.num_workers, 
-                                    pin_memory=True)
-        else: 
+            self.train = DataLoader(
+                train_dataset,
+                batch_size=self.batch_size,
+                shuffle=True,
+                drop_last=True,
+                num_workers=self.num_workers,
+                pin_memory=True
+            )
+        else:
             self.train = None
 
         if "val" in self.split and str(stage) == "TrainerFn.FITTING":
             val_dataset = self._create_val_dataset()
-            self.val = DataLoader(val_dataset, 
-                                  batch_size=self.batch_size, 
-                                  shuffle=False, 
-                                  drop_last=False, 
-                                  num_workers=self.num_workers, 
-                                  pin_memory=True)
-        else: 
+            self.val = DataLoader(
+                val_dataset,
+                batch_size=self.batch_size,
+                shuffle=False,
+                drop_last=False,
+                num_workers=self.num_workers,
+                pin_memory=True
+            )
+        else:
             self.val = None
 
         if "test" in self.split and str(stage) == "TrainerFn.TESTING":
             test_dataset = self._create_test_dataset()
-            self.test = DataLoader(test_dataset, 
-                                   batch_size=self.batch_size, 
-                                   shuffle=False, 
-                                   drop_last=False, 
-                                   num_workers=self.num_workers, 
-                                   pin_memory=True)
-        else: 
+            self.test = DataLoader(
+                test_dataset,
+                batch_size=self.batch_size,
+                shuffle=False,
+                drop_last=False,
+                num_workers=self.num_workers,
+                pin_memory=True
+            )
+        else:
             self.test = None
 
     def setup(self, stage=None):
-        #TrainerFn.FITTING,TrainerFn.TESTING 
         self._init_dataloaders(stage)
-        
+
     def _create_train_dataset(self):
         print('Reading Supervised train data:')
-        return SupervisedTorchDataset(self.path,
-                                 self.input_type, 
-                                 self.split['train'], 
-                                 transforms=self.train_transforms,
-                                 augmentations=self.augmentations,
-                                 n_views=self.n_views,)
-    
+        return SupervisedTorchDataset(
+            self.path,
+            self.input_type,
+            self.split['train'],
+            label_mapping=self.label_mapping,
+            transforms=self.train_transforms,
+            augmentations=self.augmentations,
+        )
+
     def _create_val_dataset(self):
         print('Reading Supervised val data:')
-        return SupervisedTorchDataset(self.path,
-                                 self.input_type, 
-                                 self.split['val'],  
-                                 transforms=self.test_transforms,
-                                 augmentations=self.augmentations,
-                                 n_views=self.n_views,)
-    
+        return SupervisedTorchDataset(
+            self.path,
+            self.input_type,
+            self.split['val'],
+            label_mapping=self.label_mapping,
+            transforms=self.test_transforms,
+            augmentations=self.augmentations,
+        )
+
     def _create_test_dataset(self):
         print('Reading Supervised test data:')
-        return SupervisedTorchDataset(self.path,
-                                 self.input_type, 
-                                 self.split['test'], 
-                                 transforms=self.test_transforms,
-                                 augmentations=None,
-                                 n_views=self.n_views,)
-        
+        return SupervisedTorchDataset(
+            self.path,
+            self.input_type,
+            self.split['test'],
+            label_mapping=self.label_mapping,
+            transforms=self.test_transforms,
+            augmentations=None,
+        )
+
     def train_dataloader(self):
         return self.train
 
@@ -208,4 +191,3 @@ class SupervisedDataModule(LightningDataModule):
 
     def test_dataloader(self):
         return self.test if self.test is not None else None
-    
