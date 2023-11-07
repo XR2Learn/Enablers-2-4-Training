@@ -103,7 +103,7 @@ class InitEncodersTestCase(unittest.TestCase):
         self.assertTrue(torch.allclose(encoder(shared_input), encoder_from_checkpoint(shared_input)))
 
         shutil.rmtree(test_dir)
-   
+
 
 class InitTransformsTestCase(unittest.TestCase):
     def test_init_transforms(self):
@@ -144,3 +144,35 @@ class InitTransformsTestCase(unittest.TestCase):
 
         self.assertEqual(train_transformed.numel(), test_transformed.numel())
         self.assertEqual(train_transformed.numel(), rand_input.size)
+
+
+class TestInitAugTestCase(unittest.TestCase):
+    def test_init_aug(self):
+        augmentations_cfg = {
+            "augmentations": {
+                "gaussian_noise": {
+                    "probability": 1,
+                    "kwargs": {
+                        "mean": 0,
+                        "std": 0.2
+                    }
+                },
+                "scale": {
+                    "probability": 1,
+                    "kwargs": {
+                        "max_scale": 1.3
+                    }
+                }
+            }
+        }
+
+        augmentations = init_augmentations(aug_dict=augmentations_cfg["augmentations"])
+
+        rand_input = torch.rand(128, 10).float()
+        augmented = augmentations(rand_input).float()
+
+        self.assertEqual(augmented.shape, rand_input.shape)
+        self.assertFalse(torch.allclose(
+            rand_input,
+            augmented
+        ))
