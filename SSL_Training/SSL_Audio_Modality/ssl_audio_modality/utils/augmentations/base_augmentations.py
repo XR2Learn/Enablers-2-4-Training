@@ -35,9 +35,9 @@ class GaussianNoise:
         x_noise : torch.Tensor
             Noisy data after applying Gaussian noise.
         """
-        x_noise = x + np.random.normal(
-            loc=self.mean,
-            scale=self.std,
+        x_noise = x + torch.normal(
+            mean=self.mean,
+            std=self.std,
             size=x.shape
             )
         return x_noise
