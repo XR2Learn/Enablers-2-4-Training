@@ -15,7 +15,12 @@ Component to pre-train an ED model using audio data input type.
 ## Development Environment Setup
 
 1. Clone the repository
-2. Prepare your virtual environment (e.g. VirtualEnv, Pip env, Conda)
+2. Create and activate virtual environment with `venv`. If you wish to use GPU in your environment, install requirements from `requirements-gpu.txt` (line 3):
+    ``` 
+    python -m venv ./venv
+    source ./venv/bin/activate
+    pip install -r requirements{-gpu}.txt
+    ```
 
 ## Development cycle (simplified version)
 

@@ -59,7 +59,6 @@ def run_supervised_training():
     classifier = LinearClassifier(encoder.out_size, CUSTOM_SETTINGS['dataset_config']['number_of_labels'])
     model = SupervisedModel(encoder=encoder, classifier=classifier, **CUSTOM_SETTINGS['sup_config']['kwargs'])
 
-<<<<<<< HEAD
     checkpoint_filename = f'{EXPERIMENT_ID}_model'
 
     # by default lightning does not overwrite checkpoints, but rather creates different versions (v1, v2, etc.)
@@ -67,8 +66,6 @@ def run_supervised_training():
     if os.path.exists(os.path.join(COMPONENT_OUTPUT_FOLDER, checkpoint_filename + '.ckpt')):
         os.remove(os.path.join(COMPONENT_OUTPUT_FOLDER, checkpoint_filename + '.ckpt'))
 
-=======
->>>>>>> f4c1fef (Remove redundant files and apply minor fixes)
     checkpoint_filename = f'{EXPERIMENT_ID}_model'
 
     # by default lightning does not overwrite checkpoints, but rather creates different versions (v1, v2, etc.)

@@ -9,11 +9,11 @@ Component to train an ED model using audio data input type.
 - Output file with trained weights is saved in the folder `/outputs/<file_weights>`
 
 ## Development Environment Setup
-Create and activate virtual environment with `venv`. If you wish to use GPU in your environment, install requirements from `requirements-gpu.txt` (line 2):
+Create and activate virtual environment with `venv`. If you wish to use GPU in your environment, install requirements from `requirements-gpu.txt` (line 3):
 ``` 
 python -m venv ./venv
-pip install -r requirements{-gpu}.txt
 source ./venv/bin/activate
+pip install -r requirements{-gpu}.txt
 ```
 
 ## Development Notes
