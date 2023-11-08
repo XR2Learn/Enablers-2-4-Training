@@ -17,7 +17,7 @@ class SSLTorchDataset(Dataset):
     input_type: str
         the type of input to load in this dataset
     split_path: str
-        path to the csv file containing the files and labels associated to the split
+        path to the csv file containing the files associated to the split
     transforms: torchvision.transforms.transforms.Compose
         transforms to apply to the input data,  created by using torchvision.transforms.Compose
     augmentations: torchvision.transforms.transforms.Compose
@@ -36,7 +36,6 @@ class SSLTorchDataset(Dataset):
                  ):
         self.data_path = data_path
         self.input_type = input_type
-        # subjects and labels to retrieve
         self.split_path = split_path
         self.transforms = transforms
         self.augmentations = augmentations
@@ -44,42 +43,37 @@ class SSLTorchDataset(Dataset):
 
         self._process_recordings()
 
-    def _process_recordings(self, normalize=False):
-        """ Function (i) iterates through all subjects' data in the data_path
-                         and processes them one by one (normalization, sampling);
-                    (ii) merges time windows, subjects and labels from different subjects
+    def _process_recordings(self):
+        """ Function (i) iterates through all data in the data_path and loads them into the class
 
         Parameters
         ----------
-        normalize : bool, optional
-            flag for using normalization, by default False and assumes preprocessed data
         """
 
-        # read, normalize and sample recordings
+        # read meta data
         print(os.path.join(self.data_path, self.split_path))
         meta_data = pd.read_csv(os.path.join(self.data_path, self.split_path), index_col=0)
-        self.labels = meta_data['labels']
         data_paths = meta_data['files']
         self.data = []
-        for p in tqdm(data_paths, total=meta_data.shape[0]):
-            data = np.load(os.path.join(self.data_path, self.input_type, p).replace("\\", "/"))
+        # go over all files in the given meta data
+        for path in tqdm(data_paths, total=meta_data.shape[0]):
+            # load from .npy file
+            data = np.load(os.path.join(self.data_path, self.input_type, path).replace("\\", "/"))
+            # add channel dimension if necessary
             if len(data.shape) <= 1:
                 data = np.expand_dims(data, axis=-1)
-                # print(np.expand_dims(audio,axis=-1).shape)
             self.data.append(data)
 
         self.data = [self.transforms(frame) if self.transforms is not None else frame for frame in self.data]
 
-        # re-arrange recordings and merge across subjects
-
     def __len__(self):
-        return len(self.labels)
+        return len(self.data)
 
     def __getitem__(self, idx):
         # apply augmentations if available
         output = (
             self.augmentations(self.data[idx]) if self.augmentations is not None else self.data[idx],
-            self.labels[idx],
+            None,  # None placeholder for label
             self.augmentations(self.data[idx]) if (
                 self.augmentations is not None and self.n_views == 2
                 ) else self.data[idx]
@@ -99,7 +93,7 @@ class SSLDataModule(LightningDataModule):
     batch_size: float
         number of samples to include in a single batch
     split: str
-        path to the csv files containing the files and labels associated to the split
+        path to the csv files containing the files associated to the split
     train_transforms: torchvision.transforms.transforms.Compose
         transforms to apply to the input training data, created by using torchvision.transforms.Compose
     test_transforms: torchvision.transforms.transforms.Compose
