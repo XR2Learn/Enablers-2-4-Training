@@ -104,7 +104,6 @@ def init_transforms(transforms_cfg, ssl_random_augmentations=False, random_augme
 
 
 def init_augmentations(aug_dict):
-    augmentations_to_apply = None
     augmentations_to_apply = compose_random_augmentations(aug_dict)
     augmentations_to_apply = transforms.Compose(augmentations_to_apply)
     return augmentations_to_apply

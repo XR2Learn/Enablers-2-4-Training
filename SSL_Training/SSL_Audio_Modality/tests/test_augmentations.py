@@ -57,18 +57,7 @@ class SupervisedTestCase(unittest.TestCase):
         """
         for i, aug in enumerate(self.base_augmentations):
             with self.subTest(f"{aug.__class__.__name__}", i=i):
-                aug_data = aug(self.original_data_1D)
-                self.assertEqual(aug_data.shape, self.original_data_1D.shape)
-                # channel flip has no effect on the data itself in 1D.
-                if not isinstance(aug, ChannelFlip):
-                    self.assertFalse(
-                        torch.equal(
-                            aug_data,
-                            self.original_data_1D
-                        )
-                    )
-                self.assertEqual(type(aug_data), type(self.original_data_1D))
-                self.assertEqual(aug_data.dtype, self.original_data_1D.dtype)
+                self._common_test_augmentations(aug, self.original_data_1D)
 
     def test_signal_augmentations_1d(self):
         """ test the signal augmentations in case of 1D data
@@ -76,16 +65,7 @@ class SupervisedTestCase(unittest.TestCase):
         """
         for i, aug in enumerate(self.signal_augmentations):
             with self.subTest(f"{aug.__class__.__name__}", i=i):
-                aug_data = aug(self.original_data_1D)
-                self.assertEqual(aug_data.shape, self.original_data_1D.shape)
-                self.assertFalse(
-                    torch.equal(
-                        aug_data,
-                        self.original_data_1D
-                    )
-                )
-                self.assertEqual(type(aug_data), type(self.original_data_1D))
-                self.assertEqual(aug_data.dtype, self.original_data_1D.dtype)
+                self._common_test_augmentations(aug, self.original_data_1D)
 
     def test_base_augmentations_2d(self):
         """ test the base augmentations in case of 2D data
@@ -93,16 +73,7 @@ class SupervisedTestCase(unittest.TestCase):
         """
         for i, aug in enumerate(self.base_augmentations):
             with self.subTest(f"{aug.__class__.__name__}", i=i):
-                aug_data = aug(self.original_data_2D)
-                self.assertEqual(aug_data.shape, self.original_data_2D.shape)
-                self.assertFalse(
-                    torch.equal(
-                        aug_data,
-                        self.original_data_2D
-                    )
-                )
-                self.assertEqual(type(aug_data), type(self.original_data_2D))
-                self.assertEqual(aug_data.dtype, self.original_data_2D.dtype)
+                self._common_test_augmentations(aug, self.original_data_2D)
 
     def test_signal_augmentations_2d(self):
         """ test the signal augmentations in case of 2D data
@@ -110,16 +81,19 @@ class SupervisedTestCase(unittest.TestCase):
         """
         for i, aug in enumerate(self.signal_augmentations):
             with self.subTest(f"{aug.__class__.__name__}", i=i):
-                aug_data = aug(self.original_data_2D)
-                self.assertEqual(aug_data.shape, self.original_data_2D.shape)
-                self.assertFalse(
-                    torch.equal(
-                        aug_data,
-                        self.original_data_2D
-                        )
-                    )
-                self.assertEqual(type(aug_data), type(self.original_data_2D))
-                self.assertEqual(aug_data.dtype, self.original_data_1D.dtype)
+                self._common_test_augmentations(aug, self.original_data_2D)
+
+    def _common_test_augmentations(self, aug, original_data):
+        """ common tests of the augmentations regardless of augmentation or data size
+
+        """
+        aug_data = aug(original_data)
+        self.assertEqual(aug_data.shape, original_data.shape)
+        # exceptions for 1D case when data doesnt necessarily change
+        if not isinstance(aug, ChannelFlip) and original_data.shape[0] <= 1:
+            self.assertFalse(torch.allclose(aug_data, original_data))
+        self.assertEqual(type(aug_data), type(original_data))
+        self.assertEqual(aug_data.dtype, original_data.dtype)
 
     def test_compose_augmentation_full_probability(self):
         augmentations_cfg = {

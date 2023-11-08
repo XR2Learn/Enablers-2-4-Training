@@ -18,10 +18,10 @@ class SSLTorchDataset(Dataset):
         the type of input to load in this dataset
     split_path: str
         path to the csv file containing the files and labels associated to the split
-    transforms: str
-        transforms to apply to the input data
-    augmentations: str
-        augmentations to apply to the input data
+    transforms: torchvision.transforms.transforms.Compose
+        transforms to apply to the input data,  created by using torchvision.transforms.Compose
+    augmentations: torchvision.transforms.transforms.Compose
+        augmentations to apply to the input data, created by using torchvision.transforms.Compose
     n_views: int
         number of views to create for the SSL
     """
@@ -100,16 +100,14 @@ class SSLDataModule(LightningDataModule):
         number of samples to include in a single batch
     split: str
         path to the csv files containing the files and labels associated to the split
-    train_transforms: str
-        transforms to apply to the input training data
-    train_transforms: str
-        transforms to apply to the input testing data
+    train_transforms: torchvision.transforms.transforms.Compose
+        transforms to apply to the input training data, created by using torchvision.transforms.Compose
+    test_transforms: torchvision.transforms.transforms.Compose
+        transforms to apply to the input testing data, created by using torchvision.transforms.Compose
     n_views: int
         number of views to create for the SSL
-    limited_k: ??
-        ??
-    augmentations: str
-        augmentations to apply to the input data
+    augmentations: torchvision.transforms.transforms.Compose
+        augmentations to apply to the input data, created by using torchvision.transforms.Compose
     """
 
     def __init__(self,
@@ -121,7 +119,6 @@ class SSLDataModule(LightningDataModule):
                  test_transforms={},
                  n_views=2,
                  num_workers=1,
-                 limited_k=None,
                  augmentations=None):
         super().__init__()
         self.path = path
@@ -132,7 +129,6 @@ class SSLDataModule(LightningDataModule):
         self.test_transforms = test_transforms
         self.n_views = n_views
         self.num_workers = num_workers
-        self.limited_k = limited_k
         self.augmentations = augmentations
 
     def _init_dataloaders(self, stage):

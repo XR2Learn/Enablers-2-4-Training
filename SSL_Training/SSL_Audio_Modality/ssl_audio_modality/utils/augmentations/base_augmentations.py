@@ -6,6 +6,10 @@ import numpy as np
 import random
 import torch
 
+# Augmentations based on:
+# https://openreview.net/pdf?id=bSC_xo8VQ1b
+# https://arxiv.org/pdf/2206.07656.pdf
+
 
 class GaussianNoise:
 
@@ -96,6 +100,7 @@ class ChannelFlip:
         """
         the top channel becomes the bottom channel
         (and the bottom channel becomes the top channel)
+        also known as vertical flip in 2D/Image cases
         """
     def __call__(self, x):
         """
@@ -147,7 +152,7 @@ class Scale:
 class ZeroMasking:
     def __init__(self, mask_length=10):
         """
-        Adds a zero mask on a random position to the data across all channels.
+        Adds a consecutive zero mask starting on a random position to the data across all channels.
 
         Parameters
         ----------
