@@ -9,7 +9,7 @@ from supervised_audio_modality.utils.augmentations.signal_augmentations import (
     Permutation, TimeShifting, TimeWarping
 )
 
-from supervised_audio_modality.utils.augmentations import compose_random_augmentations
+from supervised_audio_modality.utils.augmentations.compose_random_augmentations import compose_random_augmentations
 
 
 class SupervisedTestCase(unittest.TestCase):
