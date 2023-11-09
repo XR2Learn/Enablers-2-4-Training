@@ -9,7 +9,7 @@ from ssl_audio_modality.utils.augmentations.signal_augmentations import (
     Permutation, TimeShifting, TimeWarping
 )
 
-from ssl_audio_modality.utils.augmentations import compose_random_augmentations
+from ssl_audio_modality.utils.augmentations.compose_random_augmentations import compose_random_augmentations
 
 
 class SupervisedTestCase(unittest.TestCase):
