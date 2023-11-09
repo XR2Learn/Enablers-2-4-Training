@@ -42,6 +42,8 @@ Repository containing the components for training the models used in XR2Learn.
 
 `./run_all_dockers.sh`
 
+`CONFIG_FILE_PATH=<path-to-configuration-json> ./run_all_dockers.sh` 
+
 ### Running on GPU
 
 1. Using Docker images
