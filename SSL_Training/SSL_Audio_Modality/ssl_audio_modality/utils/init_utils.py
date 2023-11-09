@@ -2,7 +2,7 @@ import importlib
 from random import sample
 from pytorch_lightning.loggers import CSVLogger
 from torchvision import transforms
-from .augmentations import compose_random_augmentations
+from .augmentations.compose_random_augmentations import compose_random_augmentations
 
 
 # Models
