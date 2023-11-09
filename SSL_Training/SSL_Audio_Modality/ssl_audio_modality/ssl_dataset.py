@@ -73,7 +73,7 @@ class SSLTorchDataset(Dataset):
         # apply augmentations if available
         output = (
             self.augmentations(self.data[idx]) if self.augmentations is not None else self.data[idx],
-            None,  # None placeholder for label
+            '',  # empty placeholder for label
             self.augmentations(self.data[idx]) if (
                 self.augmentations is not None and self.n_views == 2
                 ) else self.data[idx]
