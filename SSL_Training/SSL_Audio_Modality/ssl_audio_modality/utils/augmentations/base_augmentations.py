@@ -92,7 +92,7 @@ class SignFlip:
         torch.Tensor
             sign flipped data.
         """
-        return 1 * x
+        return -1 * x
 
 
 class ChannelFlip:
