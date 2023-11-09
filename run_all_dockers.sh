@@ -1,7 +1,5 @@
 #!/bin/bash
 
-CONFIG_FILE_PATH="./configuration.json"
-
 # Deleting All dataset, output files
 #sudo rm -R datasets/*
 
