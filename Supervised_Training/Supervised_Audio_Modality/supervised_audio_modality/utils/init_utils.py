@@ -6,7 +6,7 @@ from random import sample
 #                                             IEMOCAPTorchDataset)
 #from emorec_toolbox.datasets.wesad import WESADDataModule, WESADTorchDataset
 #from emorec_toolbox.models.mlp import LinearClassifier, MLPClassifier
-from utils.augmentations import compose_random_augmentations
+from utils.augmentations.compose_random_augmentations import compose_random_augmentations
 from pytorch_lightning.loggers import CSVLogger
 from torchvision import transforms
 

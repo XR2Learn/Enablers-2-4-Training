@@ -8,11 +8,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Information to README files.
-- first version of documentation and API with mkdocs+mkdocstrings
-- CNN encoder now accepts variable length list inputs for channels/kernels hyperparameters
+- Initial documentation and API with mkdocs+mkdocstrings
+- Added tests for the augmentations implemented
 
 ### Changed
 - Code refactoring (PIP8).
+- Refactoring of augmentations.py into more descriptive files based on the type of data to augment
+- CNN encoder now accepts variable length list inputs for channels/kernels hyperparameters
 
 ## [0.1.0] - 2023-10-19
 ### Added

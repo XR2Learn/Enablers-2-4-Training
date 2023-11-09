@@ -17,11 +17,11 @@ class SSLTorchDataset(Dataset):
     input_type: str
         the type of input to load in this dataset
     split_path: str
-        path to the csv file containing the files and labels associated to the split
-    transforms: str
-        transforms to apply to the input data
-    augmentations: str 
-        augmentations to apply to the input data
+        path to the csv file containing the files associated to the split
+    transforms: torchvision.transforms.transforms.Compose
+        transforms to apply to the input data,  created by using torchvision.transforms.Compose
+    augmentations: torchvision.transforms.transforms.Compose
+        augmentations to apply to the input data, created by using torchvision.transforms.Compose
     n_views: int
         number of views to create for the SSL
     """
@@ -36,7 +36,6 @@ class SSLTorchDataset(Dataset):
                  ):
         self.data_path = data_path
         self.input_type = input_type
-        # subjects and labels to retrieve
         self.split_path = split_path
         self.transforms = transforms
         self.augmentations = augmentations
@@ -44,47 +43,40 @@ class SSLTorchDataset(Dataset):
 
         self._process_recordings()
 
-    def _process_recordings(self, normalize=False):
-        """ Function (i) iterates through all subjects' data in the data_path and processes them one by one (normalization, sampling);
-                    (ii) merges time windows, subjects and labels from different subjects
+    def _process_recordings(self):
+        """ Function (i) iterates through all data in the data_path and loads them into the class
 
         Parameters
         ----------
-        normalize : bool, optional
-            flag for using normalization, by default False and assumes preprocessed data
         """
 
-        # read, normalize and sample recordings
+        # read meta data
         print(os.path.join(self.data_path, self.split_path))
         meta_data = pd.read_csv(os.path.join(self.data_path, self.split_path), index_col=0)
-        self.labels = meta_data['labels']
         data_paths = meta_data['files']
         self.data = []
-        for p in tqdm(data_paths, total=meta_data.shape[0]):
-            data = np.load(os.path.join(self.data_path, self.input_type, p).replace("\\", "/"))
+        # go over all files in the given meta data
+        for path in tqdm(data_paths, total=meta_data.shape[0]):
+            # load from .npy file
+            data = np.load(os.path.join(self.data_path, self.input_type, path).replace("\\", "/"))
+            # add channel dimension if necessary
             if len(data.shape) <= 1:
                 data = np.expand_dims(data, axis=-1)
-                # print(np.expand_dims(audio,axis=-1).shape)
             self.data.append(data)
 
-        self.data = [self.transforms(frame) if self.transforms else frame for frame in self.data]
-
-        # re-arrange recordings and merge across subjects
+        self.data = [self.transforms(frame) if self.transforms is not None else frame for frame in self.data]
 
     def __len__(self):
-        return len(self.labels)
+        return len(self.data)
 
     def __getitem__(self, idx):
         # apply augmentations if available
-        if self.augmentations is not None:
-            aug1 = {k: self.augmentations(v) for k, v in self.data[idx].items()}
-            aug2 = {k: self.augmentations(v) for k, v in self.data[idx].items()} if self.n_views == 2 else self.data[
-                idx]
-
         output = (
-            aug1 if self.augmentations is not None else self.data[idx],
-            self.labels[idx],
-            aug2 if self.augmentations is not None else self.data[idx]
+            self.augmentations(self.data[idx]) if self.augmentations is not None else self.data[idx],
+            '',  # empty placeholder for label
+            self.augmentations(self.data[idx]) if (
+                self.augmentations is not None and self.n_views == 2
+                ) else self.data[idx]
         )
         return output
 
@@ -101,17 +93,15 @@ class SSLDataModule(LightningDataModule):
     batch_size: float
         number of samples to include in a single batch
     split: str
-        path to the csv files containing the files and labels associated to the split
-    train_transforms: str
-        transforms to apply to the input training data
-    train_transforms: str
-        transforms to apply to the input testing data
+        path to the csv files containing the files associated to the split
+    train_transforms: torchvision.transforms.transforms.Compose
+        transforms to apply to the input training data, created by using torchvision.transforms.Compose
+    test_transforms: torchvision.transforms.transforms.Compose
+        transforms to apply to the input testing data, created by using torchvision.transforms.Compose
     n_views: int
         number of views to create for the SSL
-    limited_k: ??
-        ??
-    augmentations: str 
-        augmentations to apply to the input data
+    augmentations: torchvision.transforms.transforms.Compose
+        augmentations to apply to the input data, created by using torchvision.transforms.Compose
     """
 
     def __init__(self,
@@ -123,7 +113,6 @@ class SSLDataModule(LightningDataModule):
                  test_transforms={},
                  n_views=2,
                  num_workers=1,
-                 limited_k=None,
                  augmentations=None):
         super().__init__()
         self.path = path
@@ -134,7 +123,6 @@ class SSLDataModule(LightningDataModule):
         self.test_transforms = test_transforms
         self.n_views = n_views
         self.num_workers = num_workers
-        self.limited_k = limited_k
         self.augmentations = augmentations
 
     def _init_dataloaders(self, stage):
