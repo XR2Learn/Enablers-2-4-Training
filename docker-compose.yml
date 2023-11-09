@@ -9,16 +9,14 @@ services:
       - "./Supervised_Training/Supervised_Audio_Modality:/app"
       - "./datasets:/app/datasets"
       - "./outputs:/app/outputs"
-      - "./configuration.json:/app/configuration.json"
+      - "${CONFIG_FILE_PATH:-./configuration.json}:/app/configuration.json"
     working_dir: /app
     environment:
-      - KEY=${KEY}
-    #    entrypoint: /bin/sh -c
+      - EXPERIMENT_ID=${EXPERIMENT_ID:-development-model}
     command: python supervised_audio_modality/train.py
 
   ed-training-body-tracking:
     image: some.registry.com/xr2learn-enablers/ed-training-body-tracking:latest
-    #    runtime: nvidia
     build:
       context: 'Supervised_Training/Supervised_Body_Tracking_Modality'
       dockerfile: 'Dockerfile'
@@ -26,16 +24,14 @@ services:
       - "./Supervised_Training/Supervised_Body_Tracking_Modality:/app"
       - "./datasets:/app/datasets"
       - "./outputs:/app/outputs"
-      - "./configuration.json:/app/configuration.json"
+      - "${CONFIG_FILE_PATH:-./configuration.json}:/app/configuration.json"
     working_dir: /app
     environment:
-      - KEY=${KEY}
-    #    entrypoint: /bin/sh -c
+      - EXPERIMENT_ID=${EXPERIMENT_ID:-development-model}
     command: python supervised_body_tracking_modality/train.py
 
   ssl-audio:
     image: some.registry.com/xr2learn-enablers/ssl-audio:latest
-    #    runtime: nvidia
     build:
       context: 'SSL_Training/SSL_Audio_Modality'
       dockerfile: 'Dockerfile'
@@ -43,12 +39,10 @@ services:
       - "./SSL_Training/SSL_Audio_Modality:/app"
       - "./datasets:/app/datasets"
       - "./outputs:/app/outputs"
-      - "./configuration.json:/app/configuration.json"
+      - "${CONFIG_FILE_PATH:-./configuration.json}:/app/configuration.json"
     working_dir: /app
     environment:
-      # To include environment variables in the format below
-      - KEY=${KEY}
-    #    entrypoint: /bin/sh -c
+      - EXPERIMENT_ID=${EXPERIMENT_ID:-development-model}
     command: python ssl_audio_modality/pre_train.py
 
   pre-processing-audio:
@@ -60,12 +54,10 @@ services:
       - "./Pre_processing/Pre_processing_Audio_Modality:/app"
       - "./datasets:/app/datasets"
       - "./outputs:/app/outputs"
-      - "./configuration.json:/app/configuration.json"
+      - "${CONFIG_FILE_PATH:-./configuration.json}:/app/configuration.json"
     working_dir: /app
     environment:
-      # To include environment variables in the format below
-      - KEY=${KEY}
-    #    entrypoint: /bin/sh -c
+      - EXPERIMENT_ID=${EXPERIMENT_ID:-development-model}
     command: python pre_processing_audio_modality/preprocess.py
 
   ssl-features-generation-audio:
@@ -77,12 +69,10 @@ services:
       - "./SSL_Features_Extraction/SSL_Features_Extraction_Audio_Modality:/app"
       - "./datasets:/app/datasets"
       - "./outputs:/app/outputs"
-      - "./configuration.json:/app/configuration.json"
+      - "${CONFIG_FILE_PATH:-./configuration.json}:/app/configuration.json"
     working_dir: /app
     environment:
-      # To include environment variables in the format below
-      - KEY=${KEY}
-    #    entrypoint: /bin/sh -c
+      - EXPERIMENT_ID=${EXPERIMENT_ID:-development-model}
     command: python ssl_features_extraction_audio_modality/generate_features.py
 
   handcrafted-features-generation-audio:
@@ -94,10 +84,8 @@ services:
       - "./Handcrafted_Features_Extraction/Handcrafted_Features_Extraction_Audio_modality:/app"
       - "./datasets:/app/datasets"
       - "./outputs:/app/outputs"
-      - "./configuration.json:/app/configuration.json"
+      - "${CONFIG_FILE_PATH:-./configuration.json}:/app/configuration.json"
     working_dir: /app
     environment:
-      # To include environment variables in the format below
-      - KEY=${KEY}
-    #    entrypoint: /bin/sh -c
+      - EXPERIMENT_ID=${EXPERIMENT_ID:-development-model}
     command: python handcrafted_features_extraction_audio_modality/generate_features.py
