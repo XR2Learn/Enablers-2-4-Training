@@ -19,17 +19,21 @@ def _init_model(class_constructor, config):
 
 class SupervisedTestCase(unittest.TestCase):
     """ Implements a set of basic tests for supervised models comprising of different combinations of
-        encoders and classifiers. Each test for each combination of encoder and classifier is executed as
-        a separate sub-test with name [encoder_cls-classifier_cls].
+        encoders and classifiers. These tests are encoder and classifier agnostic, i.e.
+        they are the same regardless of encoder and classifier used.
 
-        A new encoder, once implemented, can be easily integrated into this test case. 
+        Each test for each combination of encoder and classifier is executed as
+        a separate sub-test with name [encoder_cls-classifier_cls]. Thus, if a test fails,
+        the combination of encoder and classifier will be printed out along with the error.
+
+        A new encoder, once implemented, can be easily integrated into this test case.
         It is required to provide the following inputs for <encoder>:
             * self.encoder_config : kwargs dictionary that can be used to init the encoder
             * self.encoder_input_shape: input shape expected by the encoder (batch_size, ..., ...)
             * self.encoder_input = torch.randn(*self.encoder_input_shape)
-            * self.encoder = _init_model(encoder_cls, self.encoder_config) 
+            * self.encoder = _init_model(encoder_cls, self.encoder_config)
                 encoder cls is the class implementing the encoder, e.g. CNN1D
-        
+
         These should be then added to self.encoders dict as a new entry:
         self.encoders = [
             ...
@@ -146,8 +150,14 @@ class SupervisedTestCase(unittest.TestCase):
                 f"{supervised_model.encoder.__class__.__name__}-{supervised_model.classifier.__class__.__name__}",
                 i=i
             ):
-                self.assertTrue(isinstance(supervised_model.classifier, combination["classifier_cls"]))
-                self.assertTrue(isinstance(supervised_model.encoder, combination["encoder_cls"]))
+                self.assertTrue(
+                    isinstance(supervised_model.classifier, combination["classifier_cls"]),
+                    "Classifier class does not match configurations"
+                )
+                self.assertTrue(
+                    isinstance(supervised_model.encoder, combination["encoder_cls"]),
+                    "Classifier class does not match configurations"
+                )
 
     def test_forward_pass_shape(self):
         for i, combination in enumerate(self.supervised_combinations):

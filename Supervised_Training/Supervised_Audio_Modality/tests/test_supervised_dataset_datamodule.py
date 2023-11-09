@@ -209,30 +209,36 @@ class SupervisedDatasetDataModuleTestCase(unittest.TestCase):
             train_batch = next(iter(datamodule.train_dataloader()))
             self.assertEqual(
                 train_batch[0].shape,
-                (int(self.dataset_size // 10), *input_size)
+                (int(self.dataset_size // 10), *input_size),
+                "Train Dataloader: generated data batch shape is inconsistent with the input data shape."
             )
             self.assertEqual(
                 train_batch[1].shape,
-                (int(self.dataset_size // 10),)
+                (int(self.dataset_size // 10),),
+                "Train Dataloader: generated labels batch shape is inconsistent with the input labels shape."
             )
 
             val_batch = next(iter(datamodule.val_dataloader()))
             self.assertEqual(
                 val_batch[0].shape,
-                (int(self.dataset_size // 10), *input_size)
+                (int(self.dataset_size // 10), *input_size),
+                "Val Dataloader: generated data batch shape is inconsistent with the input data shape."
             )
             self.assertEqual(
                 val_batch[1].shape,
-                (int(self.dataset_size // 10),)
+                (int(self.dataset_size // 10),),
+                "Val Dataloader: generated labels batch shape is inconsistent with the input labels shape."
             )
 
             datamodule._init_dataloaders(stage="TrainerFn.TESTING")
             test_batch = next(iter(datamodule.test_dataloader()))
             self.assertEqual(
                 test_batch[0].shape,
-                (int(self.dataset_size // 10), *input_size)
+                (int(self.dataset_size // 10), *input_size),
+                "Test Dataloader: generated data batch shape is inconsistent with the input data shape."
             )
             self.assertEqual(
                 test_batch[1].shape,
-                (int(self.dataset_size // 10),)
+                (int(self.dataset_size // 10),),
+                "Test Dataloader: generated labels batch shape is inconsistent with the input labels shape."
             )

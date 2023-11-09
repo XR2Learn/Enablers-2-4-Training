@@ -37,11 +37,22 @@ class InitEncodersTestCase(unittest.TestCase):
         }
 
         encoder = init_encoder(model_cfg=cfg_cnn)
-        self.assertTrue(encoder, CNN1D)
-        self.assertEqual(len(encoder.convolutional_blocks), len(cfg_cnn["kwargs"]["out_channels"]))
+        self.assertTrue(
+            isinstance(
+                encoder,
+                CNN1D,
+            ),
+            "CNN: model class mismatch"
+        )
+        self.assertEqual(
+            len(encoder.convolutional_blocks),
+            len(cfg_cnn["kwargs"]["out_channels"]),
+            "Conv blocks number of layers mismatch"
+        )
         self.assertEqual(
             torch.nn.Flatten()(encoder(torch.randn(64, in_channels, len_seq))).shape,
-            (64, encoder.out_size)
+            (64, encoder.out_size),
+            "CNN forward pass: unexpected shape"
         )
         # Test if model is initialized from checkpoint correctly
         test_dir = tempfile.mkdtemp()
@@ -57,7 +68,10 @@ class InitEncodersTestCase(unittest.TestCase):
         encoder.eval()
         encoder_from_checkpoint.eval()
 
-        self.assertTrue(torch.allclose(encoder(shared_input), encoder_from_checkpoint(shared_input)))
+        self.assertTrue(
+            torch.allclose(encoder(shared_input), encoder_from_checkpoint(shared_input)),
+            "CNN: Incorrect model loaded from checkpoint (state_dict)"
+        )
 
         shutil.rmtree(test_dir)
 
@@ -79,11 +93,22 @@ class InitEncodersTestCase(unittest.TestCase):
         }
 
         encoder = init_encoder(cfg_w2v)
-        self.assertTrue(encoder, Wav2Vec2CNN)
-        self.assertEqual(len(encoder.cnn.convolutional_blocks), 2)
+        self.assertTrue(
+            isinstance(
+                encoder,
+                Wav2Vec2CNN
+            ),
+            "CNN: model class mismatch"
+        )
+        self.assertEqual(
+            len(encoder.cnn.convolutional_blocks),
+            2,
+            "Wav2Vec2CNN: Conv blocks number of layers mismatch"
+        )
         self.assertEqual(
             torch.nn.Flatten()(encoder(torch.randn(2, 1, len_seq * sample_rate))).shape,
-            (2, encoder.out_size)
+            (2, encoder.out_size),
+            "Wav2Vec2CNN forward pass: unexpected shape"
         )
 
         # Test if model is initialized from checkpoint correctly
@@ -100,7 +125,10 @@ class InitEncodersTestCase(unittest.TestCase):
         encoder.eval()
         encoder_from_checkpoint.eval()
 
-        self.assertTrue(torch.allclose(encoder(shared_input), encoder_from_checkpoint(shared_input)))
+        self.assertTrue(
+            torch.allclose(encoder(shared_input), encoder_from_checkpoint(shared_input)),
+            "Wav2Vec2CNN: Incorrect model loaded from checkpoint (state_dict)"
+        )
 
         shutil.rmtree(test_dir)
 
@@ -135,15 +163,23 @@ class InitTransformsTestCase(unittest.TestCase):
         }
         train_transforms, test_transforms = init_transforms(cfg_transforms["transforms"])
 
-        self.assertEqual(len(train_transforms.transforms), 3)
-        self.assertEqual(len(test_transforms.transforms), 3)
+        self.assertEqual(len(train_transforms.transforms), 3, "Mismatch in number of train transforms")
+        self.assertEqual(len(test_transforms.transforms), 3, "Mismatch in number of test transforms")
 
         rand_input = np.random.rand(10, 128)
         train_transformed = train_transforms(rand_input)
         test_transformed = test_transforms(rand_input)
 
-        self.assertEqual(train_transformed.numel(), test_transformed.numel())
-        self.assertEqual(train_transformed.numel(), rand_input.size)
+        self.assertEqual(
+            train_transformed.numel(),
+            test_transformed.numel(),
+            "Train and test transforms produce different numbers of elements"
+        )
+        self.assertEqual(
+            train_transformed.numel(),
+            rand_input.size,
+            "Train transforms produce different numbers of elements compared to input"
+        )
 
 
 class TestInitAugTestCase(unittest.TestCase):
@@ -171,8 +207,15 @@ class TestInitAugTestCase(unittest.TestCase):
         rand_input = torch.rand(128, 10)
         augmented = augmentations(rand_input)
 
-        self.assertEqual(augmented.shape, rand_input.shape)
-        self.assertFalse(torch.allclose(
-            rand_input,
-            augmented
-        ))
+        self.assertEqual(
+            augmented.shape,
+            rand_input.shape,
+            "Initialized augmentations changed data shape"
+        )
+        self.assertFalse(
+            torch.allclose(
+                rand_input,
+                augmented
+            ),
+            "Initialized augmentations did not affect data values"
+        )

@@ -4,6 +4,7 @@ import tempfile
 import unittest
 
 import torch
+
 from pytorch_lightning import LightningModule, Trainer
 
 from ssl_audio_modality.encoders.cnn1d import CNN1D
@@ -116,8 +117,14 @@ class CNN1DTestCase(unittest.TestCase):
         output_cnn_from_state_dict = cnn_loaded_from_state_dict(self.input)
         output_cnn_lightning = cnn_loaded_from_state_dict(self.input)
 
-        self.assertTrue(torch.allclose(output_cnn_default, output_cnn_from_state_dict))
-        self.assertTrue(torch.allclose(output_cnn_default, output_cnn_lightning))
+        self.assertTrue(
+            torch.allclose(output_cnn_default, output_cnn_from_state_dict),
+            "Unexpected result for a model loaded from state_dict()"
+        )
+        self.assertTrue(
+            torch.allclose(output_cnn_default, output_cnn_lightning),
+            "Unexpected result for a model loaded from lightning checkpoint"
+        )
 
         shutil.rmtree(test_dir)
 
@@ -182,7 +189,13 @@ class Wav2Vec2CNNTestCase(unittest.TestCase):
         output_w2v2_from_state_dict = w2v2_loaded_from_state_dict(self.input)
         output_w2v2_lightning = w2v2_loaded_lightning(self.input)
 
-        self.assertTrue(torch.allclose(output_w2v2_default, output_w2v2_from_state_dict))
-        self.assertTrue(torch.allclose(output_w2v2_default, output_w2v2_lightning))
+        self.assertTrue(
+            torch.allclose(output_w2v2_default, output_w2v2_from_state_dict),
+            "Unexpected result for a model loaded from state_dict()"
+        )
+        self.assertTrue(
+            torch.allclose(output_w2v2_default, output_w2v2_lightning),
+            "Unexpected result for a model loaded from lightning checkpoint"
+        )
 
         shutil.rmtree(test_dir)

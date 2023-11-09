@@ -2,7 +2,7 @@ import importlib
 from typing import Any, Dict, Optional
 
 
-from utils.augmentations.compose_random_augmentations import compose_random_augmentations
+from supervised_audio_modality.utils.augmentations.compose_random_augmentations import compose_random_augmentations
 from torchvision import transforms
 
 

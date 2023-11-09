@@ -37,7 +37,7 @@ class SetupCallbacksTestCase(unittest.TestCase):
             checkpoint_filename=model_filename,
             mode="min" if "loss" in monitor_loss else False
         )
-        self.assertTrue(checkpoint_callback_loss.mode == "min")
+        self.assertTrue(checkpoint_callback_loss.mode == "min", "Wrong mode: expected min for loss")
 
         monitor_acc = "val_accuracy"
         checkpoint_callback_acc = setup_model_checkpoint_callback(
@@ -46,7 +46,7 @@ class SetupCallbacksTestCase(unittest.TestCase):
             checkpoint_filename=model_filename,
             mode="min" if "loss" in monitor_acc else "max"
         )
-        self.assertTrue(checkpoint_callback_acc.mode == "max")
+        self.assertTrue(checkpoint_callback_acc.mode == "max", "Wrong mode: expected max for accuracy")
 
         shutil.rmtree(test_dir)
 
@@ -98,7 +98,7 @@ class SetupCallbacksTestCase(unittest.TestCase):
             batch_test_preds = {"preds": test_preds[i]}
             batch_test_labels = (None, test_labels[i])
             metrics_callback.on_validation_batch_end(None, None, batch_test_preds, batch_test_labels, None, None)
-        
+
         metrics = metrics_callback._shared_eval(lm, "val")
         # stack all predictions and labels into single arrays
         test_preds = test_preds.reshape(-1, 1).cpu().numpy()
