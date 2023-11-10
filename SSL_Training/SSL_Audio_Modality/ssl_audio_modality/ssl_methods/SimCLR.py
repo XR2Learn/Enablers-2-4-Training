@@ -1,23 +1,31 @@
+from typing import List, Union
+
 import torch
 import torch.nn.functional as F
 from pytorch_lightning import LightningModule
 from torch import nn
 
+from ssl_audio_modality.ssl_methods.projection_heads import NonLinearProjection
+
 
 class SimCLR(LightningModule):
-    def __init__(self,  
-            encoder,
-            ssl_batch_size=128,
-            temperature=0.05,
-            n_views=2,
-            optimizer_name='adam',
-            lr=0.001,
-            **kwargs):
-        """ Implementation of SimCLR with Pytorch Lightning. A user needs to provide the input encoder
+    def __init__(
+            self,
+            encoder: Union[LightningModule, nn.Module],
+            ssl_batch_size: int = 128,
+            temperature: float = 0.05,
+            n_views: int = 2,
+            optimizer_name: str = 'adam',
+            lr: float = 0.001,
+            projection_hidden: List = [256],
+            projection_out: int = 128,
+            **kwargs
+    ):
+        """ Implementation of SimCLR with Pytorch Lightning. Input encoder is supposed to be provided.
 
         Parameters
         ----------
-        encoder : 
+        encoder : Union[LightningModule, nn.Module]
             encoder to train
         ssl_batch_size : int, optional
             batch size for ssl pre-training, by default 128
@@ -29,24 +37,27 @@ class SimCLR(LightningModule):
             optimizer, by default 'adam'
         lr : float, optional
             learning rate, by default 0.001
-        """        
+        projection_hidden : List
+            hidden dimensions for projection MLP
+        projection_out : int
+            output dimension for projection MLP
+        """
         super().__init__()
 
         self.encoder = encoder
-        # TODO: make projection heads customizable (number of neurons)
-        self.projection = nn.Sequential(
-                nn.Linear(self.encoder.out_size, 512),
-                nn.ReLU(inplace=True),
 
-                nn.Linear(512, 1024),
-                nn.ReLU(inplace=True),
+        self.projection = NonLinearProjection(
+            self.encoder.out_size,
+            projection_out,
+            projection_hidden
         )
 
         self.optimizer_name_ssl = optimizer_name
-        self.lr = lr 
+        self.lr = lr
 
         self.loss = NTXent(ssl_batch_size, n_views, temperature)
 
+        self.save_hyperparameters(ignore=["encoder"])
 
     def _prepare_batch(self, batch):
         # expects that the augmented views are returned as the first and the last value in a tuple
@@ -73,7 +84,7 @@ class SimCLR(LightningModule):
         self.log("avg_positive_sim", pos)
         self.log("avg_neg_sim", neg)
         return loss
-    
+
     def validation_step(self, batch, batch_idx):
         batch = self._prepare_batch(batch)
         out = self(batch)
@@ -116,21 +127,25 @@ class NTXent(LightningModule):
     def forward(self, x):
         logits, labels, pos, neg = self.get_infoNCE_logits_labels(x, self.batch_size, self.n_views, self.temperature)
         return self.criterion(logits, labels), pos, neg
-    
+
     def get_infoNCE_logits_labels(self, features, batch_size, n_views=2, temperature=0.1):
-        # creates a vector with labels [0, 1, 2, 0, 1, 2] 
+        # creates a vector with labels [0, 1, 2, 0, 1, 2]
         labels = torch.cat([torch.arange(int(features.shape[0]/2)) for i in range(n_views)], dim=0)
-        # creates matrix where 1 is on the main diagonal and where indexes of the same intances match (e.g. [0, 4][1, 5] for batch_size=3 and n_views=2) 
+
+        # creates matrix where 1 is on the main diagonal and where indexes of the same intances match 
+        # (e.g. [0, 4][1, 5] for batch_size=3 and n_views=2) 
         labels = (labels.unsqueeze(0) == labels.unsqueeze(1)).float()
+
         # computes similarity matrix by multiplication, shape: (batch_size * n_views, batch_size * n_views)
         similarity_matrix = get_cosine_sim_matrix(features)
-        
+
         # discard the main diagonal from both: labels and similarities matrix
-        mask = torch.eye(labels.shape[0], dtype=torch.bool)#.to(self.args.device)
-        # mask out the main diagonal - output has one column less 
+        mask = torch.eye(labels.shape[0], dtype=torch.bool).to(features.device)
+
+        # mask out the main diagonal - output has one column less
         labels = labels[~mask].view(labels.shape[0], -1)
         similarity_matrix_wo_diag = similarity_matrix[~mask].view(similarity_matrix.shape[0], -1)
-        
+
         # select and combine multiple positives
         positives = similarity_matrix_wo_diag[labels.bool()].view(labels.shape[0], -1)
         # select only the negatives 
@@ -158,7 +173,7 @@ def get_cosine_sim_matrix(features):
     -------
     torch.Tensor
         Generated cosine similarity matrix
-    """    
+    """
     features = F.normalize(features, dim=1)
     similarity_matrix = torch.matmul(features, features.T)
     return similarity_matrix

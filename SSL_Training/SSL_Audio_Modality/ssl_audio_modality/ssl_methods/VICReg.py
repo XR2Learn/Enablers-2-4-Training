@@ -1,16 +1,33 @@
+from typing import List, Union
+
 import torch
 import torch.nn.functional as F
 from pytorch_lightning import LightningModule
 from torch import nn
 
+from ssl_audio_modality.ssl_methods.projection_heads import NonLinearProjection
+
+
 class VICReg(LightningModule):
-    def __init__(self, encoder, ssl_batch_size=128, sim_coeff = 25, std_coeff = 25, cov_coeff = 1, optimizer_name='adam', lr=0.005, **kwargs):
+    def __init__(
+            self,
+            encoder: Union[LightningModule, nn.Module],
+            ssl_batch_size: int = 128,
+            sim_coeff: int = 25,
+            std_coeff: int = 25,
+            cov_coeff: int = 1,
+            optimizer_name: str = 'adam',
+            lr: float = 0.005,
+            projection_hidden: List = [256],
+            projection_out: int = 128,
+            **kwargs
+    ):
 
         """ Implementation of VicReg adapted from https://github.com/facebookresearch/vicreg/
 
         Parameters
         ----------
-        encoder : 
+        encoder :
             encoder to train
         ssl_batch_size : int, optional
             batch size for ssl pre-training, by default 128
@@ -24,17 +41,15 @@ class VICReg(LightningModule):
             optimizer, by default 'adam'
         lr : float, optional
             learning rate, by default 0.005
-        """        
+        """
         super().__init__()
 
         self.encoder = encoder
-        # TODO: make projection heads customizable (number of neurons)
-        self.projection = nn.Sequential(
-                nn.Linear(self.encoder.out_size, 512),
-                nn.ReLU(inplace=True),
 
-                nn.Linear(512, 1024),
-                nn.ReLU(inplace=True),
+        self.projection = NonLinearProjection(
+            self.encoder.out_size,
+            projection_out,
+            projection_hidden
         )
 
         self.optimizer_name_ssl = optimizer_name
@@ -47,12 +62,14 @@ class VICReg(LightningModule):
         self.std_coeff = std_coeff
         self.cov_coeff = cov_coeff
 
+        self.save_hyperparameters(ignore=["encoder"])
+
     def on_fit_start(self):
         self.encoder.to(self.device)
 
     def _process_batch(self, batch):
         aug1, aug2 = batch[0].float(), batch[-1].float()
-        return aug1,aug2
+        return aug1, aug2
 
     def _compute_vicreg_loss(self, x, y, partition):
         repr_loss = F.mse_loss(x, y)
@@ -82,25 +99,25 @@ class VICReg(LightningModule):
         self.log(f"{partition}_loss", loss)
 
         return loss
-    
-    def forward(self,x,y):
+
+    def forward(self, x, y):
         x = self.projection(nn.Flatten()(self.encoder(x)))
         y = self.projection(nn.Flatten()(self.encoder(y)))
         return x, y
 
     def training_step(self, batch, batch_idx):
-        aug,x = self._process_batch(batch)
-        x, y = self(x,aug)
+        aug, x = self._process_batch(batch)
+        x, y = self(x, aug)
         return self._compute_vicreg_loss(x, y, 'train')
 
     def validation_step(self, batch, batch_idx):
-        aug,x = self._process_batch(batch)
-        x, y = self(x,aug)
+        aug, x = self._process_batch(batch)
+        x, y = self(x, aug)
         return self._compute_vicreg_loss(x, y, 'val')
-    
+
     def test_step(self, batch, batch_idx):
-        aug,x = self._process_batch(batch)
-        x, y = self(x,aug)
+        aug, x = self._process_batch(batch)
+        x, y = self(x, aug)
         return self._compute_vicreg_loss(x, y, 'test')
 
     def configure_optimizers(self):
@@ -118,14 +135,8 @@ class VICReg(LightningModule):
                 }
             }
 
-        #elif self.optimizer_name_ssl.lower() == 'lars':
-        #    optimizer = torch.optim.Adam(self.parameters(), lr=self.lr)
-        #    optimizer = LARC(optimizer)
-        #    return {
-        #        "optimizer": optimizer
-        #    }
 
-def off_diagonal(x):
+def off_diagonal(x: torch.Tensor):
     n, m = x.shape
     assert n == m
     return x.flatten()[:-1].view(n - 1, n + 1)[:, 1:].flatten()
