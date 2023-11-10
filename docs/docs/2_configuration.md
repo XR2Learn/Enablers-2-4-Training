@@ -88,7 +88,6 @@
   "encoder_config": {
     "from_module": "encoders.cnn1d",
     "class_name": "CNN1D",
-    "input_type": "eGeMAPs",
     "kwargs": {
       "in_channels": 1,
       "len_seq": 88,
@@ -101,6 +100,7 @@
   "ssl_config": {
     "from_module": "ssl_methods.VICReg",
     "ssl_framework": "VICReg",
+    "input_type": "eGeMAPs",
     "epochs": 20,
     "batch_size": 128,
     "kwargs": {
@@ -113,6 +113,7 @@
   "sup_config": {
     "epochs": 20,
     "batch_size": 128,
+    "input_type": "eGeMAPs",
     "use_augmentations_in_sup": true,
     "kwargs": {
       "lr": 0.0001,

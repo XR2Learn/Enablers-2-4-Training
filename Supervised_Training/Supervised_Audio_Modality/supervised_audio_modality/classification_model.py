@@ -1,17 +1,23 @@
+from typing import Union
+
 import torch
 from pytorch_lightning import LightningModule
 
 
-class classification_model(LightningModule):
-    """ Simple linear layer (linear probe) 
+class SupervisedModel(LightningModule):
+    """ LightningModule that takes various encoders and classifiers as inputs and performs supervised training
     """
-    def __init__(self, encoder, classifier,
-            optimizer_name='adam',
-            lr=0.001,
-            freeze_encoder=True,
-            **kwargs):
+    def __init__(
+            self,
+            encoder: Union[torch.nn.Module, LightningModule],
+            classifier: Union[torch.nn.Module, LightningModule],
+            optimizer_name: str = 'adam',
+            lr: float = 0.001,
+            freeze_encoder: bool = True,
+            **kwargs
+    ):
         super().__init__()
-        self.name = 'classification_model'
+        self.name = 'supervised_model'
         self.encoder = encoder
         self.flatten = torch.nn.Flatten()
         self.classifier = classifier
@@ -27,31 +33,42 @@ class classification_model(LightningModule):
         else:
             print("NO paramaters frozen")
 
+        ignore_list = []
+        # It is expected that if components are instances of LightningModules, they trigger their own
+        # self.save_hyperparameters() when initialized
+        if isinstance(encoder, LightningModule):
+            ignore_list.append('encoder')
+        if isinstance(classifier, LightningModule):
+            ignore_list.append('classifier')
+        self.save_hyperparameters(ignore=ignore_list)
+
     def forward(self, x):
         x = self.encoder(x)
         x = self.flatten(x)
         x = self.classifier(x)
         return x
-    
+
     def training_step(self, batch, batch_idx):
-        X,Y = batch[0],batch[1]
+        X, Y = batch[0], batch[1]
         out = self(X)
-        loss = self.loss(out,Y)
+        loss = self.loss(out, Y)
         self.log('train_loss', loss)
         return loss
-    
+
     def validation_step(self, batch, batch_idx):
-        X,Y = batch[0],batch[1]
-        out = self(X)
-        loss = self.loss(out,Y)
-        self.log("val_loss", loss)
+        return self._shared_eval(batch, batch_idx, "val_")
 
     def test_step(self, batch, batch_idx):
-        X,Y = batch[0],batch[1]
+        return self._shared_eval(batch, batch_idx, "test_")
+
+    def _shared_eval(self, batch, batch_idx, prefix="val_"):
+        X, Y = batch[0], batch[1]
         out = self(X)
-        loss = self.loss(out,Y)
-        self.log("test_loss", loss)
-    
+        loss = self.loss(out, Y)
+        self.log(f"{prefix}loss", loss)
+        preds = torch.argmax(out, dim=1)
+        return {f"{prefix}loss": loss, "preds": preds}
+
     def configure_optimizers(self):
         return self._initialize_optimizer()
 

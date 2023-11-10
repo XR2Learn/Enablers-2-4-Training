@@ -1,15 +1,22 @@
-import os
+from typing import Optional
 
 from pytorch_lightning.callbacks import ModelCheckpoint
 from pytorch_lightning.callbacks.early_stopping import EarlyStopping
 
+from .log_classifier_metrics import LogClassifierMetrics
+
 
 def setup_callbacks(
-        early_stopping_metric,
-        no_ckpt, 
-        patience=100,
-        dirpath=None
-    ):
+        early_stopping_metric: str,
+        no_ckpt: bool,
+        num_classes: int = 3,
+        patience: int = 100,
+        dirpath: Optional[str] = None,
+        monitor: str = "val_loss",
+        save_last: Optional[bool] = None,
+        save_top_k: int = 1,
+        checkpoint_filename: Optional[str] = None,
+):
     """ Setup callbacks for pytorch_lightning.Trainer
 
     Parameters
@@ -25,16 +32,32 @@ def setup_callbacks(
     -------
     list
         list of callbacks
-    """    
+    """
     callbacks = []
-    mode = 'min' if 'loss' in early_stopping_metric else 'max'
-    callbacks.append(setup_early_stopping_callback(early_stopping_metric, mode=mode, patience=patience))
+    mode_early_stopping = 'min' if 'loss' in early_stopping_metric else 'max'
+    mode_checkpoint = 'min' if 'loss' in monitor else 'max'
+    callbacks.append(setup_early_stopping_callback(early_stopping_metric, mode=mode_early_stopping, patience=patience))
+    callbacks.append(setup_classifier_metrics_logger(num_classes=num_classes))
     if not no_ckpt:
-        callbacks.append(setup_model_checkpoint_callback_last(dirpath=dirpath))
+        callbacks.append(setup_model_checkpoint_callback(
+            dirpath=dirpath,
+            monitor=monitor,
+            save_last=save_last,
+            save_top_k=save_top_k,
+            checkpoint_filename=checkpoint_filename,
+            mode=mode_checkpoint,
+        ))
     return callbacks
 
 
-def setup_model_checkpoint_callback_last(dirpath=None):
+def setup_model_checkpoint_callback(
+        dirpath: Optional[str] = None,
+        monitor: str = "val_loss",
+        save_last: Optional[bool] = None,
+        save_top_k: int = 1,
+        checkpoint_filename: Optional[str] = None,
+        mode: str = "min",
+):
     """ Setup last epoch model checkpoint
 
     Returns
@@ -44,17 +67,20 @@ def setup_model_checkpoint_callback_last(dirpath=None):
     """
     return ModelCheckpoint(
         dirpath=dirpath,
-        save_last=True,
-        filename="{epoch}"
-    )	
+        monitor=monitor,
+        save_last=save_last,
+        save_top_k=save_top_k,
+        filename=checkpoint_filename,
+        mode=mode
+    )
 
 
 def setup_early_stopping_callback(
-        metric, 
-        min_delta=0.00, 
-        patience=50, 
-        mode="min"
-    ):
+        metric: str,
+        min_delta: float = 0.00,
+        patience: int = 50,
+        mode: str = "min"
+):
     """ Initialize early stopping callback
 
     Parameters
@@ -72,5 +98,29 @@ def setup_early_stopping_callback(
     -------
     pytorch_lightning.callbacks.EarlyStopping
         initialized callback
-    """    
+    """
     return EarlyStopping(monitor=metric, min_delta=min_delta, patience=patience, verbose=False, mode=mode)
+
+
+def setup_classifier_metrics_logger(
+        num_classes,
+        metric_names=['accuracy', 'f1-score-macro', 'f1-score-micro', 'f1-score-weighted', 'precision', 'recall'],
+        average='macro'
+):
+    """ Setup classifier metrics
+
+    Parameters
+    ----------
+    num_classes : int
+        number of classes
+    metric_names : list, optional
+        metrics to log, by default ['accuracy', 'f1-score','f1-score-micro','f1-score-weighted', 'precision', 'recall']
+    average : str, optional
+        type of averaging, by default 'macro'
+
+    Returns
+    -------
+    callbacks.log_classifier_metrics.LogClassifierMetrics
+        initialized callback
+    """
+    return LogClassifierMetrics(num_classes, metric_names, average=average)

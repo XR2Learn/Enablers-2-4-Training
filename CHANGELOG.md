@@ -10,6 +10,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Information to README files.
 - Initial documentation and API with mkdocs+mkdocstrings
 - Added tests for the augmentations implemented
+- first version of documentation and API with mkdocs+mkdocstrings
+- CNN encoder now accepts variable length list inputs for channels/kernels hyperparameters
+- Convert all encoders and model to Pytorch Lightning (Supervised Component) 
+- Validation and test performance logging with torchmetrics and `LogClassifierMetrics` callback
+- Best (last if needed) model checkpointing using Pytorch Lightning
+- Unit tests coverage for the Supervised Audio Modality Component
 
 ### Changed
 - Code refactoring (PIP8).

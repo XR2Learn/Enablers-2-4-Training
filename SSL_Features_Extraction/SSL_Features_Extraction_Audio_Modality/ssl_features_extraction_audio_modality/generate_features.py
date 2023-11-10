@@ -61,7 +61,7 @@ def generate_and_save(encoder, csv_path, out_path):
     for data_path in tqdm(meta_data['files']):
         # TODO : find replacement for .replace('\\','/')) to have a seperator that works on all OS
         x = np.load(
-            os.path.join(OUTPUTS_FOLDER, CUSTOM_SETTINGS['encoder_config']['input_type'], data_path).replace('\\', '/'))
+            os.path.join(OUTPUTS_FOLDER, CUSTOM_SETTINGS['ssl_config']['input_type'], data_path).replace('\\', '/'))
         x_tensor = torch.tensor(np.expand_dims(x.T, axis=0) if len(x.shape) <= 1 else x.T)
         features = encoder(x_tensor)
         # print(data_path.split(os.path.sep))
