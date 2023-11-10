@@ -1,19 +1,20 @@
 # Python code here
+import json
 import os
+
 import torch
-
 from pytorch_lightning import Trainer
-from conf import CUSTOM_SETTINGS, OUTPUTS_FOLDER, COMPONENT_OUTPUT_FOLDER, EXPERIMENT_ID, LABEL_TO_ID
-from supervised_dataset import SupervisedDataModule
-from callbacks.setup_callbacks import setup_callbacks
-from utils.init_utils import (init_augmentations, init_transforms, init_encoder)
 
+from callbacks.setup_callbacks import setup_callbacks
 from classification_model import SupervisedModel
 from classifiers.linear import LinearClassifier
+from conf import CUSTOM_SETTINGS, OUTPUTS_FOLDER, COMPONENT_OUTPUT_FOLDER, EXPERIMENT_ID, LABEL_TO_ID
+from supervised_dataset import SupervisedDataModule
+from utils.init_utils import (init_augmentations, init_transforms, init_encoder)
 
 
 def run_supervised_training():
-    print(CUSTOM_SETTINGS)
+    print(json.dumps(CUSTOM_SETTINGS, indent=4))
     splith_paths = {'train': "train.csv", 'val': "val.csv", 'test': "test.csv"}
 
     train_transforms = {}
@@ -48,10 +49,10 @@ def run_supervised_training():
     encoder = init_encoder(
         model_cfg=CUSTOM_SETTINGS["encoder_config"],
         ckpt_path=CUSTOM_SETTINGS['encoder_config']['pretrained'] if (
-            "pretrained_path" in CUSTOM_SETTINGS['encoder_config'].keys()
+                "pretrained_path" in CUSTOM_SETTINGS['encoder_config'].keys()
         ) else f"{OUTPUTS_FOLDER}/ssl_training/{EXPERIMENT_ID}_encoder.pt" if (
-            "pretrained_same_experiment" in CUSTOM_SETTINGS['encoder_config'].keys()
-            and CUSTOM_SETTINGS['encoder_config']["pretrained_same_experiment"]
+                "pretrained_same_experiment" in CUSTOM_SETTINGS['encoder_config'].keys()
+                and CUSTOM_SETTINGS['encoder_config']["pretrained_same_experiment"]
         ) else None
     )
 
