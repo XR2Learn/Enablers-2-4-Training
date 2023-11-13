@@ -41,6 +41,7 @@
     "ssl_framework": "VICReg",
     "input_type": "standardize",
     "epochs": 20,
+    "save_last_encoder": false,
     "batch_size": 128,
     "kwargs": {
       "lr": 0.0001,
