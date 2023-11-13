@@ -69,7 +69,9 @@ def setup_model_checkpoint_callback(
         filename=checkpoint_filename,
         mode=mode
     )
-    model_checkpoint.CHECKPOINT_NAME_LAST = checkpoint_filename + "_last"
+    model_checkpoint.CHECKPOINT_NAME_LAST = checkpoint_filename + "_last" if (
+        checkpoint_filename is not None
+    ) else "last"
     return model_checkpoint
 
 
