@@ -61,7 +61,7 @@ def setup_model_checkpoint_callback(
     pytorch_lightning.callbacks.ModelCheckpoint
         initialized callback
     """
-    return ModelCheckpoint(
+    model_checkpoint = ModelCheckpoint(
         dirpath=dirpath,
         monitor=monitor,
         save_last=save_last,
@@ -69,6 +69,8 @@ def setup_model_checkpoint_callback(
         filename=checkpoint_filename,
         mode=mode
     )
+    model_checkpoint.CHECKPOINT_NAME_LAST = checkpoint_filename + "_last"
+    return model_checkpoint
 
 
 def setup_early_stopping_callback(

@@ -130,7 +130,9 @@ class NTXent(LightningModule):
 
     def get_infoNCE_logits_labels(self, features, batch_size, n_views=2, temperature=0.1):
         # creates a vector with labels [0, 1, 2, 0, 1, 2]
-        labels = torch.cat([torch.arange(int(features.shape[0]/2)) for i in range(n_views)], dim=0)
+        labels = torch.cat(
+            [torch.arange(int(features.shape[0]/2)) for i in range(n_views)], dim=0
+        ).to(features.device)
 
         # creates matrix where 1 is on the main diagonal and where indexes of the same intances match 
         # (e.g. [0, 4][1, 5] for batch_size=3 and n_views=2)
