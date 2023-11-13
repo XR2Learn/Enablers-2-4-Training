@@ -133,7 +133,7 @@ class NTXent(LightningModule):
         labels = torch.cat([torch.arange(int(features.shape[0]/2)) for i in range(n_views)], dim=0)
 
         # creates matrix where 1 is on the main diagonal and where indexes of the same intances match 
-        # (e.g. [0, 4][1, 5] for batch_size=3 and n_views=2) 
+        # (e.g. [0, 4][1, 5] for batch_size=3 and n_views=2)
         labels = (labels.unsqueeze(0) == labels.unsqueeze(1)).float()
 
         # computes similarity matrix by multiplication, shape: (batch_size * n_views, batch_size * n_views)
@@ -148,7 +148,7 @@ class NTXent(LightningModule):
 
         # select and combine multiple positives
         positives = similarity_matrix_wo_diag[labels.bool()].view(labels.shape[0], -1)
-        # select only the negatives 
+        # select only the negatives
         negatives = similarity_matrix_wo_diag[~labels.bool()].view(similarity_matrix_wo_diag.shape[0], -1)
 
         # reshuffles values in each row so that positive similarity value for each row is in the first column
