@@ -6,15 +6,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] - 2023-11-14
+
 ### Added
 - Information to README files.
-- Initial documentation and API with mkdocs+mkdocstrings
 - Added tests for the augmentations implemented
 - First version of documentation and API with mkdocs+mkdocstrings
-- Convert all encoders and model to Pytorch Lightning (Supervised Component) 
 - Validation and test performance logging with torchmetrics and `LogClassifierMetrics` callback
 - Best (last if needed) model checkpointing using Pytorch Lightning
 - Unit tests coverage for the Supervised Audio Modality Component
+
+### Changed
+- Code refactoring (PIP8).
+- Convert all encoders and model to Pytorch Lightning (Supervised Component)
+- Refactoring of augmentations.py into more descriptive files based on the type of data to augment
+- CNN encoder now accepts variable length list inputs for channels/kernels hyperparameters
 
 ### Fixed
 - ~~Passing `EXPERIMENT_ID` as an Env VAR is not supported for docker images.~~
@@ -22,10 +28,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - ~~Model checkpointing: only last epoch saved~~
 - ~~Limited logging (no performance metrics being logged)~~
 
-### Changed
-- Code refactoring (PIP8).
-- Refactoring of augmentations.py into more descriptive files based on the type of data to augment
-- CNN encoder now accepts variable length list inputs for channels/kernels hyperparameters
+### Known Issues
+- `docker-compose.yml` is mapping outside .env file to docker image, generating an error in some cases.
+- Only CNN model is supported for SSL feature extraction
 
 ## [0.1.0] - 2023-10-19
 ### Added
@@ -66,3 +71,4 @@ Example of Categories to use in each release
 
 [unreleased]: https://github.com/um-xr2learn-enablers/XR2Learn-Training/compare/v0.1.0...master
 [0.1.0]: https://github.com/um-xr2learn-enablers/XR2Learn-Training/releases/tag/v0.1.0
+[0.2.0]: https://github.com/um-xr2learn-enablers/XR2Learn-Training/releases/tag/v0.2.0
