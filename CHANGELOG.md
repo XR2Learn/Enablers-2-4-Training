@@ -35,6 +35,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Known Issues
 - `docker-compose.yml` is mapping outside .env file to docker image, generating an error in some cases.
 - Passing `EXPERIMENT_ID` as an Env VAR is not supported for docker images.
+- Augmentations are not being applied and wrong augmentation logic in Datamodules
+- Model checkpointing: only last epoch saved
+- Limited logging (no performance metrics being logged)
+- Only CNN model is supported for SSL feature extraction
 
 <!-- 
 Example of Categories to use in each release
