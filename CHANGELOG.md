@@ -10,12 +10,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Information to README files.
 - Initial documentation and API with mkdocs+mkdocstrings
 - Added tests for the augmentations implemented
-- first version of documentation and API with mkdocs+mkdocstrings
+- First version of documentation and API with mkdocs+mkdocstrings
 - Convert all encoders and model to Pytorch Lightning (Supervised Component) 
 - Validation and test performance logging with torchmetrics and `LogClassifierMetrics` callback
 - Best (last if needed) model checkpointing using Pytorch Lightning
 - Unit tests coverage for the Supervised Audio Modality Component
-- Support for using `EXPERIMENT_ID` as an Env VAR for docker images.
+
+### Fixed
+- ~~Passing `EXPERIMENT_ID` as an Env VAR is not supported for docker images.~~
+- ~~Augmentations are not being applied and wrong augmentation logic in Datamodules~~
+- ~~Model checkpointing: only last epoch saved~~
+- ~~Limited logging (no performance metrics being logged)~~
 
 ### Changed
 - Code refactoring (PIP8).
