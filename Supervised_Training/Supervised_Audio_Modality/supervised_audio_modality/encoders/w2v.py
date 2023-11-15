@@ -57,7 +57,7 @@ class Wav2Vec2CNN(LightningModule):
 
         self.cnn = CNN1D(
             in_channels=768,
-            len_seq=13,
+            len_seq=499,
             out_channels=out_channels,
             kernel_sizes=kernel_sizes,
             padding=0,
