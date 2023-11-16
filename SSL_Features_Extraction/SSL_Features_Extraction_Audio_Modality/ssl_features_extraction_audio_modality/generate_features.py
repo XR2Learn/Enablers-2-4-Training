@@ -1,11 +1,6 @@
 # Python code here
-import os
-import pathlib
-import numpy as np
-import pandas as pd
-
-from tqdm import tqdm
 from conf import CUSTOM_SETTINGS, OUTPUTS_FOLDER, EXPERIMENT_ID
+from generate_and_save import generate_and_save
 from utils.init_utils import init_encoder, init_transforms
 
 
@@ -36,9 +31,6 @@ def generate_ssl_features():
     encoder.eval()
     print(encoder)
 
-    save_folder = os.path.join(OUTPUTS_FOLDER, 'SSL_features')
-    pathlib.Path(save_folder).mkdir(parents=True, exist_ok=True)
-
     if 'transforms' in CUSTOM_SETTINGS.keys():
         train_transforms, test_transforms = init_transforms(CUSTOM_SETTINGS['transforms'])
         transforms = {
@@ -48,41 +40,14 @@ def generate_ssl_features():
         }
 
     for path_ in data_paths:
-        generate_and_save(encoder, path_, save_folder, transforms)
-
-
-def generate_and_save(encoder, data_path, out_path, transforms):
-    """
-    generate_and_save : given the encoder, extract the features and save to .npy files
-
-    Args:
-        encoder: the pytorch encoder model to extract features from
-        data_path: can take two forms:
-            - csv containing the paths to the files for which features have to be extracted and saved
-            - path to a folder with .npy files
-        out_path: output path to save the features to
-    Returns:
-        none
-    """
-    if data_path.endswith(".csv") and not os.path.isdir(data_path):
-        files = pd.read_csv(os.path.join(OUTPUTS_FOLDER, data_path))['files']
-        filename = os.path.basename(data_path)
-        cur_transforms = transforms[filename.split(".")[0]]
-    elif os.path.isdir(data_path):
-        files = os.path.listdir(data_path)
-        cur_transforms = transforms["train"]
-    else:
-        raise ValueError("Incorrect data_path format")
-
-    for data_path in tqdm(files):
-        x = np.load(
-            os.path.join(OUTPUTS_FOLDER, CUSTOM_SETTINGS['ssl_config']['input_type'], data_path).replace('\\', '/')
+        generate_and_save(
+            encoder,
+            path_,
+            OUTPUTS_FOLDER,
+            CUSTOM_SETTINGS["ssl_config"]["input_type"],
+            "SSL_features",
+            transforms
         )
-        if len(x.shape) <= 1:
-            x = np.expand_dims(x, axis=-1)
-        x_tensor = cur_transforms(x)
-        features = encoder(x_tensor)
-        np.save(os.path.join(out_path, data_path.split(os.path.sep)[-1]), features.detach().numpy())
 
 
 if __name__ == '__main__':

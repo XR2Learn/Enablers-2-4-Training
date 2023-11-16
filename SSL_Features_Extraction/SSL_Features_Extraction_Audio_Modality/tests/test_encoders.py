@@ -7,8 +7,8 @@ import torch
 
 from pytorch_lightning import LightningModule, Trainer
 
-from ssl_audio_modality.encoders.cnn1d import CNN1D
-from ssl_audio_modality.encoders.w2v import Wav2Vec2CNN
+from ssl_features_extraction_audio_modality.encoders.cnn1d import CNN1D
+from ssl_features_extraction_audio_modality.encoders.w2v import Wav2Vec2CNN
 
 
 class CNN1DTestCase(unittest.TestCase):
