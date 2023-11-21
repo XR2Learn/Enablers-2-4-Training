@@ -23,17 +23,20 @@ class SSLTorchDataset(Dataset):
     augmentations: torchvision.transforms.transforms.Compose
         augmentations to apply to the input data, created by using torchvision.transforms.Compose
     n_views: int
-        number of views to create for the SSL
+        number of views to create for the SSL. Supported values: [1, 2].
+            If n_views == 1, augmentations applied once. The second view is the input instance.
+            If n_views == 2, augmentations applied twice to generate 2 augmented views.
     """
 
-    def __init__(self,
-                 data_path,
-                 input_type,
-                 split_path,
-                 transforms=None,
-                 augmentations=None,
-                 n_views=2,
-                 ):
+    def __init__(
+            self,
+            data_path,
+            input_type,
+            split_path,
+            transforms=None,
+            augmentations=None,
+            n_views=2,
+    ):
         self.data_path = data_path
         self.input_type = input_type
         self.split_path = split_path
@@ -41,6 +44,7 @@ class SSLTorchDataset(Dataset):
         self.augmentations = augmentations
         self.n_views = n_views
 
+        assert self.n_views in [1, 2], "Number of views n_views supported: [1, 2]"
         self._process_recordings()
 
     def _process_recordings(self):
@@ -73,7 +77,6 @@ class SSLTorchDataset(Dataset):
         # apply augmentations if available
         output = (
             self.augmentations(self.data[idx]) if self.augmentations is not None else self.data[idx],
-            '',  # empty placeholder for label
             self.augmentations(self.data[idx]) if (
                 self.augmentations is not None and self.n_views == 2
                 ) else self.data[idx]
@@ -109,8 +112,8 @@ class SSLDataModule(LightningDataModule):
                  input_type,
                  batch_size,
                  split,
-                 train_transforms={},
-                 test_transforms={},
+                 train_transforms=None,
+                 test_transforms=None,
                  n_views=2,
                  num_workers=1,
                  augmentations=None):

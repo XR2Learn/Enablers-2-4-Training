@@ -1,8 +1,8 @@
-import numpy as np
 import scipy
 import torch
 
 # A set of general useful transforms
+
 
 class Normalize:
     """ Normalization to zero mean and unit variance
@@ -45,5 +45,5 @@ class Resample:
     def __init__(self, samples):
         self.samples = samples
 
-    def __call__(self,x):
+    def __call__(self, x):
         return scipy.signal.resample(x, self.samples)

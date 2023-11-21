@@ -27,7 +27,7 @@ CUSTOM_SETTINGS = {
     'key': {
         'default': 'value',
     },
-    'pre_processing':{
+    'pre_processing': {
         'some_config_preprocessing': 'values',
     }
 }

@@ -33,6 +33,7 @@
     "from_module": "ssl_methods.VICReg",
     "ssl_framework": "VICReg",
     "input_type": "standardize",
+    "save_last_encoder": false,
     "epochs": 20,
     "batch_size": 32,
     "kwargs": {
@@ -51,8 +52,7 @@
       "lr": 0.0001,
       "optimizer_name": "adam",
       "freeze_encoder": true
-    },
-    "pretrained_same_experiment": true
+    }
   },
   "augmentations": {
     "gaussian_noise": {
