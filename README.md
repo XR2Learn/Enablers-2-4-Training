@@ -1,3 +1,5 @@
+![XR2Learn](https://raw.githubusercontent.com/XR2Learn/.github/5c0fada6136915b389c1cd2151a0dd2cfc4a5aac/images/XR2Learn%20logo.png)
+
 # Enablers 2-4 Training
 
 Repository containing Enablers 2-4 and components for pre-train and fine-tuning models used in XR2Learn.
@@ -11,19 +13,24 @@ Repository containing Enablers 2-4 and components for pre-train and fine-tuning 
 [Diagram with Architecture Overview](https://drive.google.com/file/d/1k3yLi9Y8tasFMJFNxIwKY-nRJzPdKPLw/view?usp=sharing)
 
 ## Dependencies:
-
 - Docker (Nvidia-Docker for CUDA)
 - Python 3.10
 
 ## Installation
+You do not need to install any additional application to run the Enablers and their components, they are deployed using Docker containers, so you can access the Enablers and components by running docker commands. 
+You can find a list of useful docker compose commands below. 
 
+For an easier interface to use Enablers' functionalities, please check [Enablers-CLI](https://github.com/XR2Learn/Enablers-CLI) repository. 
 
 
 ## Changelog
+For a detailed list of major changes in each version, please check in:
 [CHANGELOG.md]
 
 ## Documentation 
+The documentation relative to this project can be found on the Wiki page of this repository. 
 
+More in-depth documentation can be found in this repository's `docs` folder. 
 
 ## Docker Commands
 
@@ -65,6 +72,7 @@ or
 
    Set up your local virtual environment using `requirements-gpu.txt` file instead of `requirements.txt`
 
-
+## Licence
+To be defined according to project's requirements and licences restrictions. 
 
 [CHANGELOG.md]: https://github.com/um-xr2learn-enablers/XR2Learn-Training/blob/master/CHANGELOG.md
