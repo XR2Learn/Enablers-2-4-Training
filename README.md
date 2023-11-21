@@ -1,12 +1,12 @@
-# SSL Features Extraction
+# Enablers 2-4 Training
 
-Repository containing the components for training the models used in XR2Learn.
+Repository containing Enablers 2-4 and components for pre-train and fine-tuning models used in XR2Learn.
 
 - Pre-processing: Pre-process raw data, for example, standardise, normalise.
 - Handcrafted Features Extraction: Extracts MFCCs and eGeMAPS.
-- Self-Supervised Learning (SSL) Training (pre-train): Pre-train an encoder.
-- SSL Features Extraction: Uses a trained encoder to generate features.
-- Supervised Learning Training (fine-tuning): Train a classification model.
+- Self-Supervised Learning (SSL) Training (pre-train): Pre-train an encoder (Enabler 2).
+- SSL Features Extraction: Uses a trained encoder to generate features (Enabler 3).
+- Supervised Learning Training (fine-tuning): Train a classification model (Enabler 4).
 
 [Diagram with Architecture Overview](https://drive.google.com/file/d/1k3yLi9Y8tasFMJFNxIwKY-nRJzPdKPLw/view?usp=sharing)
 
@@ -15,8 +15,15 @@ Repository containing the components for training the models used in XR2Learn.
 - Docker (Nvidia-Docker for CUDA)
 - Python 3.10
 
+## Installation
+
+
+
 ## Changelog
 [CHANGELOG.md]
+
+## Documentation 
+
 
 ## Docker Commands
 
@@ -50,80 +57,14 @@ Repository containing the components for training the models used in XR2Learn.
 
 `docker compose -f docker-compose.yml -f docker-compose-gpu.yml run --rm <service-name>`
 
+or
+
+`./compose-gpu.sh run --rm <service-name>`
+
 2. Local run
 
    Set up your local virtual environment using `requirements-gpu.txt` file instead of `requirements.txt`
 
-## Folders configuration: /datasets and /output 
 
-By default, to facilitating the development of multiple components, docker-compose.yml is configured to map the dockers
-images folders
-`\datasets` `\outputs` and the file `configuration.json` to a single location in the repository root's directory.
-
-If you do not want a single `\datasets`, `\outputs` folder to all the docker images when running docker in development,
-eliminate the volumes mapping by commenting the lines in `docker-compose.yml` file. For example:
-
-`"./datasets:/app/datasets"`
-
-`"./outputs:/app/outputs"`
-
-`"./configuration.json:/app/configuration.json"`
-
-Then, the docker images will map the `/datasets`, `/outputs` and `configuration.json` file from the ones inside each
-component.
-
-## Configuration arguments
-
-```
-├── dataset_config: 
-│   ├── dataset_name: name of dataset, should match folder name
-│   ├── number_of_labels: number of labels in the dataset
-├── pre_processing_config
-│   ├── process: preprocessing to apply, standardize or normalize
-│   ├── create_splits: create dataset splits
-│   ├── target_sr: samplerate to resample to
-│   ├── padding: add zero-padding or not
-│   ├── max_length: desired maximum lenght
-├── handcrafted_features_config
-│   ├──
-├── encoder_config
-│   ├── from_module: module where the encoder is to be found
-│   ├── class_name: name of encoder inside module
-│   ├── input_type: specify the input modality (e.g. eGeMAPs,
-│   ├── pretrained_same_experiment: use the pretrained encoder of this experiment or not,
-│   ├── kwargs: arguments for the encoder
-├─      ├── in_channels: number of channels in the input data
-│       ├── len_seq: for eGeMAPS (88), for standardize (SR * number of seconds)
-│       ├── out_channels: list containing the number of output channels for each conv block
-│       ├── kernel_sizes: list containing the kernel sizes for each conv block
-│       ├── stride: stire size over all conv blocks
-├── ssl_config
-│  ├── from_module: model from which to load the ssl framework
-│  ├── ssl_framework: name of the framework to use
-│  ├── epochs: number of epochs
-│  ├── batch_size: batch size for SSL training
-│  ├── kwargs: other arguments for SSL training
-│       ├── lr: learning rate
-│       ├── n_views: number of views, at the moment only 2 supported
-│       ├── temperature: temperature used
-│       ├── optimizer_name_ssl: at the moment only adam supported
-├── sup_config
-│  ├── epochs: number of epochs to train for
-│  ├── batch_size: batch size for supervised trianing
-│  ├── use_augmentation_in_sup: weather to use the defined augmentations in sup learning or not
-│  ├── kwargs: other supervised learning args
-│       ├── lr: learning rate
-│       ├── optimizer_name: at the moment only adam supported
-│       ├── freeze_encoder: boolean, weather to freeze the encoder in supervised training or not
-├── augmentations
-│  ├── augmentation name
-│     ├── probability: probability of augmentation to be applies
-│     ├── kwargs: arguments for the augmentation to use
-├── transforms:
-│  ├── class_name: name of transform to apply
-│  ├── from_module: where to fidn the transform
-│  ├── transform_name: name of transformation
-│  ├── in_test: if transformation is to be applied to test set or not
-```
 
 [CHANGELOG.md]: https://github.com/um-xr2learn-enablers/XR2Learn-Training/blob/master/CHANGELOG.md

@@ -1,3 +1,5 @@
+![XR2Learn](https://raw.githubusercontent.com/XR2Learn/.github/5c0fada6136915b389c1cd2151a0dd2cfc4a5aac/images/XR2Learn%20logo.png)
+
 # Overview
 
 This page is used to store the internal documentation for the XR2Learn Emotion Recognition (ER) Enablers. The internal documentation provides useful materials and guidelines to simplify the process of developing, maintaining and testing the Enablers by the project consortium developers.
