@@ -17,7 +17,7 @@ The last command will outputs the local address, where the documentation will be
 
 
 
-alternative to build html and self host:
+Alternative to build html and self-host:
 ```
 mkdocs build
 python3 -m http.server 8000 -d .\site\

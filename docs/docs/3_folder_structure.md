@@ -56,3 +56,21 @@ Within the test/train/val csvs no modality must be specified, only the file name
 └── Supervised_Training/
     └── ...
 ```
+
+### Folders configuration: /datasets and /output 
+
+By default, to facilitating the development of multiple components, docker-compose.yml is configured to map the dockers
+images folders
+`\datasets` `\outputs` and the file `configuration.json` to a single location in the repository root's directory.
+
+If you do not want a single `\datasets`, `\outputs` folder to all the docker images when running docker in development,
+eliminate the volumes mapping by commenting the lines in `docker-compose.yml` file. For example:
+
+`"./datasets:/app/datasets"`
+
+`"./outputs:/app/outputs"`
+
+`"./configuration.json:/app/configuration.json"`
+
+Then, the docker images will map the `/datasets`, `/outputs` and `configuration.json` file from the ones inside each
+component.
