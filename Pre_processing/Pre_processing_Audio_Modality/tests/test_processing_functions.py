@@ -264,7 +264,7 @@ class PreprocessCustomDatasetTestCase(unittest.TestCase):
             )
             self.assertFalse(
                 val_split["files"],
-                "Unexpected splits with create_splits: False"    
+                "Unexpected splits with create_splits: False"
             )
             self.assertFalse(
                 val_split["labels"],
