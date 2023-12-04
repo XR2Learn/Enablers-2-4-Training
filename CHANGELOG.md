@@ -7,7 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Added
 - More documentation. 
-- Unit tests for SSL and Handcrafted Features extraction pipelines for audio
+- Unit tests for Pre-processing, SSL and Handcrafted Features extraction pipelines for audio
+- Support pipelines for custom audio datasets prepared in the provided format
 
 ### Changed
 - Handcrafted feature extraction logic: one pass through data to generate required features
