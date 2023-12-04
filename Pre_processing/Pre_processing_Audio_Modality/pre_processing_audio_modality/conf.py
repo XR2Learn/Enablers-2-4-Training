@@ -53,3 +53,7 @@ RAVDESS_EMOTION_TO_LABEL = {"neutral": "01",
                             "disgust": "07",
                             "suprised": "08"
                             }
+
+CUSTOM_LABEL_TO_EMOTION = {}
+
+CUSTOM_EMOTION_TO_LABEL = {}
