@@ -18,8 +18,10 @@ class Wav2Vec2Wrapper(LightningModule):
     ):
         super().__init__()
         # TODO: add other configurations of wav2vec2.0 and integrate with Wav2VecCNN
-        if w2v2_type == 'base':
+        if w2v2_type == "base":
             bundle = torchaudio.pipelines.WAV2VEC2_BASE
+        elif w2v2_type == "large":
+            bundle = torchaudio.pipelines.WAV2VEC2_LARGE
         else:
             raise ValueError("wrong type of W2V2 model provided")
         self.w2v2 = bundle.get_model()
@@ -28,9 +30,13 @@ class Wav2Vec2Wrapper(LightningModule):
                 param.requires_grad = False
 
     def forward(self, x, lengths=None):
-        internal_features, _ = self.w2v2.extract_features(x.squeeze(axis=1), lengths=lengths)
-        output_contextual_encoder, valid_lengths = self.w2v2.forward(x.squeeze(axis=1), lengths=lengths)
-        internal_features.append(output_contextual_encoder)
+        internal_features, valid_lengths = self.w2v2.extract_features(x.squeeze(axis=1), lengths=lengths)
+        output_local_encoder = self.w2v2.encoder.feature_projection.forward(
+            self.w2v2.feature_extractor(
+                x.squeeze(axis=1), length=lengths
+            )[0]
+        )
+        internal_features.append(output_local_encoder)
         return internal_features, valid_lengths
 
 
@@ -53,10 +59,15 @@ class Wav2Vec2CNN(LightningModule):
 
         self.wav2vec2 = Wav2Vec2Wrapper(w2v2_type=w2v2_type, freeze=freeze)
 
-        self.weighted_average = nn.Parameter(torch.ones(13))  # for learnable weights
+        if w2v2_type == "base":
+            self.weighted_average = nn.Parameter(torch.ones(13))
+            in_channels = 768
+        elif w2v2_type == "large":
+            self.weighted_average = nn.Parameter(torch.ones(25))
+            in_channels = 1024
 
         self.cnn = CNN1D(
-            in_channels=768,
+            in_channels=in_channels,
             len_seq=499,
             out_channels=out_channels,
             kernel_sizes=kernel_sizes,
