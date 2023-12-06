@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [0.3.0] - 2023-12-06
 ### Added
 - More documentation. 
 - Unit tests for Pre-processing, SSL and Handcrafted Features extraction pipelines for audio
@@ -14,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - Handcrafted feature extraction logic: one pass through data to generate required features
+- Refactoring for Pre-processing, SSL and Handcrafted Features extraction pipelines for audio
 - Include features from local CNN encoder in Wav2Vec2
 
 ### Fixed
@@ -49,6 +52,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Known Issues
 - `docker-compose.yml` is mapping outside .env file to docker image, generating an error in some cases.
 - Only CNN model is supported for SSL feature extraction
+- W2V2 implementation: features from local CNN encoder are not included
 
 ## [0.1.0] - 2023-10-19
 ### Added
@@ -90,3 +94,4 @@ Example of Categories to use in each release
 [unreleased]: https://github.com/um-xr2learn-enablers/XR2Learn-Training/compare/v0.1.0...master
 [0.1.0]: https://github.com/um-xr2learn-enablers/XR2Learn-Training/releases/tag/v0.1.0
 [0.2.0]: https://github.com/um-xr2learn-enablers/XR2Learn-Training/releases/tag/v0.2.0
+[0.3.0]: https://github.com/um-xr2learn-enablers/XR2Learn-Training/releases/tag/v0.3.0
