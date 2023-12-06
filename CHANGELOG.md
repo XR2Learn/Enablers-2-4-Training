@@ -10,16 +10,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Unit tests for Pre-processing, SSL and Handcrafted Features extraction pipelines for audio
 - Support pipelines for custom audio datasets prepared in the provided format
 - Support for W2V2 models in SSL features extraction
+- Wav2Vec2 Large encoder
 
 ### Changed
 - Handcrafted feature extraction logic: one pass through data to generate required features
+- Include features from local CNN encoder in Wav2Vec2
 
 ### Fixed
 - ~~Only CNN model is supported for SSL feature extraction~~
+- ~~W2V2 implementation: features from local CNN encoder are not included~~
 
 ### Known Issues
 - `docker-compose.yml` is mapping outside .env file to docker image, generating an error in some cases.
-- W2V2 implementation: features from local CNN encoder are not included
+
 
 ## [0.2.0] - 2023-11-14
 
