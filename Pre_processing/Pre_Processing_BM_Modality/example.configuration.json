@@ -10,6 +10,9 @@
     "padding": true,
     "max_length": 5
   },
+  "inference_config": {
+    "features": "SSL_features"
+  },
   "handcrafted_features_config": {
     "MFCC": {
       "sample_rate": 16000,
@@ -28,10 +31,9 @@
   "encoder_config": {
     "from_module": "encoders.cnn1d",
     "class_name": "CNN1D",
-    "input_type": "standardize",
     "kwargs": {
       "in_channels": 1,
-      "len_seq": 80000,
+      "len_seq": 88,
       "out_channels": [
         2,
         2,
@@ -49,7 +51,8 @@
   "ssl_config": {
     "from_module": "ssl_methods.VICReg",
     "ssl_framework": "VICReg",
-    "epochs": 5,
+    "input_type": "eGeMAPs",
+    "epochs": 20,
     "batch_size": 128,
     "kwargs": {
       "lr": 0.0001,
@@ -59,13 +62,14 @@
     }
   },
   "sup_config": {
-    "epochs": 5,
+    "epochs": 20,
+    "input_type": "eGeMAPs",
     "batch_size": 128,
     "use_augmentations_in_sup": true,
     "kwargs": {
       "lr": 0.0001,
       "optimizer_name": "adam",
-      "freeze_encoder": false
+      "freeze_encoder": true
     }
   },
   "augmentations": {

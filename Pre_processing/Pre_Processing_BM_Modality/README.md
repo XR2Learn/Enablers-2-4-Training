@@ -1,5 +1,5 @@
 # Pre Processing BM Modality
-Pre-processing for BioMeasurements Modality
+Pre-processing for BM Modality
 
 # Including component in Docker-compose.yml file as a service 
 
@@ -7,17 +7,17 @@ Pre-processing for BioMeasurements Modality
 ssl-bm:
     image: some.registry.com/xr2learn-enablers/ssl-bm:latest
     build:
-      context: '<<component>>/<<project_folder>>'
+      context: '<<component>>/Pre_Processing_BM_Modality'
       dockerfile: 'Dockerfile'
     volumes:
-      - "./<<component>>/<<project_folder>>:/app"
+      - "./<<component>>/Pre_Processing_BM_Modality:/app"
       - "./datasets:/app/datasets"
       - "./outputs:/app/outputs"
-      - "./configuration.json:/app/configuration.json"
+      - "${CONFIG_FILE_PATH:-./configuration.json}:/app/configuration.json"
     working_dir: /app
     environment:
-      # To include environment variables in the format below
-      - KEY=${KEY}
-    #    entrypoint: /bin/sh -c
-    command: python <<project_slug>>/<<main_python_file>>.py
+      - EXPERIMENT_ID=${EXPERIMENT_ID:-development-model}
+    command: python pre_processing_bm_modality/preprocess.py
+
 ```
+
