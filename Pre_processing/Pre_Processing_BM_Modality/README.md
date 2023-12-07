@@ -4,8 +4,8 @@ Pre-processing for BM Modality
 # Including component in Docker-compose.yml file as a service 
 
 ```yaml
-ssl-bm:
-    image: some.registry.com/xr2learn-enablers/ssl-bm:latest
+pre-processing-bm:
+    image: some.registry.com/xr2learn-enablers/pre-processing-bm:latest
     build:
       context: '<<component>>/Pre_Processing_BM_Modality'
       dockerfile: 'Dockerfile'
