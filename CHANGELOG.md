@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added 
-- Structure for the BM modality components (Preprocessing,)
+- Structure for the BM modality components (Preprocessing, Handcrafted Features)
 
 ## [0.3.0] - 2023-12-06
 ### Added

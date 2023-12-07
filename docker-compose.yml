@@ -105,3 +105,18 @@ services:
     environment:
       - EXPERIMENT_ID=${EXPERIMENT_ID:-development-model}
     command: python pre_processing_bm_modality/preprocess.py
+
+  handcrafted-features-generation-bm:
+    image: some.registry.com/xr2learn-enablers/handcrafted-features-generation-bm:latest
+    build:
+      context: 'Handcrafted_Features_Extraction/Handcrafted_Features_Extraction_BM_Modality'
+      dockerfile: 'Dockerfile'
+    volumes:
+      - "./Handcrafted_Features_Extraction/Handcrafted_Features_Extraction_BM_Modality:/app"
+      - "./datasets:/app/datasets"
+      - "./outputs:/app/outputs"
+      - "${CONFIG_FILE_PATH:-./configuration.json}:/app/configuration.json"
+    working_dir: /app
+    environment:
+      - EXPERIMENT_ID=${EXPERIMENT_ID:-development-model}
+    command: python handcrafted_features_extraction_bm_modality/generate_features.py
