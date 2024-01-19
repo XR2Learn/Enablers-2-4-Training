@@ -94,7 +94,7 @@ Example of Categories to use in each release
 - Just an example of how to use changelog. -->
 
 
-[unreleased]: https://github.com/um-xr2learn-enablers/XR2Learn-Training/compare/v0.1.0...master
+[unreleased]: https://github.com/um-xr2learn-enablers/XR2Learn-Training/compare/v0.3.0...master
 [0.1.0]: https://github.com/um-xr2learn-enablers/XR2Learn-Training/releases/tag/v0.1.0
 [0.2.0]: https://github.com/um-xr2learn-enablers/XR2Learn-Training/releases/tag/v0.2.0
 [0.3.0]: https://github.com/um-xr2learn-enablers/XR2Learn-Training/releases/tag/v0.3.0
