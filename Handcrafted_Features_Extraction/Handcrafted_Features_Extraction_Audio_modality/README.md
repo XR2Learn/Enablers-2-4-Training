@@ -11,8 +11,9 @@ Component to pre-train an ED model using audio data input type.
 - Output files should be saved in the folder `/outputs/handcrafted-features-generation-audio/`
 
 ### Support
-- This component does not support macOS with Apple chip because one of its dependency, opensmile,
-does not support it. Check reported [issue](https://github.com/audeering/opensmile-python/issues/79#issuecomment-1614165695).
+- The “Handcrafted Features Extraction” component for audio modality does not support macOS - Apple chip,
+due to the OpenSmile Python library not supporting this OS architecture, check reported [issue](https://github.com/audeering/opensmile-python/issues/79#issuecomment-1614165695). 
+“Handcrafted Features Extraction” still supports macOS Intel chip machines. 
 
 # Development
 
@@ -38,6 +39,3 @@ does not support it. Check reported [issue](https://github.com/audeering/opensmi
 
 1. For local run create `.env` file in the same level as `example.env` to load environment variables.
 2. Add on docker compose the environment variable name under the service `ssl-audio`
-
-# TODO
- - change features to extract from listy to keys/dicts with parameters
