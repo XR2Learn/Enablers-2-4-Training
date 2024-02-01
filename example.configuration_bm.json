@@ -1,0 +1,14 @@
+{
+  "dataset_config": {
+    "dataset_name": "BM",
+    "number_of_labels": 3
+  },
+  "pre_processing_config": {
+    "process": "standardize",
+    "create_splits": true,
+    "target_sr": 16000,
+    "padding": true,
+    "max_length": 5
+  }
+
+}

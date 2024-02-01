@@ -14,6 +14,7 @@ OUTPUTS_FOLDER = config('OUTPUTS_FOLDER', default=outputs_folder)
 EXPERIMENT_ID = config('EXPERIMENT_ID', default='dev_model')
 datasets_folder = os.path.join(MAIN_FOLDER, 'datasets')
 DATASETS_FOLDER = config('DATASETS_FOLDER', default=datasets_folder)
+BM_DATA_PATH = os.path.join(MAIN_FOLDER_DEFAULT, 'datasets', 'BM')
 
 # Yet to check if this is really necessary, maybe only for cases where passing values as ENV VARS is too cumbersome
 # e.g. [[1, 'a', ],['789', 'o', 9]] would be very annoying to write and parse.
@@ -30,3 +31,15 @@ PATH_CUSTOM_SETTINGS = config('PATH_CUSTOM_SETTINGS', default=path_custom_settin
 if os.path.exists(PATH_CUSTOM_SETTINGS):
     with open(PATH_CUSTOM_SETTINGS, 'r') as f:
         CUSTOM_SETTINGS = json.load(f)
+
+
+BM_LABEL_TO_EMOTION = {
+    "01": "BORED",
+    "02": "ENGAGED",
+    "03": "FRUSTRATED"
+}
+BM_EMOTION_TO_LABEL = {
+    "BORED": "01",
+    "ENGAGED": "02",
+    "FRUSTRATED": "03"
+}
