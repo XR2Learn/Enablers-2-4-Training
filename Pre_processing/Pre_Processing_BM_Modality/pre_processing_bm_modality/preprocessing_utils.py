@@ -2,7 +2,7 @@ from collections import deque
 import glob
 import datetime
 import os
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Tuple
 import pathlib
 import pandas as pd
 from tqdm import tqdm
@@ -127,7 +127,25 @@ def process_session(
     session: str,
     threshold: float = 10,
     offset_hours_data: int = 1
-):
+) -> Tuple[pd.DataFrame, Dict[str, Any]]:
+    """
+    Extracts session data from Shimmer and Progress Events from Magic XRoom and assigns labels to sensor recordings.
+    Collects summary about the session.
+
+    Args:
+        session_data_file: path to bio-measurements recordings from the session
+        session_annot_file: path to annotations
+        subject: subject ID
+        session: session ID
+        threshold: threshold in seconds to discard irrelevant labels and levels,
+            i.e. if the time passed between annotation and the latest completed/failed level is higher than
+            this threshold, both annotation and level are discarded
+        offset_hours_data: delay in Shimmer data recording in hours caused by different time-zones
+
+    Returns:
+        labeled_data: dataframe consisting labeled sensor recordings
+        stats: dictionary with stats describing the input session
+    """
     # Timestamp format: C# ticks
     annotations = pd.read_csv(session_annot_file)
     annotations["timestamp_dt"] = (
@@ -147,7 +165,7 @@ def process_session(
         .apply(lambda x: datetime.datetime.fromtimestamp(x / 1000))
     )
     if offset_hours_data >= 1:
-        data['timestamp_dt'] += pd.Timedelta(hours=1)
+        data['timestamp_dt'] += pd.Timedelta(hours=offset_hours_data)
     data = data.drop_duplicates()
     data["label"] = np.nan
     data["interval_num"] = np.nan
