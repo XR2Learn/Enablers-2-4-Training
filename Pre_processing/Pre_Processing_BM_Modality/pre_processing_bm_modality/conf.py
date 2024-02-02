@@ -14,7 +14,7 @@ OUTPUTS_FOLDER = config('OUTPUTS_FOLDER', default=outputs_folder)
 EXPERIMENT_ID = config('EXPERIMENT_ID', default='dev_model')
 datasets_folder = os.path.join(MAIN_FOLDER, 'datasets')
 DATASETS_FOLDER = config('DATASETS_FOLDER', default=datasets_folder)
-BM_DATA_PATH = os.path.join(MAIN_FOLDER_DEFAULT, 'datasets', 'BM')
+BM_DATA_PATH = os.path.join(DATASETS_FOLDER, 'BM')
 
 # Yet to check if this is really necessary, maybe only for cases where passing values as ENV VARS is too cumbersome
 # e.g. [[1, 'a', ],['789', 'o', 9]] would be very annoying to write and parse.
