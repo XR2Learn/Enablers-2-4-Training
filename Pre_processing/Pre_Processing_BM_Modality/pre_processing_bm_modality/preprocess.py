@@ -1,4 +1,5 @@
 import os
+import pandas as pd
 
 from conf import (
     CUSTOM_SETTINGS,
@@ -19,7 +20,7 @@ def preprocess():
     all_subject_dirs = os.listdir(BM_DATA_PATH)
     print(f"Found a total of {len(all_subject_dirs)} under {BM_DATA_PATH}.")
 
-    train_split, val_split, test_split = process_dataset(
+    train_split, val_split, test_split, stats = process_dataset(
         BM_DATA_PATH,
         all_subject_dirs,
         CUSTOM_SETTINGS["pre_processing_config"],
@@ -27,6 +28,18 @@ def preprocess():
         label_to_emotion,
         dataset=dataset_name
     )
+
+    stats_df = (
+        pd.DataFrame(stats)
+        .sort_values(by=["subject", "session"])
+    )
+
+    stats_df.to_csv(os.path.join(OUTPUTS_FOLDER, "stats_biomeasurements.csv"), index=None)
+
+    print('Writing CSV files containing the splits to storage')
+    pd.DataFrame.from_dict(train_split).to_csv(os.path.join(OUTPUTS_FOLDER, 'train.csv'))
+    pd.DataFrame.from_dict(val_split).to_csv(os.path.join(OUTPUTS_FOLDER, 'val.csv'))
+    pd.DataFrame.from_dict(test_split).to_csv(os.path.join(OUTPUTS_FOLDER, 'test.csv'))
 
 
 if __name__ == '__main__':

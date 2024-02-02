@@ -17,7 +17,9 @@ def process_dataset(
         pre_processing_cfg: Dict[str, Any],
         outputs_folder: str,
         label_to_emotion: Dict[str, int],
-        dataset: str
+        dataset: str,
+        seq_len: int = 5,
+        overlap: float = 0.
 ):
     """
     Preprocesses the dataset with bio-measurements in Magic XRoom format.
@@ -30,6 +32,8 @@ def process_dataset(
         outputs_folder: path to the outputs folder,
         label_to_emotion: mapping from labels to emotions,
         dataset: name of the dataset
+        seq_len: sequence length in seconds
+        overlap: overlapping proportion between segments in [0, 1)
 
     Returns:
         train_split: a dictionary containing the 'files' and 'labels' for training
@@ -63,7 +67,7 @@ def process_dataset(
     self_functions = {
         "normalize": normalize,
         'standardize': standardize,
-        'only_resample': no_preprocessing
+        'raw': no_preprocessing
     }
 
     preprocessing_to_apply = self_functions[pre_processing_cfg['process']]
@@ -80,44 +84,57 @@ def process_dataset(
         split = splits_phase[phase]
         subjects = subjects_phase[phase]
         for subject_path in tqdm(subjects, desc=f"Preprocessing {phase} set"):
-            subject_path = os.path.join(full_dataset_path, subject_path)
-            # format: data_collection_SESSION_SENSOR_.csv
-            sessions = set([x.split("_")[2] for x in os.listdir(subject_path)])
-            
-            for session in sessions:
-                processed_file_paths = []
-                processed_file_labels = []
+            try:
+                subject_path = os.path.join(full_dataset_path, subject_path)
+                # format: data_collection_SESSION_SENSOR_.csv
+                sessions = set([x.split("_")[2] for x in os.listdir(subject_path)])
 
-                session_annot = glob.glob(os.path.join(subject_path, f"*{session}*PROGRESS_EVENT_.csv"))[0]
-                session_bm = glob.glob(os.path.join(subject_path, f"*{session}*SHIMMER_.csv"))[0]
+                for session in sessions:
+                    processed_file_paths = []
+                    processed_file_labels = []
 
-                processed_session, stats = process_session(
-                    session_bm,
-                    session_annot,
-                    subject_path,
-                    session=session
-                )
-                ovr_stats.append(stats)
-                processed_session.to_csv(f"./{os.path.basename(subject_path)}_{session}.csv", index=None)
+                    session_annot = glob.glob(os.path.join(subject_path, f"*{session}*PROGRESS_EVENT_.csv"))[0]
+                    session_bm = glob.glob(os.path.join(subject_path, f"*{session}*SHIMMER_.csv"))[0]
 
-                # # (data, label)
-                # for i, instance in enumerate(processed_session):
-                #     filepath = os.path.join(
-                #         outputs_folder,
-                #         pre_processing_cfg['process'],
-                #         f"{session}_{i}_emotion{instance[1]}.npy"
-                #     )
-                #     preprocessed_instance = preprocessing_to_apply(instance[0])
-                #     np.save(filepath, preprocessed_instance.astype(np.float32))
+                    # Assign available labels from annotations to bio-measurement data
+                    # to obtain dataframe with labeled signals corresponding to multiple levels (intervals)
+                    processed_session, stats = process_session(
+                        session_bm,
+                        session_annot,
+                        subject_path,
+                        session=session
+                    )
+                    ovr_stats.append(stats)
 
-                #     processed_file_paths.append(filepath.split(os.sep)[-1])
-                #     processed_file_labels.append(instance[1])
-                    
-                # split['files'].extend(processed_file_paths)
-                # split['labels'].extend(processed_file_labels)
+                    # Segment each extracted level into shorter time windows
+                    # Each level (interval) will be split into multiple segments with the same length
+                    segmented_session, labels = segment_processed_session(
+                        processed_session,
+                        seq_len,
+                        overlap
+                    )
 
-    pd.DataFrame(ovr_stats).sort_values(by=["subject", "session"]).to_csv("./stats_xroom_shimmer.csv", index=None)
-    return train_split, val_split, test_split
+                    # apply pre-processing (e.g., normalization) for the whole session
+                    preprocessed_session = preprocessing_to_apply(segmented_session)
+
+                    for i in range(len(preprocessed_session)):
+                        filepath = os.path.join(
+                            outputs_folder,
+                            pre_processing_cfg['process'],
+                            f"{os.path.basename(subject_path)}_{session}_{i}_emotion_{labels[i]}.npy"
+                        )
+
+                        np.save(filepath, preprocessed_session[i].astype(np.float32))
+
+                        processed_file_paths.append(filepath.split(os.sep)[-1])
+                        processed_file_labels.append(labels[i])
+
+                    split['files'].extend(processed_file_paths)
+                    split['labels'].extend(processed_file_labels)
+            except:
+                print(f"Skipping subject {subject_path}, error in pre-processing")
+
+    return train_split, val_split, test_split, ovr_stats
 
 
 def process_session(
@@ -220,7 +237,7 @@ def process_session(
             start, end, label, _ = labeled_intervals.popleft()
             interval_num += 1
 
-    # query labeled data 
+    # query labeled data
     labeled_data = data[~data["label"].isna()]
 
     # compute length of recorded labeled data and each emotion
@@ -235,24 +252,24 @@ def process_session(
     min_max_intervals["interval_length"] = (
         min_max_intervals["timestamp_dt_max"] - min_max_intervals["timestamp_dt_min"]
     )
-
+    min_max_intervals["interval_length"] = min_max_intervals["interval_length"].dt.total_seconds()
     length_of_labeled_data = min_max_intervals["interval_length"].sum()
 
     length_per_min_max_intervals = (
         min_max_intervals
         .groupby(by=["label_min"])
-        .sum()
+        .sum(numeric_only=True)
         .reset_index()
     )
 
     lengths = {
-        "length_BORED": pd.Timedelta(0),
-        "length_ENGAGED": pd.Timedelta(0),
-        "length_FRUSTRATED": pd.Timedelta(0)
+        "length_seconds_BORED": pd.Timedelta(0),
+        "length_seconds_ENGAGED": pd.Timedelta(0),
+        "length_seconds_FRUSTRATED": pd.Timedelta(0)
     }
 
     for _, row in length_per_min_max_intervals.iterrows():
-        lengths[f"length_{row['label_min']}"] = row["interval_length"]
+        lengths[f"length_seconds_{row['label_min']}"] = row["interval_length"]
 
     stats = {
         "subject": os.path.basename(subject),
@@ -265,15 +282,53 @@ def process_session(
         "shimmer_first_entry": shimmer_first_entry,
         "shimmer_last_entry": shimmer_last_entry,
         "labeled_shimmer_data_pct": round(labeled_data.shape[0] / data.shape[0], 2),
-        "num_labeled_intervals": len(labeled_data["interval_num"].unique()),
+        "num_labeled_intervals_seconds": len(labeled_data["interval_num"].unique()),
         "length_labeled_intervals": length_of_labeled_data,
     }
     stats = {**stats, **lengths}
-    print(stats)
     return labeled_data, stats
 
 
-def normalize(subject_all_audio):
+def segment_processed_session(
+    session_df: pd.DataFrame,
+    seq_len: int,
+    overlap: float,
+    frequency: float = 10
+) -> Tuple[np.ndarray, List[str]]:
+    """
+    Segmenting processed sessions into time windows of the provided sequence length in seconds
+
+    Args:
+        session_df: Dataframe obtained after calling process_session()
+        seq_len: lengths of sequences (time windows) in seconds
+        overlap: proportion of overlap between time windows in [0, 1)
+        frequency: (expected) frequency of the signal
+    """
+    window_length = int(seq_len * frequency)
+    intervals = session_df["interval_num"].unique()
+    segmented_session = []
+    labels = []
+    for interval in intervals:
+        interval_data = session_df[session_df["interval_num"] == interval]
+        unique_labels = interval_data["label"].unique()
+        if len(unique_labels) > 1:
+            raise ValueError("Found multiple labels per interval")
+        label = unique_labels[0]
+        drop_cols = ["index", "timestamp", "updated_timestamp", "timestamp_dt", "label", "interval_num"]
+        interval_data_sensors = np.array(
+            interval_data
+            .drop([x for x in drop_cols if x in interval_data.columns], axis=1)
+        )
+
+        for i in range(0, len(interval_data_sensors) - window_length, int(window_length * (1 - overlap))):
+            curr_window = interval_data_sensors[i: i + window_length]
+            segmented_session.append(curr_window)
+            labels.append(label)
+
+    return np.stack(segmented_session), labels
+
+
+def normalize(bm_segments):
     """
     normalize: transformed into a range between -1 and 1 by normalization for each speaker (min-max scaling)
 
@@ -284,39 +339,38 @@ def normalize(subject_all_audio):
         subject_all_normalized_audio: a list containing the normalized numpy arrays with audio from a subject
     """
 
-    # could be heavily influenced by outliers
-    min = np.min(np.hstack(subject_all_audio))
-    max = np.max(np.hstack(subject_all_audio))
+    # stack segments for the whole session and compute per-channel statistics
+    stacked_segments = bm_segments.reshape(-1, bm_segments.shape[-1])
+    min_channel = stacked_segments.min(axis=0)
+    max_channel = stacked_segments.max(axis=0)
 
-    subject_all_normalized_audio = [2 * (au - min) / (max - min) - 1 for au in subject_all_audio]
+    segments_min_max = (bm_segments - min_channel) / (max_channel - min_channel)
 
-    return subject_all_normalized_audio
+    return segments_min_max
 
 
-def standardize(subject_all_audio):
+def standardize(bm_segments: np.ndarray):
     """
-    z-normalization to zero mean and unit variance for each speaker
+    z-normalization to zero mean and unit variance for each segment with bio-measurements
 
     Args:
-        subject_all_audio: a list containing the numpy arrays with all the audio data of the subject
+        bm_segment: 3D-array containing bio-measurement signals from one session (multiple segments per session)
 
     Returns:
-        subject_all_standardized_audio: a list containing the standardized numpy arrays with audio from a subject
+        standardized_signal: a list containing the standardized numpy arrays with audio from a subject
     """
 
-    # as the encoding is float32, could maybe cause under/overflow?
-    mean = np.mean(np.hstack(subject_all_audio))
-    std = np.std(np.hstack(subject_all_audio))
-    subject_all_standardized_audio = [(au - mean) / std for au in subject_all_audio]
+    # stack segments for the whole session and compute per-channel statistics
+    stacked_segments = bm_segments.reshape(-1, bm_segments.shape[-1])
+    mean_channel = stacked_segments.mean(axis=0)
+    std_channel = stacked_segments.std(axis=0)
 
-    # check if mean is 0+-tol and std 1+-tol
-    assert -0.05 < np.mean(np.hstack(subject_all_standardized_audio)) < 0.05, "mean is not equal to 0"
-    assert 0.95 < np.std(np.hstack(subject_all_standardized_audio)) < 1.05, "std is not equal to 1"
+    bm_z_normalized = (bm_segments - mean_channel) / std_channel
 
-    return subject_all_standardized_audio
+    return bm_z_normalized
 
 
-def no_preprocessing(subject_all_audio):
+def no_preprocessing(bm_segment):
     """
     No pre-processing applied
 
@@ -326,24 +380,24 @@ def no_preprocessing(subject_all_audio):
     Returns:
         subject_all_audio: a list containing the numpy arrays with all the audio data of the subject
     """
-    return subject_all_audio
+    return bm_segment
 
 
-def resample_audio_signal(
-        audio: np.ndarray,
+def resample_bm(
+        bm_segment: np.ndarray,
         sample_rate: int,
         target_rate: int
 ):
     """
-    Resample the given (audio) signal to a target frequency
+    Resample stacked signals to a target frequency
 
     Args:
-        audio: a numpy array with the audio data to resample
+        bm_segment: 3D numpy array with the bio-measurement data to resample
         sample_rate: the sample rate of the original signal
         target_rate: the target sample rate
     Returns:
-        subject_all_audio: a list containing the numpy arrays with all the audio data of the subject
+        resampled: resampled signals
     """
-    number_of_samples = round(len(audio) * float(target_rate) / sample_rate)
-    resampled_audio = scipy.signal.resample(audio, number_of_samples)
-    return resampled_audio
+    number_of_samples = round(len(bm_segment) * float(target_rate) / sample_rate)
+    resampled = scipy.signal.resample(bm_segment, number_of_samples, axis=-1)
+    return resampled
