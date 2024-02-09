@@ -84,12 +84,12 @@ def process_dataset(
         split = splits_phase[phase]
         subjects = subjects_phase[phase]
         for subject_path in tqdm(subjects, desc=f"Preprocessing {phase} set"):
-            try:
-                subject_path = os.path.join(full_dataset_path, subject_path)
-                # format: data_collection_SESSION_SENSOR_.csv
-                sessions = set([x.split("_")[2] for x in os.listdir(subject_path)])
+            subject_path = os.path.join(full_dataset_path, subject_path)
+            # format: data_collection_SESSION_SENSOR_.csv
+            sessions = set([x.split("_")[2] for x in os.listdir(subject_path)])
 
-                for session in sessions:
+            for session in sessions:
+                try:
                     processed_file_paths = []
                     processed_file_labels = []
 
@@ -131,9 +131,8 @@ def process_dataset(
 
                     split['files'].extend(processed_file_paths)
                     split['labels'].extend(processed_file_labels)
-            except:
-                print(f"Skipping subject {subject_path}, error in pre-processing")
-
+                except:
+                    print(f"Skipping subject {subject_path} session {session}, error in pre-processing")
     return train_split, val_split, test_split, ovr_stats
 
 
