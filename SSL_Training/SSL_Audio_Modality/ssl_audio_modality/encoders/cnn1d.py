@@ -1,9 +1,10 @@
-import torch
-import torch.nn as nn
 from collections import OrderedDict
+from typing import Optional, List
 
+
+import torch.nn as nn
 from pytorch_lightning import LightningModule
-from typing import List, Optional
+import torch
 
 
 class CNN1D(LightningModule):
@@ -24,28 +25,17 @@ class CNN1D(LightningModule):
         """
         1D-Convolutional Network with three layers.
 
-        Parameters
-        ----------
-        in_channels : int
-            Number of channels in the input data.
-        len_seq : int
-            Length of the input sequence.
-        out_channels : list of int
-            List containing the number of channels in the convolutional layers.
-        kernel_sizes : list of int
-            List containing the sizes of the convolutional kernels.
-        stride : int
-            Size of the stride.
-        padding : int
-            Unused, just to compute the out size.
-        pool_padding : int
-            Padding for maxpooling.
-        pool_size : int
-            Size of the maxpooling.
-        p_drop : float
-            Dropout value.
-        pretrained : str
-            Path to pretrained model.
+        Args:
+            in_channels: Number of channels in the input data.
+            len_seq: Length of the input sequence.
+            out_channels: List containing the number of channels in the convolutional layers.
+            kernel_sizes: List containing the sizes of the convolutional kernels.
+            stride: Size of the stride.
+            padding: Unused, just to compute the out size.
+            pool_padding: Padding for maxpooling.
+            pool_size: Size of the maxpooling.
+            p_drop: Dropout value.
+            pretrained: Path to pretrained model.
         """
         super(CNN1D, self).__init__()
         assert len(out_channels) == len(kernel_sizes), "out_channels and kernel_size list lengths should match"
@@ -123,18 +113,5 @@ class CNN1D(LightningModule):
         return int(num_channels * conv_out_size)
 
     def forward(self, x):
-        """
-        Forward pass of the CNN1D.
-
-        Parameters
-        ----------
-        x : torch.Tensor
-            Input tensor.
-
-        Returns
-        -------
-        torch.Tensor
-            Output tensor after applying CNN layers.
-        """
         x = self.convolutional_blocks(x)
         return x
