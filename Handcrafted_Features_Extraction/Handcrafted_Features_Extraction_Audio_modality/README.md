@@ -47,5 +47,7 @@ Component to pre-train an ED model using audio data input type.
 The handcrafted features extraction component for the audio modality is shared for non-commercial use only, to comply
 with [OpenSMILE](https://github.com/audeering/opensmile-python) license.
 
+Copyright © 2024, Maastricht University
+
 Please refer to [LICENSE.md](LICENSE.md)
 document for more details.

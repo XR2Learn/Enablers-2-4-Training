@@ -82,6 +82,8 @@ or
 The Training tools code is shared under a dual-licensing model. For non-commercial use, it is released under the MIT
 open-source license. A commercial license is required for commercial use.
 
+Copyright © 2024, Maastricht University
+
 The handcrafted features extraction components for the audio modality is shared for non-commercial use only, to comply
 with [OpenSMILE](https://github.com/audeering/opensmile-python) license.
 
