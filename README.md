@@ -13,24 +13,29 @@ Repository containing Enablers 2-4 and components for pre-train and fine-tuning 
 [Diagram with Architecture Overview](https://drive.google.com/file/d/1k3yLi9Y8tasFMJFNxIwKY-nRJzPdKPLw/view?usp=sharing)
 
 ## Dependencies:
+
 - Docker (Nvidia-Docker for CUDA)
 - Python 3.10
 
 ## Installation
-You do not need to install any additional application to run the Enablers and their components, they are deployed using Docker containers, so you can access the Enablers and components by running docker commands. 
-You can find a list of useful docker compose commands below. 
 
-For an easier interface to use Enablers' functionalities, please check [Enablers-CLI](https://github.com/XR2Learn/Enablers-CLI) repository. 
+You do not need to install any additional application to run the Enablers and their components, they are deployed using
+Docker containers, so you can access the Enablers and components by running docker commands.
+You can find a list of useful docker compose commands below.
 
+For an easier interface to use Enablers' functionalities, please
+check [Enablers-CLI](https://github.com/XR2Learn/Enablers-CLI) repository.
 
 ## Changelog
+
 For a detailed list of major changes in each version, please check in:
 [CHANGELOG.md]
 
-## Documentation 
-The documentation relative to this project can be found on the Wiki page of this repository. 
+## Documentation
 
-More in-depth documentation can be found in this repository's `docs` folder. 
+The documentation relative to this project can be found on the Wiki page of this repository.
+
+More in-depth documentation can be found in this repository's `docs` folder.
 
 ## Docker Commands
 
@@ -56,7 +61,7 @@ More in-depth documentation can be found in this repository's `docs` folder.
 
 `./run_all_dockers.sh`
 
-`CONFIG_FILE_PATH=<path-to-configuration-json> ./run_all_dockers.sh` 
+`CONFIG_FILE_PATH=<path-to-configuration-json> ./run_all_dockers.sh`
 
 ### Running on GPU
 
@@ -73,6 +78,17 @@ or
    Set up your local virtual environment using `requirements-gpu.txt` file instead of `requirements.txt`
 
 ## Licence
-To be defined according to project's requirements and licences restrictions. 
 
-[CHANGELOG.md]: https://github.com/um-xr2learn-enablers/XR2Learn-Training/blob/master/CHANGELOG.md
+The Training tools code is shared under a dual-licensing model. For non-commercial use, it is released under the MIT
+open-source license. A commercial license is required for commercial use.
+
+The handcrafted features extraction components for the audio modality is shared for non-commercial use only, to comply
+with [OpenSMILE](https://github.com/audeering/opensmile-python) license.
+
+Pre-trained and fine-tuned models created using the RAVDESS dataset are shared under the CC BY-NC-SA 4.0 license to
+comply with the RAVDESS license, as the models are derivative works from this dataset.
+
+Please refer to [LICENSE.md](LICENSE.md) document for more details.
+
+
+[CHANGELOG.md]: CHANGELOG.md
