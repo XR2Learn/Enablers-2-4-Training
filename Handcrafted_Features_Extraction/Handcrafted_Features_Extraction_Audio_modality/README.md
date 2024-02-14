@@ -6,14 +6,16 @@ Component to pre-train an ED model using audio data input type.
 
 - CSV Input file should be in the folder `/datasets/<input_CSV_file.CSV>`
 
-`Output`: CSV files (train.csv, test.csv, val.csv) with labels + path to features extracted, per features type. 
+`Output`: CSV files (train.csv, test.csv, val.csv) with labels + path to features extracted, per features type.
 
 - Output files should be saved in the folder `/outputs/handcrafted-features-generation-audio/`
 
 ### Support
+
 - The “Handcrafted Features Extraction” component for audio modality does not support macOS - Apple chip,
-due to the OpenSmile Python library not supporting this OS architecture, check reported [issue](https://github.com/audeering/opensmile-python/issues/79#issuecomment-1614165695). 
-“Handcrafted Features Extraction” still supports macOS Intel chip machines. 
+  due to the OpenSmile Python library not supporting this OS architecture, check
+  reported [issue](https://github.com/audeering/opensmile-python/issues/79#issuecomment-1614165695).
+  “Handcrafted Features Extraction” still supports macOS Intel chip machines.
 
 # Development
 
@@ -39,3 +41,11 @@ due to the OpenSmile Python library not supporting this OS architecture, check r
 
 1. For local run create `.env` file in the same level as `example.env` to load environment variables.
 2. Add on docker compose the environment variable name under the service `ssl-audio`
+
+## License
+
+The handcrafted features extraction component for the audio modality is shared for non-commercial use only, to comply
+with [OpenSMILE](https://github.com/audeering/opensmile-python) license.
+
+Please refer to [LICENSE.md](Handcrafted_Features_Extraction/Handcrafted_Features_Extraction_Audio_modality/LICENSE.md)
+document for more details.
