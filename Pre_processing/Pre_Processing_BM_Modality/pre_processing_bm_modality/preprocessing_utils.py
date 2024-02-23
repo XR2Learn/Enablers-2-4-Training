@@ -45,6 +45,9 @@ def process_dataset(
     val_split = {'files': [], 'labels': []}
     test_split = {'files': [], 'labels': []}
 
+    get_ssl = pre_processing_cfg["get_ssl"] if "get_ssl" in pre_processing_cfg else False
+    get_stats = pre_processing_cfg["get_stats"] if "get_stats" in pre_processing_cfg else False
+
     # check if datasets has to be split in a 80/10/10 way, else put every subject in training
     if pre_processing_cfg['create_splits']:
         test_subjects = np.random.choice(all_subjects_dirs, max(1, int(0.1 * len(all_subjects_dirs))), replace=False)
@@ -61,6 +64,11 @@ def process_dataset(
     print('test: ', test_subjects)
 
     splits_phase = {'train': train_split, 'val': val_split, 'test': test_split}
+    if get_ssl:
+        ssl_train_split = {'files': []}
+        ssl_val_split = {'files': []}
+        ssl_test_split = {'files': []}
+        ssl_splits_phase = {'train': ssl_train_split, 'val': ssl_val_split, 'test': ssl_test_split}
     subjects_phase = {'train': train_subjects, 'val': val_subjects, 'test': test_subjects}
 
     # get the right function to use, and create path to save files to is doesnt exist
@@ -78,10 +86,20 @@ def process_dataset(
         )
     ).mkdir(parents=True, exist_ok=True)
 
+    if get_ssl:
+        pathlib.Path(
+            os.path.join(
+                outputs_folder,
+                pre_processing_cfg['process'] + "_ssl"
+            )
+        ).mkdir(parents=True, exist_ok=True)
+
     # go over each phase/split
     ovr_stats = []
     for phase in ['train', 'val', 'test']:
         split = splits_phase[phase]
+        if get_ssl:
+            ssl_split = ssl_splits_phase[phase]
         subjects = subjects_phase[phase]
         for subject_path in tqdm(subjects, desc=f"Preprocessing {phase} set"):
             subject_path = os.path.join(full_dataset_path, subject_path)
@@ -91,6 +109,8 @@ def process_dataset(
             for session in sessions:
                 try:
                     processed_file_paths = []
+                    if get_ssl:
+                        processed_file_paths_ssl = []
                     processed_file_labels = []
 
                     session_annot = glob.glob(os.path.join(subject_path, f"*{session}*PROGRESS_EVENT_.csv"))[0]
@@ -98,13 +118,16 @@ def process_dataset(
 
                     # Assign available labels from annotations to bio-measurement data
                     # to obtain dataframe with labeled signals corresponding to multiple levels (intervals)
-                    processed_session, stats = process_session(
+                    processed_session, stats, processed_session_ssl = process_session(
                         session_bm,
                         session_annot,
                         subject_path,
-                        session=session
+                        session=session,
+                        get_ssl=get_ssl,
+                        get_stats=get_stats,
                     )
-                    ovr_stats.append(stats)
+                    if get_stats:
+                        ovr_stats.append(stats)
 
                     # Segment each extracted level into shorter time windows
                     # Each level (interval) will be split into multiple segments with the same length
@@ -131,9 +154,42 @@ def process_dataset(
 
                     split['files'].extend(processed_file_paths)
                     split['labels'].extend(processed_file_labels)
+
+                    # repeat the processing for unlabeled ssl data
+                    if get_ssl:
+                        segmented_session_ssl = segment_processed_session_ssl(
+                            processed_session_ssl,
+                            seq_len,
+                            overlap
+                        )
+
+                        # apply pre-processing (e.g., normalization) for the whole session
+                        preprocessed_session_ssl = preprocessing_to_apply(segmented_session_ssl)
+
+                        for i in range(len(preprocessed_session_ssl)):
+                            filepath = os.path.join(
+                                outputs_folder,
+                                pre_processing_cfg['process'] + "_ssl",
+                                f"{os.path.basename(subject_path)}_{session}_{i}.npy"
+                            )
+
+                            np.save(filepath, preprocessed_session_ssl[i].astype(np.float32))
+
+                            processed_file_paths_ssl.append(filepath.split(os.sep)[-1])
+
+                        ssl_split['files'].extend(processed_file_paths_ssl)
                 except:
                     print(f"Skipping subject {subject_path} session {session}, error in pre-processing")
-    return train_split, val_split, test_split, ovr_stats
+
+    return (
+        train_split,
+        val_split,
+        test_split,
+        ovr_stats if get_stats else None,
+        ssl_train_split if get_ssl else [],
+        ssl_val_split if get_ssl else [],
+        ssl_test_split if get_ssl else [],
+    )
 
 
 def process_session(
@@ -142,7 +198,9 @@ def process_session(
     subject: str,
     session: str,
     threshold: float = 10,
-    offset_hours_data: int = 1
+    offset_hours_data: int = 1,
+    get_ssl: bool = False,
+    get_stats: bool = False,
 ) -> Tuple[pd.DataFrame, Dict[str, Any]]:
     """
     Extracts session data from Shimmer and Progress Events from Magic XRoom and assigns labels to sensor recordings.
@@ -157,6 +215,8 @@ def process_session(
             i.e. if the time passed between annotation and the latest completed/failed level is higher than
             this threshold, both annotation and level are discarded
         offset_hours_data: delay in Shimmer data recording in hours caused by different time-zones
+        get_ssl: return unlabeled dataframe together with annotated dataframe
+        get_stats: flag for generating stats csv (for labeled data)
 
     Returns:
         labeled_data: dataframe consisting labeled sensor recordings
@@ -217,8 +277,8 @@ def process_session(
                     (last_finished_level_start, last_finished_level_end, event_type, row["timestamp_dt"])
                 )
 
-    shimmer_first_entry = min(data['timestamp_dt'])
-    shimmer_last_entry = max(data['timestamp_dt'])
+    sensor_first_entry = min(data['timestamp_dt'])
+    sensor_last_entry = max(data['timestamp_dt'])
     progress_event_first_entry = min(annotations['timestamp_dt'])
     progress_event_last_entry = max(annotations['timestamp_dt'])
 
@@ -239,53 +299,59 @@ def process_session(
     # query labeled data
     labeled_data = data[~data["label"].isna()]
 
-    # compute length of recorded labeled data and each emotion
-    min_max_intervals = (
-        labeled_data[["interval_num", "timestamp_dt", "label"]]
-        .groupby(by="interval_num")
-        .agg([np.min, np.max])
-        .reset_index(drop=True)
-    )
-    min_max_intervals.columns = min_max_intervals.columns.map('_'.join).str.strip('_')
-    min_max_intervals = min_max_intervals[["timestamp_dt_min", "timestamp_dt_max", "label_min"]]
-    min_max_intervals["interval_length"] = (
-        min_max_intervals["timestamp_dt_max"] - min_max_intervals["timestamp_dt_min"]
-    )
-    min_max_intervals["interval_length"] = min_max_intervals["interval_length"].dt.total_seconds()
-    length_of_labeled_data = min_max_intervals["interval_length"].sum()
+    if get_stats:
+        # compute length of recorded labeled data and each emotion
+        min_max_intervals = (
+            labeled_data[["interval_num", "timestamp_dt", "label"]]
+            .groupby(by="interval_num")
+            .agg([np.min, np.max])
+            .reset_index(drop=True)
+        )
+        min_max_intervals.columns = min_max_intervals.columns.map('_'.join).str.strip('_')
+        min_max_intervals = min_max_intervals[["timestamp_dt_min", "timestamp_dt_max", "label_min"]]
+        min_max_intervals["interval_length"] = (
+            min_max_intervals["timestamp_dt_max"] - min_max_intervals["timestamp_dt_min"]
+        )
+        min_max_intervals["interval_length"] = min_max_intervals["interval_length"].dt.total_seconds()
+        length_of_labeled_data = min_max_intervals["interval_length"].sum()
 
-    length_per_min_max_intervals = (
-        min_max_intervals
-        .groupby(by=["label_min"])
-        .sum(numeric_only=True)
-        .reset_index()
-    )
+        length_per_min_max_intervals = (
+            min_max_intervals
+            .groupby(by=["label_min"])
+            .sum(numeric_only=True)
+            .reset_index()
+        )
 
-    lengths = {
-        "length_seconds_BORED": pd.Timedelta(0),
-        "length_seconds_ENGAGED": pd.Timedelta(0),
-        "length_seconds_FRUSTRATED": pd.Timedelta(0)
-    }
+        lengths = {
+            "length_seconds_BORED": pd.Timedelta(0),
+            "length_seconds_ENGAGED": pd.Timedelta(0),
+            "length_seconds_FRUSTRATED": pd.Timedelta(0)
+        }
 
-    for _, row in length_per_min_max_intervals.iterrows():
-        lengths[f"length_seconds_{row['label_min']}"] = row["interval_length"]
+        for _, row in length_per_min_max_intervals.iterrows():
+            lengths[f"length_seconds_{row['label_min']}"] = row["interval_length"]
 
-    stats = {
-        "subject": os.path.basename(subject),
-        "session": session,
-        "shimmer_session_length": shimmer_last_entry - shimmer_first_entry,
-        "progress_event_length": progress_event_last_entry - progress_event_first_entry,
-        "avg_actual_frequency": data.shape[0] / int((shimmer_last_entry - shimmer_first_entry).total_seconds()),
-        "progress_event_first_entry": progress_event_first_entry,
-        "progress_event_last_entry": progress_event_last_entry,
-        "shimmer_first_entry": shimmer_first_entry,
-        "shimmer_last_entry": shimmer_last_entry,
-        "labeled_shimmer_data_pct": round(labeled_data.shape[0] / data.shape[0], 2),
-        "num_labeled_intervals_seconds": len(labeled_data["interval_num"].unique()),
-        "length_labeled_intervals": length_of_labeled_data,
-    }
-    stats = {**stats, **lengths}
-    return labeled_data, stats
+        stats = {
+            "subject": os.path.basename(subject),
+            "session": session,
+            "sensor_session_length": sensor_last_entry - sensor_first_entry,
+            "progress_event_length": progress_event_last_entry - progress_event_first_entry,
+            "avg_actual_frequency": data.shape[0] / int((sensor_last_entry - sensor_first_entry).total_seconds()),
+            "progress_event_first_entry": progress_event_first_entry,
+            "progress_event_last_entry": progress_event_last_entry,
+            "sensor_first_entry": sensor_first_entry,
+            "sensor_last_entry": sensor_last_entry,
+            "labeled_sensor_data_pct": round(labeled_data.shape[0] / data.shape[0], 2),
+            "num_labeled_intervals_seconds": len(labeled_data["interval_num"].unique()),
+            "length_labeled_intervals": length_of_labeled_data,
+        }
+        stats = {**stats, **lengths}
+
+    return (
+        labeled_data,
+        stats if get_stats else None,
+        data if get_ssl else None
+    ) 
 
 
 def segment_processed_session(
@@ -295,7 +361,7 @@ def segment_processed_session(
     frequency: float = 10
 ) -> Tuple[np.ndarray, List[str]]:
     """
-    Segmenting processed sessions into time windows of the provided sequence length in seconds
+    Segmenting processed sessions into time windows of the provided sequence length in seconds using labeled intervals
 
     Args:
         session_df: Dataframe obtained after calling process_session()
@@ -325,6 +391,36 @@ def segment_processed_session(
             labels.append(label)
 
     return np.stack(segmented_session), labels
+
+
+def segment_processed_session_ssl(
+    session_df: pd.DataFrame,
+    seq_len: int,
+    overlap: float,
+    frequency: float = 10
+) -> Tuple[np.ndarray, List[str]]:
+    """
+    Segmenting processed sessions into time windows of the provided sequence length in seconds for ssl data
+
+    Args:
+        session_df: Dataframe obtained after calling process_session()
+        seq_len: lengths of sequences (time windows) in seconds
+        overlap: proportion of overlap between time windows in [0, 1)
+        frequency: (expected) frequency of the signal
+    """
+    window_length = int(seq_len * frequency)
+    segmented_session = []
+    drop_cols = ["index", "timestamp", "updated_timestamp", "timestamp_dt", "label", "interval_num"]
+    session_data_sensors = np.array(
+        session_df
+        .drop([x for x in drop_cols if x in session_df.columns], axis=1)
+    )
+
+    for i in range(0, len(session_data_sensors) - window_length, int(window_length * (1 - overlap))):
+        curr_window = session_data_sensors[i: i + window_length]
+        segmented_session.append(curr_window)
+
+    return np.stack(segmented_session)
 
 
 def normalize(bm_segments):
