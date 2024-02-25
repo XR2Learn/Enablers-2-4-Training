@@ -20,7 +20,16 @@ def run_pre_training():
     Pre-train encoder and save checkpoints.
     """
     print(CUSTOM_SETTINGS)
-    splith_paths = {'train': "train.csv", 'val': "val.csv", 'test': "test.csv"}
+
+    if (
+        'get_ssl' in CUSTOM_SETTINGS['pre_processing_config'] and
+        CUSTOM_SETTINGS['pre_processing_config']['get_ssl']
+    ):
+        prefix = "ssl_"
+    else:
+        prefix = ""
+
+    splith_paths = {'train': f"{prefix}train.csv", 'val': f"{prefix}val.csv", 'test': f"{prefix}test.csv"}
 
     train_transforms = None
     test_transforms = None
@@ -33,7 +42,7 @@ def run_pre_training():
 
     datamodule = SSLDataModule(
         path=OUTPUTS_FOLDER,
-        input_type=CUSTOM_SETTINGS['ssl_config']['input_type'],
+        input_type=prefix + CUSTOM_SETTINGS['ssl_config']['input_type'],
         batch_size=CUSTOM_SETTINGS['ssl_config']['batch_size'],
         split=splith_paths,
         train_transforms=train_transforms,

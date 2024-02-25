@@ -90,7 +90,7 @@ def process_dataset(
         pathlib.Path(
             os.path.join(
                 outputs_folder,
-                pre_processing_cfg['process'] + "_ssl"
+                "ssl_" + pre_processing_cfg['process']
             )
         ).mkdir(parents=True, exist_ok=True)
 
@@ -169,7 +169,7 @@ def process_dataset(
                         for i in range(len(preprocessed_session_ssl)):
                             filepath = os.path.join(
                                 outputs_folder,
-                                pre_processing_cfg['process'] + "_ssl",
+                                "ssl_" + pre_processing_cfg['process'],
                                 f"{os.path.basename(subject_path)}_{session}_{i}.npy"
                             )
 
