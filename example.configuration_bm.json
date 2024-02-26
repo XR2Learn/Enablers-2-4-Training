@@ -26,8 +26,7 @@
         3
       ],
       "stride": 1
-    },
-    "pretrained_same_experiment": true
+    }
   },
   "ssl_config": {
     "from_module": "ssl_methods.SimCLR",
@@ -35,7 +34,7 @@
     "input_type": "standardize",
     "save_last_encoder": false,
     "epochs": 100,
-    "batch_size": 32,
+    "batch_size": 64,
     "kwargs": {
       "lr": 0.0001,
       "n_views": 2,
@@ -43,17 +42,27 @@
       "optimizer_name_ssl": "adam"
     }
   },
-
+  "sup_config": {
+    "input_type": "standardize",
+    "epochs": 20,
+    "batch_size": 32,
+    "use_augmentations_in_sup": true,
+    "kwargs": {
+      "lr": 0.0001,
+      "optimizer_name": "adam",
+      "freeze_encoder": true
+    }
+  },
   "augmentations": {
     "gaussian_noise": {
-      "probability": 0.33,
+      "probability": 0.5,
       "kwargs": {
         "mean": 0,
         "std": 0.2
       }
     },
     "scale": {
-      "probability": 0.4,
+      "probability": 0.5,
       "kwargs": {
         "max_scale": 1.3
       }
