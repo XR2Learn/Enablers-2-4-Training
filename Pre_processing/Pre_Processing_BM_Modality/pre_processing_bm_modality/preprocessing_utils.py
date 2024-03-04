@@ -157,7 +157,6 @@ def process_dataset(
                             f"{os.path.basename(subject_path)}_{session}_{i}_emotion_{labels[i]}.npy"
                         )
 
-                        print(session_to_save.shape)
                         np.save(filepath, session_to_save.astype(np.float32))
 
                         processed_file_paths.append(filepath.split(os.sep)[-1])

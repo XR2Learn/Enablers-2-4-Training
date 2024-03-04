@@ -26,7 +26,7 @@ def preprocess():
         frequency=CUSTOM_SETTINGS["pre_processing_config"]["frequency"],  # in Hz
         resample_freq=CUSTOM_SETTINGS["pre_processing_config"]["resample_freq"] if (
             "resample_freq" in CUSTOM_SETTINGS["pre_processing_config"]
-            ) else CUSTOM_SETTINGS["pre_processing_config"]["frequency"], # resampling if needed
+            ) else CUSTOM_SETTINGS["pre_processing_config"]["frequency"],  # resampling if needed
         use_sensors=CUSTOM_SETTINGS["pre_processing_config"]["use_sensors"] if (
             "use_sensors" in CUSTOM_SETTINGS["pre_processing_config"]
             ) else None,  # select sensors to be used for a model
