@@ -2,7 +2,7 @@ from collections import deque
 import glob
 import datetime
 import os
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 import pathlib
 import pandas as pd
 from tqdm import tqdm
@@ -16,10 +16,11 @@ def process_dataset(
         all_subjects_dirs: List,
         pre_processing_cfg: Dict[str, Any],
         outputs_folder: str,
-        label_to_emotion: Dict[str, int],
-        dataset: str,
         seq_len: int = 5,
-        overlap: float = 0.
+        overlap: float = 0.,
+        frequency: int = 10,
+        resample_freq: int = 10,
+        use_sensors: Optional[List[str]] = None
 ):
     """
     Preprocesses the dataset with bio-measurements in Magic XRoom format.
@@ -30,10 +31,9 @@ def process_dataset(
         all_subjects_dirs: a list containing all subdirectories which is assumed to be all the different subjects
         pre_processing_cfg: configutation for pre-processing
         outputs_folder: path to the outputs folder,
-        label_to_emotion: mapping from labels to emotions,
-        dataset: name of the dataset
         seq_len: sequence length in seconds
         overlap: overlapping proportion between segments in [0, 1)
+        frequency: frequency of the raw signal
 
     Returns:
         train_split: a dictionary containing the 'files' and 'labels' for training
@@ -107,47 +107,58 @@ def process_dataset(
             sessions = set([x.split("_")[2] for x in os.listdir(subject_path)])
 
             for session in sessions:
+                processed_file_paths = []
+                if get_ssl:
+                    processed_file_paths_ssl = []
+                processed_file_labels = []
+
+                session_annot = glob.glob(os.path.join(subject_path, f"*{session}*PROGRESS_EVENT_.csv"))[0]
+                session_bm = glob.glob(os.path.join(subject_path, f"*{session}*SHIMMER_.csv"))[0]
+
+                # Assign available labels from annotations to bio-measurement data
+                # to obtain dataframe with labeled signals corresponding to multiple levels (intervals)
+                processed_session, stats, processed_session_ssl = process_session(
+                    session_bm,
+                    session_annot,
+                    subject_path,
+                    session=session,
+                    get_ssl=get_ssl,
+                    get_stats=get_stats,
+                    use_sensors=use_sensors
+                )
+                if get_stats:
+                    ovr_stats.append(stats)
+
+                # Segment each extracted level into shorter time windows
+                # Each level (interval) will be split into multiple segments with the same length
                 try:
-                    processed_file_paths = []
-                    if get_ssl:
-                        processed_file_paths_ssl = []
-                    processed_file_labels = []
-
-                    session_annot = glob.glob(os.path.join(subject_path, f"*{session}*PROGRESS_EVENT_.csv"))[0]
-                    session_bm = glob.glob(os.path.join(subject_path, f"*{session}*SHIMMER_.csv"))[0]
-
-                    # Assign available labels from annotations to bio-measurement data
-                    # to obtain dataframe with labeled signals corresponding to multiple levels (intervals)
-                    processed_session, stats, processed_session_ssl = process_session(
-                        session_bm,
-                        session_annot,
-                        subject_path,
-                        session=session,
-                        get_ssl=get_ssl,
-                        get_stats=get_stats,
-                    )
-                    if get_stats:
-                        ovr_stats.append(stats)
-
-                    # Segment each extracted level into shorter time windows
-                    # Each level (interval) will be split into multiple segments with the same length
                     segmented_session, labels = segment_processed_session(
                         processed_session,
                         seq_len,
-                        overlap
+                        overlap,
+                        frequency=frequency
                     )
+                except ValueError:
+                    segmented_session = None
 
+                if segmented_session is not None:
                     # apply pre-processing (e.g., normalization) for the whole session
                     preprocessed_session = preprocessing_to_apply(segmented_session)
 
                     for i in range(len(preprocessed_session)):
+                        # apply resampling if needed
+                        session_to_save = preprocessed_session[i]
+                        if resample_freq != frequency:
+                            session_to_save = resample_bm(session_to_save, frequency, resample_freq)
+
                         filepath = os.path.join(
                             outputs_folder,
                             pre_processing_cfg['process'],
                             f"{os.path.basename(subject_path)}_{session}_{i}_emotion_{labels[i]}.npy"
                         )
 
-                        np.save(filepath, preprocessed_session[i].astype(np.float32))
+                        print(session_to_save.shape)
+                        np.save(filepath, session_to_save.astype(np.float32))
 
                         processed_file_paths.append(filepath.split(os.sep)[-1])
                         processed_file_labels.append(labels[i])
@@ -155,31 +166,45 @@ def process_dataset(
                     split['files'].extend(processed_file_paths)
                     split['labels'].extend(processed_file_labels)
 
-                    # repeat the processing for unlabeled ssl data
-                    if get_ssl:
+                # repeat the processing for unlabeled ssl data
+                if get_ssl:
+                    try:
                         segmented_session_ssl = segment_processed_session_ssl(
                             processed_session_ssl,
                             seq_len,
-                            overlap
+                            overlap,
+                            frequency=frequency
                         )
+                    except ValueError:
+                        segmented_session_ssl = None
 
+                    if segmented_session_ssl is not None:
                         # apply pre-processing (e.g., normalization) for the whole session
                         preprocessed_session_ssl = preprocessing_to_apply(segmented_session_ssl)
 
                         for i in range(len(preprocessed_session_ssl)):
+                            session_to_save = preprocessed_session_ssl[i]
+                            if resample_freq != frequency:
+                                session_to_save = resample_bm(session_to_save, frequency, resample_freq)
+
                             filepath = os.path.join(
                                 outputs_folder,
                                 "ssl_" + pre_processing_cfg['process'],
                                 f"{os.path.basename(subject_path)}_{session}_{i}.npy"
                             )
 
-                            np.save(filepath, preprocessed_session_ssl[i].astype(np.float32))
+                            np.save(filepath, session_to_save.astype(np.float32))
 
                             processed_file_paths_ssl.append(filepath.split(os.sep)[-1])
 
                         ssl_split['files'].extend(processed_file_paths_ssl)
-                except:
-                    print(f"Skipping subject {subject_path} session {session}, error in pre-processing")
+
+                if segmented_session is None:
+                    print(f"""Skipping subject {subject_path} session {session}.
+                            Error in pre-processing labeled data: Not enough labeled data""")
+                if get_ssl and segment_processed_session_ssl is None:
+                    print(f"""Skipping subject {subject_path} session {session}.
+                            Error in pre-processing unlabeled data: Not enough unlabeled data""")
 
     return (
         train_split,
@@ -201,6 +226,7 @@ def process_session(
     offset_hours_data: int = 1,
     get_ssl: bool = False,
     get_stats: bool = False,
+    use_sensors: Optional[List[str]] = None
 ) -> Tuple[pd.DataFrame, Dict[str, Any]]:
     """
     Extracts session data from Shimmer and Progress Events from Magic XRoom and assigns labels to sensor recordings.
@@ -236,6 +262,10 @@ def process_session(
 
     # Timestamp format: Unix
     data = pd.read_csv(session_data_file)
+    if use_sensors is not None:
+        save_cols = ["timestamp"]
+        save_cols.extend(use_sensors)
+        data = data[save_cols]
     data["timestamp_dt"] = (
         data["timestamp"]
         .apply(lambda x: datetime.datetime.fromtimestamp(x / 1000))
@@ -351,7 +381,7 @@ def process_session(
         labeled_data,
         stats if get_stats else None,
         data if get_ssl else None
-    ) 
+    )
 
 
 def segment_processed_session(
@@ -389,7 +419,7 @@ def segment_processed_session(
             curr_window = interval_data_sensors[i: i + window_length]
             segmented_session.append(curr_window)
             labels.append(label)
-
+    
     return np.stack(segmented_session), labels
 
 
@@ -494,5 +524,5 @@ def resample_bm(
         resampled: resampled signals
     """
     number_of_samples = round(len(bm_segment) * float(target_rate) / sample_rate)
-    resampled = scipy.signal.resample(bm_segment, number_of_samples, axis=-1)
+    resampled = scipy.signal.resample(bm_segment, number_of_samples, axis=0)
     return resampled

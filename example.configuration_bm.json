@@ -7,13 +7,18 @@
     "process": "standardize",
     "create_splits": true,
     "get_stats": true,
-    "get_ssl": true
+    "get_ssl": true,
+    "use_sensors": ["gsr", "ppg"],
+    "seq_len": 5,
+    "frequency": 10,
+    "overlap": 0.0,
+    "resample_freq": 10
   },
   "encoder_config": {
     "from_module": "encoders.cnn1d",
     "class_name": "CNN1D",
     "kwargs": {
-      "in_channels": 6,
+      "in_channels": 2,
       "len_seq": 50,
       "out_channels": [
         16,

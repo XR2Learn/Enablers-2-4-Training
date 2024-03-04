@@ -3,7 +3,6 @@ import pandas as pd
 
 from conf import (
     CUSTOM_SETTINGS,
-    BM_LABEL_TO_EMOTION,
     BM_DATA_PATH,
     OUTPUTS_FOLDER
 )
@@ -14,9 +13,6 @@ from preprocessing_utils import process_dataset
 def preprocess():
     print('Pre Processing BM Modality')
 
-    dataset_name = CUSTOM_SETTINGS['dataset_config']['dataset_name']
-    label_to_emotion = BM_LABEL_TO_EMOTION
-
     all_subject_dirs = os.listdir(BM_DATA_PATH)
     print(f"Found a total of {len(all_subject_dirs)} under {BM_DATA_PATH}.")
 
@@ -25,8 +21,15 @@ def preprocess():
         all_subject_dirs,
         CUSTOM_SETTINGS["pre_processing_config"],
         OUTPUTS_FOLDER,
-        label_to_emotion,
-        dataset=dataset_name
+        seq_len=CUSTOM_SETTINGS["pre_processing_config"]["seq_len"],  # in seconds
+        overlap=CUSTOM_SETTINGS["pre_processing_config"]["overlap"],  # between 0 and 1 (proportion)
+        frequency=CUSTOM_SETTINGS["pre_processing_config"]["frequency"],  # in Hz
+        resample_freq=CUSTOM_SETTINGS["pre_processing_config"]["resample_freq"] if (
+            "resample_freq" in CUSTOM_SETTINGS["pre_processing_config"]
+            ) else CUSTOM_SETTINGS["pre_processing_config"]["frequency"], # resampling if needed
+        use_sensors=CUSTOM_SETTINGS["pre_processing_config"]["use_sensors"] if (
+            "use_sensors" in CUSTOM_SETTINGS["pre_processing_config"]
+            ) else None,  # select sensors to be used for a model
     )
 
     if stats is not None:
