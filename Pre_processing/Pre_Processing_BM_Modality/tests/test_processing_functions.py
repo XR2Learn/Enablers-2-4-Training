@@ -3,6 +3,7 @@ import unittest
 import numpy as np
 import os
 import pandas as pd
+import time
 
 from pre_processing_bm_modality.preprocessing_utils import (
     resample_bm,
@@ -100,31 +101,16 @@ class PreprocessingMagicXRoomTestCase(unittest.TestCase):
         self.subject = "P0"
         self.session = "xxxx"
         self.threshold = 10
-        self.offset_hours_data = 0
+        self.timezone = time.tzname
+        print(self.timezone)
+        if "CET" in self.timezone:
+            self.offset_hours_data = 0
+        elif "UTC" in self.timezone:
+            self.offset_hours_data = 1
         self.get_ssl = True
         self.get_stats = True
         self.use_sensors = ["gsr", "ppg"]
         self.all_sensors = ["accel_x", "accel_y", "accel_z", "gsr", "ppg", "hr"]
-
-    # def test_noise(self):
-    #     directory = "tests/anonymized_magicxroom"
-    #     filename = "data_collection_638409299190572115_SHIMMER_.csv"
-    #     data = pd.read_csv(os.path.join(directory, filename))
-    #     noise_arr = np.zeros(data.shape)
-    #     for i, col in enumerate(data.columns):
-    #         if "timestamp" not in col:
-    #             data_col = data[col]
-    #             mean = data_col.mean()
-    #             std = data_col.std()
-    #             noise_arr[:, i] = np.random.normal(mean, std, data_col.shape)
-    #         else:
-    #             try:
-    #                 noise_arr[:, i] = np.array(data[col])
-    #             except ValueError:
-    #                 pass
-    #     dataframe = pd.DataFrame(noise_arr)
-    #     dataframe.columns = data.columns
-    #     dataframe.to_csv(os.path.join(directory, "anonymized_" + filename), index=None)
 
     def test_process_session(self):
         labeled_data, stats, data = process_session(
