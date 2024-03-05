@@ -17,8 +17,8 @@ class InitTransformsTestCase(unittest.TestCase):
         sys.path.append("./ssl_features_extraction_bm_modality")
         self.dataset_size = 10
         # CNN
-        in_channels = 10
-        len_seq = 500
+        in_channels = 6
+        len_seq = 100
         out_channels = [16, 32, 32, 64]
         kernel_sizes = [3, 3, 3, 5]
         stride = 2
