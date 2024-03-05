@@ -31,7 +31,8 @@
         3
       ],
       "stride": 1
-    }
+    },
+    "pretrained_same_experiment": true
   },
   "ssl_config": {
     "from_module": "ssl_methods.SimCLR",
@@ -49,9 +50,9 @@
   },
   "sup_config": {
     "input_type": "standardize",
-    "epochs": 20,
+    "epochs": 50,
     "batch_size": 32,
-    "use_augmentations_in_sup": true,
+    "use_augmentations_in_sup": false,
     "kwargs": {
       "lr": 0.0001,
       "optimizer_name": "adam",
