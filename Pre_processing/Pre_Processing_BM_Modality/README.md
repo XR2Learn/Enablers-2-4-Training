@@ -1,23 +1,36 @@
-# Pre Processing BM Modality
-Pre-processing for BM Modality
+# Pre Processing Bio-Measurements (BM) Modality
 
-# Including component in Docker-compose.yml file as a service 
+Pre-processing for BM Modality, collected using shimmer device.
+It includes the data: ......
 
-```yaml
-pre-processing-bm:
-    image: some.registry.com/xr2learn-enablers/pre-processing-bm:latest
-    build:
-      context: '<<component>>/Pre_Processing_BM_Modality'
-      dockerfile: 'Dockerfile'
-    volumes:
-      - "./<<component>>/Pre_Processing_BM_Modality:/app"
-      - "./datasets:/app/datasets"
-      - "./outputs:/app/outputs"
-      - "${CONFIG_FILE_PATH:-./configuration.json}:/app/configuration.json"
-    working_dir: /app
-    environment:
-      - EXPERIMENT_ID=${EXPERIMENT_ID:-development-model}
-    command: python pre_processing_bm_modality/preprocess.py
+# Local Installation and run
 
-```
+## Set up virtual environment
 
+`python -m venv ./venv`
+
+`source ./venv/bin/activate`
+
+## Install requirements
+
+`pip install -r requirements.txt`
+
+## Set up your local variables
+
+1. Create your .env file
+
+`cp example.env .env`
+
+2. Change the variable values required to be changed according to the user's needs in the `.env` file, e.g., 
+`PATH_CUSTOM_SETTINGS`, 
+`DATASETS_FOLDER`, 
+`OUTPUTS_FOLDER`
+
+## Run the python script:
+
+`python preprocess.py`
+
+----
+
+**Note**: participants data included in the initial implementation of BM preprocessing component:
+P1 (second session), P3, P5, P6, P7, P8, P10, P11, P13

@@ -18,16 +18,26 @@ def generate_ssl_features():
     # currently, use custom train, val, test csv paths
     data_paths = ["train.csv", "val.csv", "test.csv"]
 
-    encoder = init_encoder(
-        CUSTOM_SETTINGS["encoder_config"],
-        CUSTOM_SETTINGS['encoder_config']['pretrained'] if (
-            "pretrained_path" in CUSTOM_SETTINGS['encoder_config']
-        ) else f"{OUTPUTS_FOLDER}/ssl_training/{EXPERIMENT_ID}_encoder.pt" if (
-            "pretrained_same_experiment" in CUSTOM_SETTINGS['encoder_config'] and
-            CUSTOM_SETTINGS['encoder_config']["pretrained_same_experiment"]
-        ) else None
-    )
+    if "pretrained_path" in CUSTOM_SETTINGS['encoder_config']:
+        ckpt_path = CUSTOM_SETTINGS['encoder_config']['pretrained_path']
+    elif (
+        "pretrained_same_experiment" in CUSTOM_SETTINGS['encoder_config'] and
+        CUSTOM_SETTINGS['encoder_config']["pretrained_same_experiment"]
+    ):
+        ckpt_path = f"{OUTPUTS_FOLDER}/ssl_training/{EXPERIMENT_ID}_encoder.pt"
+    else:
+        raise ValueError("Pre-trained model checkpoint is not provided.")
 
+    try:
+        encoder = init_encoder(
+            CUSTOM_SETTINGS["encoder_config"],
+            ckpt_path
+        )
+    except:
+        raise ValueError("""
+                         The encoder cannot be initialized from the provided checkpoint.
+                         Make sure that checkpoint model architecture matches the model from configuration
+                         """)
     encoder.eval()
     print(encoder)
 

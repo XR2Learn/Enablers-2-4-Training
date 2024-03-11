@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Support for bio-measurements (BM) modality using data format by [Magic XRoom](https://github.com/XR2Learn/magic-xroom).
+
+
 ## [0.3.2] - 2024-02-15
 
 ### Added

@@ -3,6 +3,10 @@
     "dataset_name": "RAVDESS",
     "number_of_labels": 8
   },
+  "inference_config": {
+    "features": "SSL_features",
+    "mode": "features"
+  },
   "pre_processing_config": {
     "process": "standardize",
     "create_splits": true,
@@ -10,27 +14,13 @@
     "padding": true,
     "max_length": 5
   },
-  "handcrafted_features_config": {
-    "MFCC": {
-      "sample_rate": 16000,
-      "n_mfcc": 13,
-      "melkwargs": {
-        "n_fft": 400,
-        "hop_length": 160,
-        "n_mels": 23,
-        "center": false
-      }
-    },
-    "eGeMAPs": {
-      "sampling_rate": 16000
-    }
-  },
   "encoder_config": {
     "from_module": "encoders.cnn1d",
     "class_name": "CNN1D",
+    "input_type": "standardize",
     "kwargs": {
       "in_channels": 1,
-      "len_seq": 88,
+      "len_seq": 80000,
       "out_channels": [
         2,
         2,
@@ -48,8 +38,7 @@
   "ssl_config": {
     "from_module": "ssl_methods.VICReg",
     "ssl_framework": "VICReg",
-    "input_type": "eGeMAPs",
-    "save_last_encoder": false,
+    "input_type": "standardize",
     "epochs": 20,
     "batch_size": 128,
     "kwargs": {
@@ -60,14 +49,14 @@
     }
   },
   "sup_config": {
-    "input_type": "eGeMAPs",
-    "epochs": 20,
-    "batch_size": 128,
+    "input_type": "standardize",
+    "epochs": 4,
+    "batch_size": 10,
     "use_augmentations_in_sup": true,
     "kwargs": {
       "lr": 0.0001,
       "optimizer_name": "adam",
-      "freeze_encoder": false
+      "freeze_encoder": true
     }
   },
   "augmentations": {

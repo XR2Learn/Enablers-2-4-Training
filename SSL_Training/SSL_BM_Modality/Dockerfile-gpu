@@ -1,0 +1,23 @@
+FROM pytorch/pytorch:2.0.1-cuda11.7-cudnn8-runtime
+ENV LC_ALL=C.UTF-8
+ENV LANG=C.UTF-8
+RUN apt-get update \
+&& DEBIAN_FRONTEND=noninteractive apt-get install -y \
+        build-essential \
+        cmake \
+        git \
+        wget \
+        unzip \
+        yasm \
+        pkg-config \
+        vim
+COPY ./requirements-gpu.txt /app/requirements-gpu.txt
+COPY ./setup.py /app/setup.py
+RUN mkdir -p /app/ssl_bm_modality/ && \
+    touch /app/ssl_bm_modality/__init__.py
+WORKDIR /app
+RUN pip install -r requirements-gpu.txt && \
+    rm -rf /tmp/pip* /root/.cache/pip
+ADD ./ /app
+RUN pip install -e . && \
+    rm -rf /tmp/pip* /root/.cache/pip
