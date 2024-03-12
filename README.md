@@ -130,12 +130,21 @@ For a detailed list of major changes in each version, please check in:
 
 ## License
 
-The Training tools code is shared under a dual-licensing model. For non-commercial use, it is released under the MIT
-open-source license. A commercial license is required for commercial use.
-
 Copyright © 2024, Maastricht University
 
-The handcrafted features extraction components for the audio modality is shared for non-commercial use only, to comply
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+The handcrafted features extraction component for the audio modality is shared for non-commercial use only, to comply
 with [OpenSMILE](https://github.com/audeering/opensmile-python) license.
 
 Pre-trained and fine-tuned models created using the RAVDESS dataset are shared under
@@ -143,6 +152,5 @@ the [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en)
 comply with the RAVDESS license, as the models are derivative works from this dataset.
 
 Please refer to [LICENSE.md](LICENSE.md) document for more details.
-
 
 [CHANGELOG.md]: CHANGELOG.md
