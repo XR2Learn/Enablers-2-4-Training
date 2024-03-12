@@ -7,9 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.0] - 2024-03-12
+
 ### Added
 - Support for bio-measurements (BM) modality using data format by [Magic XRoom](https://github.com/XR2Learn/magic-xroom).
-- License Update for Apache 2.0.
+- License Update to Apache 2.0.
+
+### Known Issues
+- `docker-compose.yml` is mapping outside .env file to docker image, generating an error in some cases.
 
 
 ## [0.3.2] - 2024-02-15
@@ -122,7 +127,7 @@ Example of Categories to use in each release
 - Just an example of how to use changelog. -->
 
 
-[unreleased]: https://github.com/um-xr2learn-enablers/XR2Learn-Training/compare/v0.3.2...master
+[unreleased]: https://github.com/um-xr2learn-enablers/XR2Learn-Training/compare/v0.4.0...master
 
 [0.1.0]: https://github.com/um-xr2learn-enablers/XR2Learn-Training/releases/tag/v0.1.0
 
@@ -133,3 +138,5 @@ Example of Categories to use in each release
 [0.3.1]: https://github.com/um-xr2learn-enablers/XR2Learn-Training/releases/tag/v0.3.1
 
 [0.3.2]: https://github.com/um-xr2learn-enablers/XR2Learn-Training/releases/tag/v0.3.2
+
+[0.4.0]: https://github.com/um-xr2learn-enablers/XR2Learn-Training/releases/tag/v0.4.0
