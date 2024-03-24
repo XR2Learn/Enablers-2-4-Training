@@ -34,7 +34,7 @@
       "w2v2_type": "base",
       "freeze": "true"
     },
-    "pretrained_same_experiment": true
+    "pretrained_same_experiment": false
   },
   "ssl_config": {
     "from_module": "ssl_methods.VICReg",
@@ -42,7 +42,7 @@
     "input_type": "standardize",
     "epochs": 20,
     "save_last_encoder": false,
-    "batch_size": 128,
+    "batch_size": 16,
     "kwargs": {
       "lr": 0.0001,
       "n_views": 2,
@@ -53,10 +53,10 @@
   "sup_config": {
     "input_type": "standardize",
     "epochs": 20,
-    "batch_size": 128,
-    "use_augmentations_in_sup": true,
+    "batch_size": 16,
+    "use_augmentations_in_sup": false,
     "kwargs": {
-      "lr": 0.0001,
+      "lr": 0.001,
       "optimizer_name": "adam",
       "freeze_encoder": false
     }

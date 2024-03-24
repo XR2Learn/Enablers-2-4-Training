@@ -5,7 +5,7 @@ from pytorch_lightning import Trainer
 
 from conf import (
     CUSTOM_SETTINGS,
-    OUTPUTS_FOLDER,
+    MODALITY_FOLDER,
     EXPERIMENT_ID,
     COMPONENT_OUTPUT_FOLDER
 )
@@ -41,7 +41,7 @@ def run_pre_training():
         print(augmentations)
 
     datamodule = SSLDataModule(
-        path=OUTPUTS_FOLDER,
+        path=MODALITY_FOLDER,
         input_type=prefix + CUSTOM_SETTINGS['ssl_config']['input_type'],
         batch_size=CUSTOM_SETTINGS['ssl_config']['batch_size'],
         split=splith_paths,
