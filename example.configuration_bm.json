@@ -33,7 +33,7 @@
       ],
       "stride": 1
     },
-    "pretrained_same_experiment": true
+    "pretrained_same_experiment": false
   },
   "ssl_config": {
     "from_module": "ssl_methods.SimCLR",
@@ -103,5 +103,3 @@
     }
   ]
 }
-
-

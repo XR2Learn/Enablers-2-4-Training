@@ -1,5 +1,5 @@
 # Python code here
-from conf import CUSTOM_SETTINGS, OUTPUTS_FOLDER, EXPERIMENT_ID
+from conf import CUSTOM_SETTINGS, MODALITY_FOLDER, EXPERIMENT_ID
 from generate_and_save import generate_and_save
 from utils.init_utils import init_encoder, init_transforms
 
@@ -24,7 +24,7 @@ def generate_ssl_features():
         "pretrained_same_experiment" in CUSTOM_SETTINGS['encoder_config'] and
         CUSTOM_SETTINGS['encoder_config']["pretrained_same_experiment"]
     ):
-        ckpt_path = f"{OUTPUTS_FOLDER}/ssl_training/{EXPERIMENT_ID}_encoder.pt"
+        ckpt_path = f"{MODALITY_FOLDER}/ssl_training/{EXPERIMENT_ID}_encoder.pt"
     else:
         raise ValueError("Pre-trained model checkpoint is not provided.")
 
@@ -53,7 +53,7 @@ def generate_ssl_features():
         generate_and_save(
             encoder,
             path_,
-            OUTPUTS_FOLDER,
+            MODALITY_FOLDER,
             CUSTOM_SETTINGS["ssl_config"]["input_type"],
             "SSL_features",
             transforms

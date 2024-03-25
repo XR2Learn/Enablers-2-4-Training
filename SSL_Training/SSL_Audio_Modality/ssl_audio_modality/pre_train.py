@@ -3,7 +3,7 @@ import os
 import torch
 
 from pytorch_lightning import Trainer
-from conf import CUSTOM_SETTINGS, OUTPUTS_FOLDER, COMPONENT_OUTPUT_FOLDER, EXPERIMENT_ID
+from conf import CUSTOM_SETTINGS, MODALITY_FOLDER, COMPONENT_OUTPUT_FOLDER, EXPERIMENT_ID
 from ssl_dataset import SSLDataModule
 from callbacks.setup_callbacks import setup_callbacks
 from utils.init_utils import (init_augmentations, init_transforms,
@@ -27,7 +27,7 @@ def run_pre_training():
         print(augmentations)
 
     datamodule = SSLDataModule(
-        path=OUTPUTS_FOLDER,
+        path=MODALITY_FOLDER,
         input_type=CUSTOM_SETTINGS['ssl_config']['input_type'],
         batch_size=CUSTOM_SETTINGS['ssl_config']['batch_size'],
         split=splith_paths,

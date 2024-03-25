@@ -8,7 +8,7 @@ from pytorch_lightning import Trainer
 from callbacks.setup_callbacks import setup_callbacks
 from classification_model import SupervisedModel
 from classifiers.linear import LinearClassifier
-from conf import CUSTOM_SETTINGS, OUTPUTS_FOLDER, COMPONENT_OUTPUT_FOLDER, EXPERIMENT_ID, LABEL_TO_ID
+from conf import CUSTOM_SETTINGS, MODALITY_FOLDER, COMPONENT_OUTPUT_FOLDER, EXPERIMENT_ID, LABEL_TO_ID
 from supervised_dataset import SupervisedDataModule
 from utils.init_utils import (init_augmentations, init_transforms, init_encoder)
 
@@ -35,7 +35,7 @@ def run_supervised_training():
     label_mapping = LABEL_TO_ID[CUSTOM_SETTINGS['dataset_config']['dataset_name']]
 
     datamodule = SupervisedDataModule(
-        path=OUTPUTS_FOLDER,
+        path=MODALITY_FOLDER,
         input_type=CUSTOM_SETTINGS['sup_config']['input_type'],
         batch_size=CUSTOM_SETTINGS['sup_config']['batch_size'],
         split=splith_paths,
@@ -50,7 +50,7 @@ def run_supervised_training():
         model_cfg=CUSTOM_SETTINGS["encoder_config"],
         ckpt_path=CUSTOM_SETTINGS['encoder_config']['pretrained'] if (
                 "pretrained_path" in CUSTOM_SETTINGS['encoder_config'].keys()
-        ) else f"{OUTPUTS_FOLDER}/ssl_training/{EXPERIMENT_ID}_encoder.pt" if (
+        ) else f"{MODALITY_FOLDER}/ssl_training/{EXPERIMENT_ID}_encoder.pt" if (
                 "pretrained_same_experiment" in CUSTOM_SETTINGS['encoder_config'].keys()
                 and CUSTOM_SETTINGS['encoder_config']["pretrained_same_experiment"]
         ) else None
