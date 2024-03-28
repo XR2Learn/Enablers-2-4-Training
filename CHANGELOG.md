@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- Support for data format of [Magic XRoom](https://github.com/XR2Learn/magic-xroom) version 1.0 on Preprocessing Component BM modality.
+
+### Changed
+- Bio-Measurements (BM) dataset name changed to 'XRoom', for data coming from [Magic XRoom](https://github.com/XR2Learn/magic-xroom). 
+- Output directory structure: Additional directory level to indicate the modality/dataset that produced the output (changes applied for audio and BM modalities).
 
 ## [0.4.0] - 2024-03-12
 
