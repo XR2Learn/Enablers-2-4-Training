@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - Bio-Measurements (BM) dataset name changed to 'XRoom', for data coming from [Magic XRoom](https://github.com/XR2Learn/magic-xroom). 
-- Output directory structure: Additional directory level to indicate the modality/dataset that produced the output (changes applied for audio and BM modalities).
+- Output directory structure: Two additional directory levels to indicate the dataset/modality that produced the output (changes applied for audio and BM modalities).
 
 ## [0.4.0] - 2024-03-12
 
