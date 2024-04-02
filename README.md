@@ -61,7 +61,7 @@ information on how to use CLI. However, if changing or expanding the enablers’
 possible to access each component using docker commands, as exemplified below. Thus, the instructions described below
 are focused on running the enablers for a development environment.
 
-A `configuration.json` file is required to provide the enablers with the necessary specifications for running. A default
+A `configuration.json` file is required to provide the components with the necessary specifications for running. A default
 version of “configuration.json” is provided and can be changed by the user.
 
 Run a docker image:
