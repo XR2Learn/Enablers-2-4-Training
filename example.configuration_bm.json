@@ -17,6 +17,7 @@
   },
   "encoder_config": {
     "from_module": "encoders.cnn1d",
+    "input_type": "standardize",
     "class_name": "CNN1D",
     "kwargs": {
       "in_channels": 2,
@@ -33,7 +34,7 @@
       ],
       "stride": 1
     },
-    "pretrained_same_experiment": false
+    "pretrained_same_experiment": true
   },
   "ssl_config": {
     "from_module": "ssl_methods.SimCLR",
@@ -103,3 +104,5 @@
     }
   ]
 }
+
+
