@@ -6,22 +6,32 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
 ### Added
-- Support for data format of [Magic XRoom](https://github.com/XR2Learn/magic-xroom) version 1.0 on Preprocessing Component BM modality.
+
+- Support for data format of [Magic XRoom](https://github.com/XR2Learn/magic-xroom) version 1.0 on Preprocessing
+  Component BM modality.
+- "modality" configuration required in addition to dataset name, under "dataset_configuration"
+  on ```configuration.json``` file.
 
 ### Changed
-- Bio-Measurements (BM) dataset name changed to 'XRoom', for data coming from [Magic XRoom](https://github.com/XR2Learn/magic-xroom). 
-- Output directory structure: Two additional directory levels to indicate the dataset/modality that produced the output (changes applied for audio and BM modalities).
+
+- Bio-Measurements (BM) dataset name changed to 'XRoom', for data coming
+  from [Magic XRoom](https://github.com/XR2Learn/magic-xroom).
+- Output directory structure: Two additional directory levels to indicate the dataset/modality that produced the
+  output (changes applied for audio and BM modalities).
 
 ## [0.4.0] - 2024-03-12
 
 ### Added
-- Support for bio-measurements (BM) modality using data format by [Magic XRoom](https://github.com/XR2Learn/magic-xroom).
+
+- Support for bio-measurements (BM) modality using data format
+  by [Magic XRoom](https://github.com/XR2Learn/magic-xroom).
 - License Update to Apache 2.0.
 
 ### Known Issues
-- `docker-compose.yml` is mapping outside .env file to docker image, generating an error in some cases.
 
+- `docker-compose.yml` is mapping outside .env file to docker image, generating an error in some cases.
 
 ## [0.3.2] - 2024-02-15
 
