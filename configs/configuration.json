@@ -1,0 +1,99 @@
+{
+  "dataset_config": {
+    "dataset_name": "RAVDESS",
+    "number_of_labels": 8
+  },
+  "pre_processing_config": {
+    "process": "standardize",
+    "create_splits": true,
+    "target_sr": 16000,
+    "padding": true,
+    "max_length": 5
+  },
+  "encoder_config": {
+    "from_module": "encoders.cnn1d",
+    "class_name": "CNN1D",
+    "kwargs": {
+      "in_channels": 1,
+      "len_seq": 80000,
+      "out_channels": [
+        64,
+        64,
+        64
+      ],
+      "kernel_sizes": [
+        5,
+        3,
+        3
+      ],
+      "stride": 2
+    },
+    "pretrained_same_experiment": true
+  },
+  "ssl_config": {
+    "from_module": "ssl_methods.SimCLR",
+    "ssl_framework": "SimCLR",
+    "input_type": "standardize",
+    "epochs": 100,
+    "batch_size": 64,
+    "save_last_encoder": false,
+    "kwargs": {
+      "lr": 0.0001,
+      "n_views": 2,
+      "temperature": 0.1,
+      "optimizer_name_ssl": "adam"
+    }
+  },
+  "sup_config": {
+    "input_type": "standardize",
+    "epochs": 50,
+    "batch_size": 64,
+    "use_augmentations_in_sup": false,
+    "kwargs": {
+      "lr": 0.0001,
+      "optimizer_name": "adam",
+      "freeze_encoder": true
+    }
+  },
+  "augmentations": {
+    "gaussian_noise": {
+      "probability": 0.8,
+      "kwargs": {
+        "mean": 0,
+        "std": 0.5
+      }
+    },
+    "scale": {
+      "probability": 0.8,
+      "kwargs": {
+        "max_scale": 1.5
+      }
+    }
+  },
+  "transforms": [
+    {
+      "class_name": "ToTensor",
+      "from_module": "general_transforms",
+      "transform_name": "to_tensor",
+      "in_test": true
+    },
+    {
+      "class_name": "Permute",
+      "from_module": "general_transforms",
+      "transform_name": "permutation",
+      "in_test": true,
+      "kwargs": {
+        "shape": [
+          1,
+          0
+        ]
+      }
+    },
+    {
+      "class_name": "ToFloat",
+      "from_module": "general_transforms",
+      "transform_name": "to_float",
+      "in_test": true
+    }
+  ]
+}

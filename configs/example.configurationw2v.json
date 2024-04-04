@@ -11,24 +11,10 @@
     "padding": true,
     "max_length": 5
   },
-  "handcrafted_features_config": {
-    "MFCC": {
-      "sample_rate": 16000,
-      "n_mfcc": 13,
-      "melkwargs": {
-        "n_fft": 400,
-        "hop_length": 160,
-        "n_mels": 23,
-        "center": false
-      }
-    },
-    "eGeMAPs": {
-      "sampling_rate": 16000
-    }
-  },
   "encoder_config": {
     "from_module": "encoders.w2v",
     "class_name": "Wav2Vec2CNN",
+    "input_type": "standardize",
     "kwargs": {
       "length_samples": 10,
       "sample_rate": 16000,
@@ -41,7 +27,7 @@
     "from_module": "ssl_methods.VICReg",
     "ssl_framework": "VICReg",
     "input_type": "standardize",
-    "epochs": 20,
+    "epochs": 1,
     "save_last_encoder": false,
     "batch_size": 16,
     "kwargs": {
@@ -53,7 +39,7 @@
   },
   "sup_config": {
     "input_type": "standardize",
-    "epochs": 20,
+    "epochs": 1,
     "batch_size": 16,
     "use_augmentations_in_sup": false,
     "kwargs": {
@@ -102,5 +88,10 @@
       "transform_name": "to_float",
       "in_test": true
     }
-  ]
+  ],
+  "inference_config": {
+    "features": "SSL_features",
+    "mode": "end-to-end",
+    "publisher": true
+  }
 }
