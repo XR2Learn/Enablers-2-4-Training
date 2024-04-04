@@ -1,4 +1,6 @@
 # Python code here
+import os
+
 from conf import CUSTOM_SETTINGS, MODALITY_FOLDER, EXPERIMENT_ID
 from generate_and_save import generate_and_save
 from utils.init_utils import init_encoder, init_transforms
@@ -24,7 +26,22 @@ def generate_ssl_features():
         "pretrained_same_experiment" in CUSTOM_SETTINGS['encoder_config'] and
         CUSTOM_SETTINGS['encoder_config']["pretrained_same_experiment"]
     ):
-        ckpt_path = f"{MODALITY_FOLDER}/ssl_training/{EXPERIMENT_ID}_encoder.pt"
+        modality = CUSTOM_SETTINGS['dataset_config']['modality'] if (
+            'modality' in CUSTOM_SETTINGS['dataset_config']
+        ) else 'default_modality'
+
+        ckpt_name = (
+            f"{EXPERIMENT_ID}_"
+            f"{CUSTOM_SETTINGS['dataset_config']['dataset_name']}_"
+            f"{modality}_"
+            f"{CUSTOM_SETTINGS['ssl_config']['input_type']}_"
+            f"{CUSTOM_SETTINGS['encoder_config']['class_name']}_"
+        )
+        ckpt_path = os.path.join(
+            MODALITY_FOLDER,
+            "ssl_training",
+            f"{ckpt_name}_encoder.pt"
+        )
     else:
         raise ValueError("Pre-trained model checkpoint is not provided.")
 
@@ -56,7 +73,7 @@ def generate_ssl_features():
             path_,
             MODALITY_FOLDER,
             CUSTOM_SETTINGS["ssl_config"]["input_type"],
-            "SSL_features",
+            f"ssl_features_{os.path.basename(ckpt_path).split('.')[0]}",
             transforms
         )
 
