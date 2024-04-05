@@ -35,7 +35,7 @@ def generate_ssl_features():
             f"{CUSTOM_SETTINGS['dataset_config']['dataset_name']}_"
             f"{modality}_"
             f"{CUSTOM_SETTINGS['ssl_config']['input_type']}_"
-            f"{CUSTOM_SETTINGS['encoder_config']['class_name']}_"
+            f"{CUSTOM_SETTINGS['encoder_config']['class_name']}"
         )
         ckpt_path = os.path.join(
             MODALITY_FOLDER,

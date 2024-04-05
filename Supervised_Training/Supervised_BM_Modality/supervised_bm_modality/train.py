@@ -53,7 +53,7 @@ def run_supervised_training():
         f"{CUSTOM_SETTINGS['dataset_config']['dataset_name']}_"
         f"{modality}_"
         f"{CUSTOM_SETTINGS['sup_config']['input_type']}_"
-        f"{CUSTOM_SETTINGS['encoder_config']['class_name']}_"
+        f"{CUSTOM_SETTINGS['encoder_config']['class_name']}"
     )
 
     if "pretrained_path" in CUSTOM_SETTINGS['encoder_config'].keys():

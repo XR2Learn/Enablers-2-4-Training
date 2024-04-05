@@ -73,7 +73,7 @@ def run_pre_training():
         f"{CUSTOM_SETTINGS['dataset_config']['dataset_name']}_"
         f"{modality}_"
         f"{CUSTOM_SETTINGS['ssl_config']['input_type']}_"
-        f"{CUSTOM_SETTINGS['encoder_config']['class_name']}_"
+        f"{CUSTOM_SETTINGS['encoder_config']['class_name']}"
     )
 
     ssl_checkpoint = checkpoint_filename + "ssl_model"

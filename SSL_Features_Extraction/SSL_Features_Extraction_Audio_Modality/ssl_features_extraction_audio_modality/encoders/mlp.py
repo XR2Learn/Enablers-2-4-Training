@@ -25,11 +25,10 @@ class LinearEncoder(LightningModule):
             print(f'succesfully loaded weights from {pretrained}')
         else:
             print("NO pretrained weights loaded")
-        
+
         self.save_hyperparameters()
 
     def forward(self, x):
         x = self.flatten(x)
-        x = self.layer1(torch.squeeze(x))
-        x = torch.unsqueeze(x, -1)
+        x = self.layer1(x)
         return x
