@@ -12,7 +12,7 @@
     "max_length": 5
   },
   "inference_config": {
-    "features": "SSL_features",
+    "features": "ssl_features",
     "mode": "features"
   },
   "handcrafted_features_config": {
