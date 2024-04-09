@@ -105,6 +105,21 @@ services:
       - EXPERIMENT_ID=${EXPERIMENT_ID:-development-model}
     command: python ssl_features_extraction_audio_modality/generate_features.py
 
+  ssl-features-generation-body-tracking:
+    image: some.registry.com/xr2learn-enablers/ssl-features-generation-body-tracking:latest
+    build:
+      context: 'SSL_Features_Extraction/SSL_Features_Extraction_Body_Tracking_Modality'
+      dockerfile: 'Dockerfile'
+    volumes:
+      - "./SSL_Features_Extraction/SSL_Features_Extraction_Body_Tracking_Modality:/app"
+      - "./datasets:/app/datasets"
+      - "./outputs:/app/outputs"
+      - "${CONFIG_FILE_PATH:-./configuration.json}:/app/configuration.json"
+    working_dir: /app
+    environment:
+      - EXPERIMENT_ID=${EXPERIMENT_ID:-development-model}
+    command: python ssl_features_extraction_body_tracking_modality/generate_features.py
+
   handcrafted-features-generation-audio:
     image: some.registry.com/xr2learn-enablers/handcrafted-features-generation-audio:latest
     build:
