@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - "modality" configuration required in addition to dataset name, under "dataset_configuration"
   on ```configuration.json``` file.
 - MLP encoder for audio modality (for eGeMAPs)
+- Architecture structure for the Body Tracking modality
 
 ### Changed
 

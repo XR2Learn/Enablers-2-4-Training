@@ -1,10 +1,10 @@
 # Your Python code here
 
-from conf import MAIN_FOLDER
+from conf import PATH_CUSTOM_SETTINGS
 
 
 def call_component():
-    print(MAIN_FOLDER)
+    print(PATH_CUSTOM_SETTINGS)
     print('Call component Pre Processing Body Tracking Modality')
 
 
