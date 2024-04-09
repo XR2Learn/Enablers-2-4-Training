@@ -60,6 +60,21 @@ services:
       - EXPERIMENT_ID=${EXPERIMENT_ID:-development-model}
     command: python pre_processing_audio_modality/preprocess.py
 
+  pre-processing-body-tracking:
+    image: some.registry.com/xr2learn-enablers/pre-processing-body-tracking:latest
+    build:
+      context: 'Pre_processing/Pre_Processing_Body_Tracking_Modality'
+      dockerfile: 'Dockerfile'
+    volumes:
+      - "./Pre_processing/Pre_Processing_Body_Tracking_Modality:/app"
+      - "./datasets:/app/datasets"
+      - "./outputs:/app/outputs"
+      - "${CONFIG_FILE_PATH:-./configuration.json}:/app/configuration.json"
+    working_dir: /app
+    environment:
+      - EXPERIMENT_ID=${EXPERIMENT_ID:-development-model}
+    command: python pre_processing_body_tracking_modality/preprocess.py
+
   ssl-features-generation-audio:
     image: some.registry.com/xr2learn-enablers/ssl-features-generation-audio:latest
     build:
