@@ -1,0 +1,3 @@
+--extra-index-url https://download.pytorch.org/whl/cpu
+python-decouple==3.6
+-e file:./#egg=handcrafted_features_extraction_body_tracking_modality
