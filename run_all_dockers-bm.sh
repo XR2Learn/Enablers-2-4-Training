@@ -3,7 +3,7 @@
 # Deleting All dataset, output files
 #sudo rm -R datasets/*
 
-#sudo rm -R outputs/*
+sudo rm -R outputs/XRoom/*
 
 echo "--------------------"
 echo "Pre-processing-bm"
