@@ -3,7 +3,7 @@
 # Deleting All dataset, output files
 #sudo rm -R datasets/*
 
-sudo rm -R outputs/XRoom/*
+sudo rm -R outputs/XRoom/shimmer/*
 
 echo "--------------------"
 echo "Pre-processing-bm"
