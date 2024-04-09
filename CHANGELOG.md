@@ -14,7 +14,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - "modality" configuration required in addition to dataset name, under "dataset_configuration"
   on ```configuration.json``` file.
 - MLP encoder for audio modality (for eGeMAPs)
-- Architecture structure for the Body Tracking modality
+- Architecture structure for the Body Tracking modality (Preprocessing, Handcrafted Features, SSL Training, SSL Features
+  Extraction)
 
 ### Changed
 
@@ -22,7 +23,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   from [Magic XRoom](https://github.com/XR2Learn/magic-xroom).
 - Output directory structure: Two additional directory levels to indicate the dataset/modality that produced the
   output (changes applied for audio and BM modalities).
-- Model names structure: include dataset_name, modality, input_type, model_class_name from configuration files additionally to EXPERIMENT_ID
+- Model names structure: include dataset_name, modality, input_type, model_class_name from configuration files
+  additionally to EXPERIMENT_ID
 
 ## [0.4.0] - 2024-03-12
 
