@@ -1,6 +1,7 @@
 {
   "dataset_config": {
     "dataset_name": "RAVDESS",
+    "modality": "audio",
     "number_of_labels": 8
   },
   "pre_processing_config": {
@@ -9,6 +10,10 @@
     "target_sr": 16000,
     "padding": true,
     "max_length": 5
+  },
+  "inference_config": {
+    "features": "ssl_features",
+    "mode": "features"
   },
   "handcrafted_features_config": {
     "MFCC": {
@@ -26,39 +31,37 @@
     }
   },
   "encoder_config": {
-    "from_module": "encoders.w2v",
-    "class_name": "Wav2Vec2CNN",
+    "from_module": "encoders.mlp",
+    "class_name": "LinearEncoder",
+    "input_type": "eGeMAPs",
     "kwargs": {
-      "length_samples": 10,
-      "sample_rate": 16000,
-      "w2v2_type": "base",
-      "freeze": "true"
+      "in_size": 88,
+      "out_size": 128
     },
     "pretrained_same_experiment": true
   },
   "ssl_config": {
     "from_module": "ssl_methods.VICReg",
     "ssl_framework": "VICReg",
-    "input_type": "standardize",
-    "epochs": 20,
-    "save_last_encoder": false,
+    "input_type": "eGeMAPs",
+    "epochs": 100,
     "batch_size": 128,
     "kwargs": {
-      "lr": 0.0001,
+      "lr": 0.001,
       "n_views": 2,
       "temperature": 0.05,
       "optimizer_name_ssl": "adam"
     }
   },
   "sup_config": {
-    "input_type": "standardize",
-    "epochs": 20,
+    "epochs": 100,
+    "input_type": "eGeMAPs",
     "batch_size": 128,
     "use_augmentations_in_sup": true,
     "kwargs": {
-      "lr": 0.0001,
+      "lr": 0.001,
       "optimizer_name": "adam",
-      "freeze_encoder": false
+      "freeze_encoder": true
     }
   },
   "augmentations": {

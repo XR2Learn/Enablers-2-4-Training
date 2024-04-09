@@ -1,7 +1,12 @@
 {
   "dataset_config": {
     "dataset_name": "RAVDESS",
+    "modality": "audio",
     "number_of_labels": 8
+  },
+  "inference_config": {
+    "features": "ssl_features",
+    "mode": "features"
   },
   "pre_processing_config": {
     "process": "standardize",
@@ -13,6 +18,7 @@
   "encoder_config": {
     "from_module": "encoders.cnn1d",
     "class_name": "CNN1D",
+    "input_type": "standardize",
     "kwargs": {
       "in_channels": 1,
       "len_seq": 80000,
@@ -27,15 +33,15 @@
         3
       ],
       "stride": 2
-    }
+    },
+    "pretrained_same_experiment": true
   },
   "ssl_config": {
     "from_module": "ssl_methods.VICReg",
     "ssl_framework": "VICReg",
     "input_type": "standardize",
-    "save_last_encoder": false,
     "epochs": 20,
-    "batch_size": 32,
+    "batch_size": 128,
     "kwargs": {
       "lr": 0.0001,
       "n_views": 2,
@@ -45,8 +51,8 @@
   },
   "sup_config": {
     "input_type": "standardize",
-    "epochs": 20,
-    "batch_size": 32,
+    "epochs": 4,
+    "batch_size": 10,
     "use_augmentations_in_sup": true,
     "kwargs": {
       "lr": 0.0001,

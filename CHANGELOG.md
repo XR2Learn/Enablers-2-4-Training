@@ -7,15 +7,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.0] - 2024-04-09
+### Added
+
+- Support for data format of [Magic XRoom](https://github.com/XR2Learn/magic-xroom) version 1.0 on Preprocessing
+  Component BM modality.
+- "modality" configuration required in addition to dataset name, under "dataset_configuration"
+  on ```configuration.json``` file.
+- MLP encoder for audio modality (for eGeMAPs)
+- Architecture structure for the Body Tracking modality (Preprocessing, Handcrafted Features, SSL Training, SSL Features
+  Extraction)
+
+### Changed
+
+- Bio-Measurements (BM) dataset name changed to 'XRoom', for data coming
+  from [Magic XRoom](https://github.com/XR2Learn/magic-xroom).
+- Output directory structure: Two additional directory levels to indicate the dataset/modality that produced the
+  output (changes applied for audio and BM modalities).
+- Model names structure: include dataset_name, modality, input_type, model_class_name from configuration files
+  additionally to EXPERIMENT_ID
+
 ## [0.4.0] - 2024-03-12
 
 ### Added
-- Support for bio-measurements (BM) modality using data format by [Magic XRoom](https://github.com/XR2Learn/magic-xroom).
+
+- Support for bio-measurements (BM) modality using data format
+  by [Magic XRoom](https://github.com/XR2Learn/magic-xroom).
 - License Update to Apache 2.0.
 
 ### Known Issues
-- `docker-compose.yml` is mapping outside .env file to docker image, generating an error in some cases.
 
+- `docker-compose.yml` is mapping outside .env file to docker image, generating an error in some cases.
 
 ## [0.3.2] - 2024-02-15
 
@@ -127,16 +149,18 @@ Example of Categories to use in each release
 - Just an example of how to use changelog. -->
 
 
-[unreleased]: https://github.com/um-xr2learn-enablers/XR2Learn-Training/compare/v0.4.0...master
+[unreleased]: https://github.com/XR2Learn/Enablers-2-4-Training/compare/v0.5.0...master
 
-[0.1.0]: https://github.com/um-xr2learn-enablers/XR2Learn-Training/releases/tag/v0.1.0
+[0.1.0]: https://github.com/XR2Learn/Enablers-2-4-Training/releases/tag/v0.1.0
 
-[0.2.0]: https://github.com/um-xr2learn-enablers/XR2Learn-Training/releases/tag/v0.2.0
+[0.2.0]: https://github.com/XR2Learn/Enablers-2-4-Training/releases/tag/v0.2.0
 
-[0.3.0]: https://github.com/um-xr2learn-enablers/XR2Learn-Training/releases/tag/v0.3.0
+[0.3.0]: https://github.com/XR2Learn/Enablers-2-4-Training/releases/tag/v0.3.0
 
-[0.3.1]: https://github.com/um-xr2learn-enablers/XR2Learn-Training/releases/tag/v0.3.1
+[0.3.1]: https://github.com/XR2Learn/Enablers-2-4-Training/releases/tag/v0.3.1
 
-[0.3.2]: https://github.com/um-xr2learn-enablers/XR2Learn-Training/releases/tag/v0.3.2
+[0.3.2]: https://github.com/XR2Learn/Enablers-2-4-Training/releases/tag/v0.3.2
 
-[0.4.0]: https://github.com/um-xr2learn-enablers/XR2Learn-Training/releases/tag/v0.4.0
+[0.4.0]: https://github.com/XR2Learn/Enablers-2-4-Training/releases/tag/v0.4.0
+
+[0.5.0]: https://github.com/XR2Learn/Enablers-2-4-Training/releases/tag/v0.5.0

@@ -1,7 +1,7 @@
 # Python code here
 import os
 
-from conf import CUSTOM_SETTINGS, OUTPUTS_FOLDER
+from conf import CUSTOM_SETTINGS, MODALITY_FOLDER
 
 from feature_extraction import extract_and_save_features
 
@@ -11,7 +11,7 @@ def extract_handcrafted_features():
     Main function that extracts handcrafted features defined by/in the json configuration file
     """
     processed_data_folder = os.path.join(
-        OUTPUTS_FOLDER,
+        MODALITY_FOLDER,
         CUSTOM_SETTINGS['pre_processing_config']['process']
     )
 
@@ -24,7 +24,7 @@ def extract_handcrafted_features():
 
     extract_and_save_features(
         full_data_paths,
-        OUTPUTS_FOLDER,
+        MODALITY_FOLDER,
         CUSTOM_SETTINGS["handcrafted_features_config"]
     )
 

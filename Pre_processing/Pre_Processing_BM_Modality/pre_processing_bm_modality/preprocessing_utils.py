@@ -20,7 +20,7 @@ def process_dataset(
         overlap: float = 0.,
         frequency: int = 10,
         resample_freq: int = 10,
-        use_sensors: Optional[List[str]] = None
+        use_sensors: Optional[List[str]] = None,
 ):
     """
     Preprocesses the dataset with bio-measurements in Magic XRoom format.
@@ -127,7 +127,8 @@ def process_dataset(
                     use_sensors=use_sensors
                 )
                 if get_stats:
-                    ovr_stats.append(stats)
+                    if stats:
+                        ovr_stats.append(stats)
 
                 # Segment each extracted level into shorter time windows
                 # Each level (interval) will be split into multiple segments with the same length
@@ -265,10 +266,20 @@ def process_session(
         save_cols = ["timestamp"]
         save_cols.extend(use_sensors)
         data = data[save_cols]
-    data["timestamp_dt"] = (
-        data["timestamp"]
-        .apply(lambda x: datetime.datetime.fromtimestamp(x / 1000))
-    )
+    # Older version of Magic XRoom collects Shimmer internal UNIX timestamp as 'timestamp' column
+    try:
+        data["timestamp_dt"] = (
+            data["timestamp"]
+            .apply(lambda x: datetime.datetime.fromtimestamp(x / 1000))
+        )
+    # Current version of Magic XRoom uses C# timestamp as 'timestamp' column
+    #   and internal UNIX timestamps as 'timestamp_int' column
+    except ValueError:
+        data["timestamp_dt"] = (
+            data["timestamp"]
+            .apply(lambda x: datetime.datetime(1, 1, 1) + datetime.timedelta(microseconds=x // 10))
+        )
+        offset_hours_data = 0
     if offset_hours_data >= 1:
         data['timestamp_dt'] += pd.Timedelta(hours=offset_hours_data)
     data = data.drop_duplicates()
@@ -283,52 +294,60 @@ def process_session(
     stack_level_ts = []
     labeled_intervals = deque()
 
-    level_started = False
     # iterate through annotations file to assign labels to level timestamps
     for _, row in annotations.iterrows():
         event_type = row["event_type"]
         if event_type == "LEVEL_STARTED":
-            level_started = True
             # it is not expected to have LEVEL_STARTED two times in a row
             start_ts = row["timestamp_dt"]
 
         elif event_type in ["LEVEL_COMPLETED", "LEVEL_FAILED"]:
             # save interval to stack if level_started
-            if level_started:
-                stack_level_ts.append((start_ts, row['timestamp_dt']))
-                level_started = False
+            stack_level_ts.append((start_ts, row['timestamp_dt']))
 
         elif event_type in ["BORED", "ENGAGED", "FRUSTRATED", "SKIP"]:
-            last_finished_level_start, last_finished_level_end = stack_level_ts.pop()
+            last_finished_level_start, last_finished_level_end = stack_level_ts.pop() if (
+                stack_level_ts
+            ) else (None, None)
+            while stack_level_ts:
+                prev_start, prev_end = stack_level_ts.pop()
+                if (prev_end - last_finished_level_start).total_seconds() < threshold:
+                    last_finished_level_start = prev_start
             # assign label to the latest level interval (from stack) if time difference is not larger than a threhsold
-            if event_type != "SKIP" and (row["timestamp_dt"] - last_finished_level_end).total_seconds() < threshold:
+#             print("START-END:", last_finished_level_start, last_finished_level_end)
+            if (
+                event_type != "SKIP" and
+                last_finished_level_end is not None and
+                (row["timestamp_dt"] - last_finished_level_end).total_seconds() < threshold
+            ):
                 labeled_intervals.append(
                     (last_finished_level_start, last_finished_level_end, event_type, row["timestamp_dt"])
                 )
 
     sensor_first_entry = min(data['timestamp_dt'])
     sensor_last_entry = max(data['timestamp_dt'])
-    progress_event_first_entry = min(annotations['timestamp_dt'])
-    progress_event_last_entry = max(annotations['timestamp_dt'])
+    progress_event_first_entry = min(annotations['timestamp_dt']) if annotations.shape[0] > 0 else None
+    progress_event_last_entry = max(annotations['timestamp_dt']) if annotations.shape[0] > 0 else None
 
-    start, end, label, _ = labeled_intervals.popleft()
+    start, end, label, _ = labeled_intervals.popleft() if labeled_intervals else (None, None, None, None)
     interval_num = 1
 
     # iterate through data (bio-measurements) to assign labels based on intervals
-    for idx, row in data.iterrows():
-        if start <= row["timestamp_dt"] <= end:
-            data.at[idx, "label"] = label
-            data.at[idx, "interval_num"] = interval_num
-        elif end < row['timestamp_dt']:
-            if not labeled_intervals:
-                break
-            start, end, label, _ = labeled_intervals.popleft()
-            interval_num += 1
+    if None not in [start, end]:
+        for idx, row in data.iterrows():
+            if start <= row["timestamp_dt"] <= end:
+                data.at[idx, "label"] = label
+                data.at[idx, "interval_num"] = interval_num
+            elif end < row['timestamp_dt']:
+                if not labeled_intervals:
+                    break
+                start, end, label, _ = labeled_intervals.popleft()
+                interval_num += 1
 
     # query labeled data
     labeled_data = data[~data["label"].isna()]
-
-    if get_stats:
+    stats = {}
+    if get_stats and not labeled_data.empty:
         # compute length of recorded labeled data and each emotion
         min_max_intervals = (
             labeled_data[["interval_num", "timestamp_dt", "label"]]

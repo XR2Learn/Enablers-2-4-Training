@@ -6,7 +6,7 @@ from conf import (
     CUSTOM_SETTINGS,
     RAVDESS_LABEL_TO_EMOTION,
     DATASETS_FOLDER,
-    OUTPUTS_FOLDER
+    MODALITY_FOLDER
 )
 from download_datasets import download_RAVDESS
 from preprocessing_utils import process_dataset
@@ -40,7 +40,7 @@ def preprocess():
     # check if dataset folder exist, if not : download and create, forn ow only RAVDESS supported
     if not os.path.isdir(full_dataset_path):
         if dataset_name == "RAVDESS":
-            download_RAVDESS()
+            download_RAVDESS(full_dataset_path)
         else:
             raise ValueError("Unknown dataset name for downloading.")
     else:
@@ -59,15 +59,15 @@ def preprocess():
         full_dataset_path,
         all_subject_dirs,
         CUSTOM_SETTINGS["pre_processing_config"],
-        OUTPUTS_FOLDER,
+        MODALITY_FOLDER,
         label_to_emotion,
         dataset=dataset_name
     )
 
     print('Writing CSV files containing the splits to storage')
-    pd.DataFrame.from_dict(train_split).to_csv(os.path.join(OUTPUTS_FOLDER, 'train.csv'))
-    pd.DataFrame.from_dict(val_split).to_csv(os.path.join(OUTPUTS_FOLDER, 'val.csv'))
-    pd.DataFrame.from_dict(test_split).to_csv(os.path.join(OUTPUTS_FOLDER, 'test.csv'))
+    pd.DataFrame.from_dict(train_split).to_csv(os.path.join(MODALITY_FOLDER, 'train.csv'))
+    pd.DataFrame.from_dict(val_split).to_csv(os.path.join(MODALITY_FOLDER, 'val.csv'))
+    pd.DataFrame.from_dict(test_split).to_csv(os.path.join(MODALITY_FOLDER, 'test.csv'))
 
 
 if __name__ == "__main__":

@@ -3,7 +3,7 @@ import os
 import torch
 
 from pytorch_lightning import Trainer
-from conf import CUSTOM_SETTINGS, OUTPUTS_FOLDER, COMPONENT_OUTPUT_FOLDER, EXPERIMENT_ID
+from conf import CUSTOM_SETTINGS, MODALITY_FOLDER, COMPONENT_OUTPUT_FOLDER, EXPERIMENT_ID
 from ssl_dataset import SSLDataModule
 from callbacks.setup_callbacks import setup_callbacks
 from utils.init_utils import (init_augmentations, init_transforms,
@@ -27,7 +27,7 @@ def run_pre_training():
         print(augmentations)
 
     datamodule = SSLDataModule(
-        path=OUTPUTS_FOLDER,
+        path=MODALITY_FOLDER,
         input_type=CUSTOM_SETTINGS['ssl_config']['input_type'],
         batch_size=CUSTOM_SETTINGS['ssl_config']['batch_size'],
         split=splith_paths,
@@ -50,12 +50,24 @@ def run_pre_training():
     ssl_model = setup_ssl_model(encoder, model_cfg=CUSTOM_SETTINGS['ssl_config'])
     print(ssl_model)
 
-    checkpoint_filename = f'{EXPERIMENT_ID}_ssl_model'
+    modality = CUSTOM_SETTINGS['dataset_config']['modality'] if (
+        'modality' in CUSTOM_SETTINGS['dataset_config']
+    ) else 'default_modality'
+
+    checkpoint_filename = (
+        f"{EXPERIMENT_ID}_"
+        f"{CUSTOM_SETTINGS['dataset_config']['dataset_name']}_"
+        f"{modality}_"
+        f"{CUSTOM_SETTINGS['ssl_config']['input_type']}_"
+        f"{CUSTOM_SETTINGS['encoder_config']['class_name']}"
+    )
+
+    ssl_checkpoint = checkpoint_filename + "ssl_model"
 
     # by default lightning does not overwrite checkpoints, but rather creates different versions (v1, v2, etc.)
     # for the sample checkpoint_filename. Thus, in order to enable overwriting, we delete checkpoint if it exists.
-    if os.path.exists(os.path.join(COMPONENT_OUTPUT_FOLDER, checkpoint_filename + '.ckpt')):
-        os.remove(os.path.join(COMPONENT_OUTPUT_FOLDER, checkpoint_filename + '.ckpt'))
+    if os.path.exists(os.path.join(COMPONENT_OUTPUT_FOLDER, ssl_checkpoint + '.ckpt')):
+        os.remove(os.path.join(COMPONENT_OUTPUT_FOLDER, ssl_checkpoint + '.ckpt'))
 
     # initialize callbacks
     callbacks = setup_callbacks(
@@ -66,7 +78,7 @@ def run_pre_training():
         monitor="val_loss",
         save_last=True,
         save_top_k=1,
-        checkpoint_filename=checkpoint_filename
+        checkpoint_filename=ssl_checkpoint
     )
 
     # initialize Pytorch-Lightning Training
@@ -90,7 +102,13 @@ def run_pre_training():
             encoder=encoder
         )
 
-    torch.save(ssl_model.encoder.state_dict(), os.path.join(COMPONENT_OUTPUT_FOLDER, f'{EXPERIMENT_ID}_encoder.pt'))
+    torch.save(
+        ssl_model.encoder.state_dict(),
+        os.path.join(
+            COMPONENT_OUTPUT_FOLDER,
+            f'{checkpoint_filename}_encoder.pt'
+        )
+    )
 
 
 if __name__ == '__main__':

@@ -1,6 +1,4 @@
-![XR2Learn](https://raw.githubusercontent.com/XR2Learn/.github/5c0fada6136915b389c1cd2151a0dd2cfc4a5aac/images/XR2Learn%20logo.png)
-
-# Enablers 2-4 Training
+# [XR2Learn Emotion Recognition] Training Tools
 
 Training tools involve Enablers 2, 3, and 4 with related components, a total of five tools, for pre-training and
 fine-tuning models used in XR2Learn. Each tool is a modularized component with an isolated environment and dependencies
@@ -61,7 +59,7 @@ information on how to use CLI. However, if changing or expanding the enablers’
 possible to access each component using docker commands, as exemplified below. Thus, the instructions described below
 are focused on running the enablers for a development environment.
 
-A `configuration.json` file is required to provide the enablers with the necessary specifications for running. A default
+A `configuration.json` file is required to provide the components with the necessary specifications for running. A default
 version of “configuration.json” is provided and can be changed by the user.
 
 Run a docker image:

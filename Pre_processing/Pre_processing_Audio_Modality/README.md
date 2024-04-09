@@ -1,8 +1,9 @@
 # Pre-processing - Audio Modality
 
-Component to pre-process audio data input type for an Emotion Detection (ED) model.
+Component to pre-process raw data into an organized time window of data and labels to be used by the other
+components.
 
-`Input`: path to dataset.
+`Input`: Raw files from a dataset
 
 - Dataset Input files should be in the folder `/datasets/<input_CSV_file.CSV>`
 

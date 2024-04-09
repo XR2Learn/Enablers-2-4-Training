@@ -8,7 +8,7 @@ from pytorch_lightning import Trainer
 from callbacks.setup_callbacks import setup_callbacks
 from classification_model import SupervisedModel
 from classifiers.linear import LinearClassifier
-from conf import CUSTOM_SETTINGS, OUTPUTS_FOLDER, COMPONENT_OUTPUT_FOLDER, EXPERIMENT_ID, LABEL_TO_ID
+from conf import CUSTOM_SETTINGS, MODALITY_FOLDER, COMPONENT_OUTPUT_FOLDER, EXPERIMENT_ID, LABEL_TO_ID
 from supervised_dataset import SupervisedDataModule
 from utils.init_utils import (init_augmentations, init_transforms, init_encoder)
 
@@ -35,7 +35,7 @@ def run_supervised_training():
     label_mapping = LABEL_TO_ID[CUSTOM_SETTINGS['dataset_config']['dataset_name']]
 
     datamodule = SupervisedDataModule(
-        path=OUTPUTS_FOLDER,
+        path=MODALITY_FOLDER,
         input_type=CUSTOM_SETTINGS['sup_config']['input_type'],
         batch_size=CUSTOM_SETTINGS['sup_config']['batch_size'],
         split=splith_paths,
@@ -45,29 +45,38 @@ def run_supervised_training():
         augmentations=augmentations,
     )
 
+    modality = CUSTOM_SETTINGS['dataset_config']['modality'] if (
+            'modality' in CUSTOM_SETTINGS['dataset_config']
+        ) else 'default_modality'
+    ckpt_name = (
+        f"{EXPERIMENT_ID}_"
+        f"{CUSTOM_SETTINGS['dataset_config']['dataset_name']}_"
+        f"{modality}_"
+        f"{CUSTOM_SETTINGS['sup_config']['input_type']}_"
+        f"{CUSTOM_SETTINGS['encoder_config']['class_name']}"
+    )
+
+    if "pretrained_path" in CUSTOM_SETTINGS['encoder_config'].keys():
+        ckpt_path = CUSTOM_SETTINGS['encoder_config']['pretrained_path']
+    elif (
+        "pretrained_same_experiment" in CUSTOM_SETTINGS['encoder_config'].keys() and
+        CUSTOM_SETTINGS['encoder_config']["pretrained_same_experiment"]
+    ):
+        ckpt_path = os.path.join(MODALITY_FOLDER, "ssl_training", f"{ckpt_name}_encoder.pt")
+    else:
+        ckpt_path = None
+
     # initialise encoder
     encoder = init_encoder(
         model_cfg=CUSTOM_SETTINGS["encoder_config"],
-        ckpt_path=CUSTOM_SETTINGS['encoder_config']['pretrained_path'] if (
-                "pretrained_path" in CUSTOM_SETTINGS['encoder_config'].keys()
-        ) else f"{OUTPUTS_FOLDER}/ssl_training/{EXPERIMENT_ID}_encoder.pt" if (
-                "pretrained_same_experiment" in CUSTOM_SETTINGS['encoder_config'].keys()
-                and CUSTOM_SETTINGS['encoder_config']["pretrained_same_experiment"]
-        ) else None
+        ckpt_path=ckpt_path
     )
 
     # add classification head to encoder
     classifier = LinearClassifier(encoder.out_size, CUSTOM_SETTINGS['dataset_config']['number_of_labels'])
     model = SupervisedModel(encoder=encoder, classifier=classifier, **CUSTOM_SETTINGS['sup_config']['kwargs'])
 
-    checkpoint_filename = f'{EXPERIMENT_ID}_model'
-
-    # by default lightning does not overwrite checkpoints, but rather creates different versions (v1, v2, etc.)
-    # for the sample checkpoint_filename. Thus, in order to enable overwriting, we delete checkpoint if it exists.
-    if os.path.exists(os.path.join(COMPONENT_OUTPUT_FOLDER, checkpoint_filename + '.ckpt')):
-        os.remove(os.path.join(COMPONENT_OUTPUT_FOLDER, checkpoint_filename + '.ckpt'))
-
-    checkpoint_filename = f'{EXPERIMENT_ID}_model'
+    checkpoint_filename = f'{ckpt_name}_model'
 
     # by default lightning does not overwrite checkpoints, but rather creates different versions (v1, v2, etc.)
     # for the sample checkpoint_filename. Thus, in order to enable overwriting, we delete checkpoint if it exists.
@@ -105,7 +114,7 @@ def run_supervised_training():
     # save weights of the classifier independently for future use with SSL features
     torch.save(
         classifier.state_dict(),
-        os.path.join(COMPONENT_OUTPUT_FOLDER, f'{EXPERIMENT_ID}_classifier.pt')
+        os.path.join(COMPONENT_OUTPUT_FOLDER, f'{ckpt_name}_classifier.pt')
     )
 
 
