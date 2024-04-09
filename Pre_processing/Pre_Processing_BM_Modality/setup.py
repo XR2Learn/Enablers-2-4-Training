@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='pre_processing_bm_modality',
-    version='0.4.0',
+    version='0.5.0',
     description='Pre-processing for BM Modality',
     author='UM-XR2Learn-Enablers',
     packages=['pre_processing_bm_modality'],
