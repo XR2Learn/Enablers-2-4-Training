@@ -15,6 +15,8 @@ EXPERIMENT_ID = config('EXPERIMENT_ID', default='development-model')
 datasets_folder = os.path.join(MAIN_FOLDER, 'datasets')
 DATASETS_FOLDER = config('DATASETS_FOLDER', default=datasets_folder)
 
+
+
 # Yet to check if this is really necessary, maybe only for cases where passing values as ENV VARS is too cumbersome
 # e.g. [[1, 'a', ],['789', 'o', 9]] would be very annoying to write and parse.
 CUSTOM_SETTINGS = {
@@ -40,3 +42,9 @@ DATASET = CUSTOM_SETTINGS["dataset_config"]["dataset_name"]
 MODALITY = CUSTOM_SETTINGS["dataset_config"].get("modality", "default_modality")
 
 OUTPUT_MODALITY_FOLDER = os.path.join(OUTPUTS_FOLDER, DATASET, MODALITY)
+
+EMOTION_TO_LABEL = {
+    "BORED": "01",
+    "ENGAGED": "02",
+    "FRUSTRATED": "03"
+}
