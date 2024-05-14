@@ -13,7 +13,7 @@
       "gsr",
       "ppg"
     ],
-    "seq_len": 5,
+    "seq_len": 1,
     "frequency": 10,
     "overlap": 0.0,
     "resample_freq": 10

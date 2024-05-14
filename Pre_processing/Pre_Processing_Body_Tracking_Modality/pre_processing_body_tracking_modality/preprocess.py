@@ -10,7 +10,6 @@ import warnings
 warnings.filterwarnings('ignore')
 
 def call_component():
-    print(PATH_CUSTOM_SETTINGS)
     print('Call component Pre Processing Body Tracking Modality')
     
     specified_labels = list(EMOTION_TO_LABEL.keys())
@@ -137,7 +136,7 @@ def call_component():
         return segmented_features, np.array(segmented_labels)
 
     # Segment size
-    segment_size = 10  
+    segment_size = CUSTOM_SETTINGS["pre_processing_config"]["seq_len"]*CUSTOM_SETTINGS["pre_processing_config"]["frequency"]
 
     # Applying the function to segment X and y_encoded
     X_segmented, y_segmented = create_fixed_size_segments(X, y_encoded, segment_size)
@@ -195,6 +194,36 @@ def call_component():
     train_df.to_csv('train_set.csv', index=False)
     test_df.to_csv('test_set.csv', index=False)
     val_df.to_csv('validation_set.csv', index=False)
+
+    import pathlib
+
+
+    pathlib.Path(
+        os.path.join(
+            MODALITY_FOLDER,
+        )
+    ).mkdir(parents=True, exist_ok=True)
+
+    train_df.to_csv(
+        os.path.join(
+            MODALITY_FOLDER,
+            'train.csv'
+        )
+    )
+
+    val_df.to_csv(
+        os.path.join(
+            MODALITY_FOLDER,
+            'val.csv'
+        )
+    )
+
+    test_df.to_csv(
+        os.path.join(
+            MODALITY_FOLDER,
+            'test.csv'
+        )
+    )
 
 
 if __name__ == '__main__':

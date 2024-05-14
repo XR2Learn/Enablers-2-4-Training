@@ -39,9 +39,16 @@ DATA_PATH = os.path.join(DATASETS_FOLDER, CUSTOM_SETTINGS["dataset_config"]["dat
 
 DATASET = CUSTOM_SETTINGS["dataset_config"]["dataset_name"]
 
-MODALITY = CUSTOM_SETTINGS["dataset_config"].get("modality", "default_modality")
+if "modality" in CUSTOM_SETTINGS["dataset_config"]:
+    modality = CUSTOM_SETTINGS["dataset_config"]["modality"]
+else:
+    modality = "default_modality"
 
-OUTPUT_MODALITY_FOLDER = os.path.join(OUTPUTS_FOLDER, DATASET, MODALITY)
+MODALITY_FOLDER = os.path.join(
+    OUTPUTS_FOLDER,
+    CUSTOM_SETTINGS["dataset_config"]["dataset_name"],
+    modality,
+)
 
 EMOTION_TO_LABEL = {
     "BORED": "01",
