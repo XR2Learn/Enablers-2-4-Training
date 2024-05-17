@@ -28,7 +28,7 @@ services:
     working_dir: /app
     environment:
       - EXPERIMENT_ID=${EXPERIMENT_ID:-development-model}
-    command: python supervised_body_tracking_modality/train.py
+    command: python supervised_body_tracking_modality/traincnn.py
 
   ssl-audio:
     image: some.registry.com/xr2learn-enablers/ssl-audio:latest
