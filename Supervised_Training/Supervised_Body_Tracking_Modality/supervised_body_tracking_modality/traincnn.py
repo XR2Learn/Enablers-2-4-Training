@@ -56,6 +56,7 @@ def example_run():
     ])
     model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
 
+
     # Train the Model
     history = model.fit(X_train, y_train_encoded, epochs=5, batch_size=10, validation_data=(X_val, y_val_encoded), verbose=2)
 
