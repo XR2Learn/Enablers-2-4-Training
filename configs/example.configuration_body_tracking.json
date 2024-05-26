@@ -22,6 +22,8 @@
     "from_module": "encoders.cnn1d",
     "input_type": "standardize",
     "class_name": "CNN1D",
+    "epoch": 1,
+    "batch_size": 10,
     "kwargs": {
       "in_channels": 2,
       "len_seq": 50,

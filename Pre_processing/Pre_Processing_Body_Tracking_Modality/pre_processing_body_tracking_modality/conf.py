@@ -50,6 +50,23 @@ MODALITY_FOLDER = os.path.join(
     modality,
 )
 
+
+# import os
+# # get the directory of the current script (conf.py)
+# current_script_directory = os.path.dirname(os.path.abspath(__file__))
+# # Go up one level to get the parent directory
+# parent_directory = os.path.dirname(current_script_directory)
+# # Define the path to the 'output' directory
+# output_directory = os.path.join(parent_directory, 'output')
+# # Set COMPONENT_OUTPUT_FOLDER to be a subdirectory within 'output'
+# COMPONENT_OUTPUT_FOLDER = os.path.join(output_directory, 'supervised_training')
+
+
+COMPONENT_OUTPUT_FOLDER = os.path.join(
+   MODALITY_FOLDER,
+   'supervised_training'
+)
+
 EMOTION_TO_LABEL = {
     "BORED": "01",
     "ENGAGED": "02",
