@@ -16,7 +16,6 @@ datasets_folder = os.path.join(MAIN_FOLDER, 'datasets')
 DATASETS_FOLDER = config('DATASETS_FOLDER', default=datasets_folder)
 
 
-
 # Yet to check if this is really necessary, maybe only for cases where passing values as ENV VARS is too cumbersome
 # e.g. [[1, 'a', ],['789', 'o', 9]] would be very annoying to write and parse.
 CUSTOM_SETTINGS = {
@@ -48,23 +47,6 @@ MODALITY_FOLDER = os.path.join(
     OUTPUTS_FOLDER,
     CUSTOM_SETTINGS["dataset_config"]["dataset_name"],
     modality,
-)
-
-
-# import os
-# # get the directory of the current script (conf.py)
-# current_script_directory = os.path.dirname(os.path.abspath(__file__))
-# # Go up one level to get the parent directory
-# parent_directory = os.path.dirname(current_script_directory)
-# # Define the path to the 'output' directory
-# output_directory = os.path.join(parent_directory, 'output')
-# # Set COMPONENT_OUTPUT_FOLDER to be a subdirectory within 'output'
-# COMPONENT_OUTPUT_FOLDER = os.path.join(output_directory, 'supervised_training')
-
-
-COMPONENT_OUTPUT_FOLDER = os.path.join(
-   MODALITY_FOLDER,
-   'supervised_training'
 )
 
 EMOTION_TO_LABEL = {

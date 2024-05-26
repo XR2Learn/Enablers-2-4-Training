@@ -22,7 +22,7 @@
     "from_module": "encoders.cnn1d",
     "input_type": "standardize",
     "class_name": "CNN1D",
-    "epoch": 1,
+    "epoch": 5,
     "batch_size": 10,
     "kwargs": {
       "in_channels": 2,
