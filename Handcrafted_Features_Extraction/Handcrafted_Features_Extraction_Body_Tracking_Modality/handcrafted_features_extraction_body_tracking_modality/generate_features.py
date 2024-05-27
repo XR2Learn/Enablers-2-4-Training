@@ -9,6 +9,8 @@ from scipy.signal import welch
 from scipy.fft import fft, fftfreq
 from scipy.signal import find_peaks
 from collections import Counter
+from sklearn.preprocessing import StandardScaler
+from sklearn.model_selection import train_test_split
 import re
 import pathlib
 import warnings
@@ -200,7 +202,7 @@ def call_component():
 
     # 7.Power Specteral Density
     # Calculate PSD using Welch's method
-    def calculate_psd(pos_data, fs, nperseg=64, noverlap=32):
+    def calculate_psd(pos_data, fs, nperseg=CUSTOM_SETTINGS["handcrafted_feature_extraction"]["psd_sample_per_segment"], noverlap=CUSTOM_SETTINGS["handcrafted_feature_extraction"]["psd_sample_segment_overlap"]):
         frequencies, power = welch(pos_data, fs=fs, nperseg=nperseg, noverlap=noverlap)
         return frequencies, power
     # Calculate time differences in seconds
@@ -208,8 +210,8 @@ def call_component():
     # Calculate sampling frequency (fs) safely
     fs = 1 / np.mean(time_diffs) if time_diffs.size > 0 else 1  # prevent division by zero
     # Window length and overlap for PSD calculation
-    window_length = 100  # Length of the window for PSD calculation
-    overlap = 50  # 50% overlap
+    window_length = CUSTOM_SETTINGS["handcrafted_feature_extraction"]["psd_win_len"]  # Length of the window for PSD calculation
+    overlap = CUSTOM_SETTINGS["handcrafted_feature_extraction"]["psd_win_len_overlap"]
     # DataFrame to store PSD features, ensuring it matches the index of vr_data
     psd_features = pd.DataFrame(index=vr_data.index)
     # Compute PSD for each coordinate of each body part using a sliding window
@@ -308,8 +310,8 @@ def call_component():
         stats_features[f'min_{feature_name}'] = np.min(data)
         stats_features[f'max_{feature_name}'] = np.max(data)
     # Parameters for sliding window
-    window_size = 100  # Length of the window for calculations
-    overlap = 50       # Number of overlapping data points
+    window_size = CUSTOM_SETTINGS["handcrafted_feature_extraction"]["stat_win_size"]  # Length of the window for calculations
+    overlap = CUSTOM_SETTINGS["handcrafted_feature_extraction"]["stat_win_size_overlap"]   # Number of overlapping data points
     # store statistics
     stats_features = pd.DataFrame(index=vr_data.index)
     # calculate path length
@@ -377,8 +379,8 @@ def call_component():
         energy_spectrum = np.sum(amp_spectrum**2) / len(pos_data)
         return dominant_frequency, mean_frequency, energy_spectrum
     # Parameters for sliding window
-    window_size = 100  # Length of the window for FFT calculation
-    overlap = 50       # Number of overlapping data points
+    window_size = CUSTOM_SETTINGS["handcrafted_feature_extraction"]["fft_win_size"]  # Length of the window for FFT calculation
+    overlap = CUSTOM_SETTINGS["handcrafted_feature_extraction"]["fft_win_size_overlap"]  # Number of overlapping data points
     # DataFrame to store frequency features
     frequency_features = pd.DataFrame(index=vr_data.index)
     # Process each body part and each coordinate for frequency analysis
@@ -416,8 +418,8 @@ def call_component():
         symmetry_diff = np.abs(data_left - data_right)
         return symmetry_diff.mean(), symmetry_diff.std()
     # Parameters for sliding window
-    window_size = 100  # Length of the window for symmetry calculation
-    overlap = 50       # Number of overlapping data points
+    window_size = CUSTOM_SETTINGS["handcrafted_feature_extraction"]["sym_win_size"]  # Length of the window for symmetry calculation
+    overlap = CUSTOM_SETTINGS["handcrafted_feature_extraction"]["sym_win_size_overlap"]       # Number of overlapping data points
     # DataFrame to store symmetry features, matching the index of vr_data
     symmetry_features = pd.DataFrame(index=vr_data.index)
     # Calculate symmetry for each axis
@@ -465,8 +467,8 @@ def call_component():
         harmonic_amps = amplitude_spectrum[peaks]
         return harmonic_freqs, harmonic_amps
     # Parameters for sliding window
-    window_size = 100  # Length of the window for harmonic analysis
-    overlap = 50       # Number of overlapping data points
+    window_size = CUSTOM_SETTINGS["handcrafted_feature_extraction"]["harmo_win_size"]  # Length of the window for harmonic analysis
+    overlap = CUSTOM_SETTINGS["handcrafted_feature_extraction"]["harmo_win_size_overlap"]   # Number of overlapping data points
     # DataFrame to store harmonic features, matching the index of vr_data
     harmonics_features = pd.DataFrame(index=vr_data.index)
     # Calculate harmonics for each body part and coordinate using sliding windows
@@ -562,7 +564,7 @@ def call_component():
         return segmented_features, np.array(segmented_labels)
 
     # Segment size
-    segment_size = CUSTOM_SETTINGS["handcrafted_feature_extraction"]["segment_size"]
+    segment_size = CUSTOM_SETTINGS["handcrafted_feature_extraction"]["frame_segment_size"]
 
     # Applying the function to segment X and y_encoded
     X_segmented, y_segmented = create_fixed_size_segments(X, y_encoded, segment_size)
@@ -583,7 +585,6 @@ def call_component():
     X_flattened = X_segmented.reshape(X_segmented.shape[0], -1)
 
     # Standardize the data --------------------------------------------------------------
-    from sklearn.preprocessing import StandardScaler
     stacked_data = np.array(X_flattened)
     scaler = StandardScaler()
     # Fit the scaler to the data and transform it
@@ -591,10 +592,9 @@ def call_component():
     # ------------------------------------------------------------------------------------
 
     # Save CSVs-----------------------------
-    from sklearn.model_selection import train_test_split
     # Split the data into training and temporary sets
     X_train, X_temp, y_train_encoded, y_temp_encoded = train_test_split(
-      X_flattened, y_segmented, test_size=0.3, random_state=42, stratify=y_segmented)
+      X_flattened, y_segmented, test_size=CUSTOM_SETTINGS["handcrafted_feature_extraction"]["test_size"], random_state=42, stratify=y_segmented)
     # Split the temporary set into test and validation sets
     X_test, X_val, y_test_encoded, y_val_encoded = train_test_split(
       X_temp, y_temp_encoded, test_size=0.5, random_state=42, stratify=y_temp_encoded)
