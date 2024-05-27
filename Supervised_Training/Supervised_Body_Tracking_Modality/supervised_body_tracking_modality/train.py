@@ -1,4 +1,3 @@
-# Python code here
 
 from conf import CUSTOM_SETTINGS, MODALITY_FOLDER, COMPONENT_OUTPUT_FOLDER
 
@@ -9,6 +8,12 @@ from tensorflow.keras.layers import Conv1D, MaxPooling1D, Flatten, Dense, Dropou
 import pandas as pd
 import numpy as np
 from sklearn.preprocessing import LabelEncoder
+import shutil
+import torch
+from decouple import config
+import pathlib
+from sklearn.metrics import classification_report, confusion_matrix
+
 import warnings
 warnings.filterwarnings('ignore')
 
@@ -46,27 +51,25 @@ def example_run():
     num_classes = len(np.unique(y_train_encoded))
 
     # Build the 1D CNN Model
+    activation_fcn = CUSTOM_SETTINGS["sup_config"]["activation"]
     model = Sequential([
-        Conv1D(filters=64, kernel_size=3, activation='relu', input_shape=(X_train.shape[1], 1)),
+        Conv1D(filters=CUSTOM_SETTINGS["sup_config"]["filters"], kernel_size=CUSTOM_SETTINGS["sup_config"]["kernel_size"], activation='relu', input_shape=(X_train.shape[1], 1)),
         MaxPooling1D(pool_size=2),
         Flatten(),
-        Dense(50, activation='relu'),
-        Dropout(0.5),
+        Dense(CUSTOM_SETTINGS["sup_config"]["dense_neurons"], activation=CUSTOM_SETTINGS["sup_config"]['activation']),
+        Dropout(CUSTOM_SETTINGS["sup_config"]["dropout"]),
         Dense(num_classes, activation='softmax')
     ])
-    model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
+    model.compile(optimizer=CUSTOM_SETTINGS["sup_config"]['optimizer_name'], loss='sparse_categorical_crossentropy', metrics=['accuracy'])
 
-
-    epoch = CUSTOM_SETTINGS["encoder_config"]["epoch"]
-    batch_size = CUSTOM_SETTINGS["encoder_config"]["batch_size"]
+    epoch = CUSTOM_SETTINGS["sup_config"]["epochs"]
+    batch_size = CUSTOM_SETTINGS["sup_config"]["batch_size"]
 
     # Train the Model
     history = model.fit(X_train, y_train_encoded, epochs=epoch, batch_size=batch_size, validation_data=(X_val, y_val_encoded), verbose=2)
 
     # Evaluate the Model
     test_loss, test_accuracy = model.evaluate(X_test, y_test_encoded, verbose=0)
-
-    from sklearn.metrics import classification_report, confusion_matrix
 
     # Predict classes on the test set
     predictions = model.predict(X_test)
@@ -88,16 +91,6 @@ def example_run():
     print(f"Test Loss: {test_loss:.4f}")
     print(f"Test Accuracy: {test_accuracy * 100:.2f}%")
     
-    
-
-
-    
-    
-    import shutil
-    import torch
-    from decouple import config
-    import pathlib
-
     def clear_directory(directory):
         """Clears the specified directory, removing and recreating it."""
         if os.path.exists(directory):
@@ -122,8 +115,6 @@ def example_run():
         print(f"Full model checkpoint has been saved to {checkpoint_path}")
 
     save_model_weights_and_checkpoint(model)    
-    
-    
 
 if __name__ == '__main__':
     example_run()

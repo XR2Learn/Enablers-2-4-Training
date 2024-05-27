@@ -1,11 +1,14 @@
 from conf import CUSTOM_SETTINGS, DATA_PATH, MODALITY_FOLDER, EMOTION_TO_LABEL
 
-
 import os
 import pandas as pd
 import numpy as np
 from sklearn.preprocessing import LabelEncoder
 from collections import Counter
+import re
+from sklearn.preprocessing import StandardScaler
+from sklearn.model_selection import train_test_split
+import pathlib
 import warnings
 warnings.filterwarnings('ignore')
 
@@ -13,8 +16,7 @@ def call_component():
     print('Call component Pre Processing Body Tracking Modality')
     
     specified_labels = list(EMOTION_TO_LABEL.keys())
-
-    data_folder_path = DATA_PATH  # Corrected main folder name
+    data_folder_path = DATA_PATH  
 
     # Aggregate data from multiple CSV files within a subfolder based on file name pattern
     def aggregate_data_from_subfolder(folder_path, file_contains):
@@ -44,7 +46,6 @@ def call_component():
             last_timestamp = timestamp
         return VR_df
 
-
     all_labeled_VR_data = pd.DataFrame()
 
     # Iterate over each participant's subfolders within the main data folder
@@ -59,8 +60,6 @@ def call_component():
             print(f"No event data or 'event_type' column for participant {participant}, skipping labeling.")
     print("Labeling complete. Data ready for further processing.")
 
-
-    import re   
     def correct_row(row):
         # Extract the 'head_rotW' value 
         head_rotW_value = str(row['head_rotW'])
@@ -73,7 +72,6 @@ def call_component():
             row['rcontroller_rotW'] = row['lcontroller_rotW']
             row['lcontroller_rotW'] = matched_values[1]
         elif len(matched_values) == 1:
-            # Only one number found, assign it to 'head_rotW'
             row['head_rotW'] = matched_values[0]
         return row
 
@@ -99,7 +97,6 @@ def call_component():
     observations_per_class_df.columns = ['Event Label', 'Number of Observations']
     print(" ")
 
-
     # Prepare the features and target variable
     X = all_labeled_VR_data.drop(['event_label'], axis=1)  # Drop 'event_label' as it's the target variable
     # Drop the first column from X
@@ -111,13 +108,12 @@ def call_component():
         if X[col].dtype == 'object':
             X[col] = X[col].astype('category')
 
-    # encode categorical columns as numeric using their category codes
+    # Encode categorical columns as numeric using their category codes
     categorical_cols = X.select_dtypes(['category']).columns
     X[categorical_cols] = X[categorical_cols].apply(lambda x: x.cat.codes)
     # Encode the target variable
     label_encoder = LabelEncoder()
     y_encoded = label_encoder.fit_transform(y)
-
 
     # Frames Segmentation --------------------------------------------------------
     def create_fixed_size_segments(features, labels, segment_size):
@@ -128,15 +124,13 @@ def call_component():
         labels_truncated = labels[:max_index]
         # Reshape features into segments
         segmented_features = np.array(features_truncated).reshape(-1, segment_size, features_truncated.shape[1])
-        # For labels, we can either take the first label of each segment or use a majority vote
         segmented_labels = []
         for i in range(0, len(labels_truncated), segment_size):
-            # Example: Taking the first label of each segment
             segmented_labels.append(labels_truncated[i])
         return segmented_features, np.array(segmented_labels)
 
     # Segment size
-    segment_size = CUSTOM_SETTINGS["pre_processing_config"]["seq_len"]*CUSTOM_SETTINGS["pre_processing_config"]["frequency"]
+    segment_size = CUSTOM_SETTINGS["pre_processing_config"]["segment_size"]
 
     # Applying the function to segment X and y_encoded
     X_segmented, y_segmented = create_fixed_size_segments(X, y_encoded, segment_size)
@@ -145,8 +139,6 @@ def call_component():
     print("Shape of segmented labels:", y_segmented.shape)
     print(" ")
 
-
-    from collections import Counter
     decoded_labels = label_encoder.inverse_transform(y_segmented)  # Decode the labels to their original string form
     label_counts = Counter(decoded_labels)  # Count each label
     # Sort labels based on count in descending order
@@ -157,25 +149,20 @@ def call_component():
         print(f"{label}: {count} samples")
     print(" ")
 
-
     # Flatten the segmented features from 3D to 2D
     X_flattened = X_segmented.reshape(X_segmented.shape[0], -1)
 
-
     # Standardize the data --------------------------------------------------------------
-    from sklearn.preprocessing import StandardScaler
     stacked_data = np.array(X_flattened)
     scaler = StandardScaler()
     # Fit the scaler to the data and transform it
     X_flattened = scaler.fit_transform(stacked_data)
     # ------------------------------------------------------------------------------------
 
-
     # Save CSVs-----------------------------
-    from sklearn.model_selection import train_test_split
     # Split the data into training and temporary sets
     X_train, X_temp, y_train_encoded, y_temp_encoded = train_test_split(
-      X_flattened, y_segmented, test_size=0.3, random_state=42, stratify=y_segmented)
+      X_flattened, y_segmented, test_size=CUSTOM_SETTINGS["pre_processing_config"]["test_size"], random_state=42, stratify=y_segmented)
     # Split the temporary set into test and validation sets
     X_test, X_val, y_test_encoded, y_val_encoded = train_test_split(
       X_temp, y_temp_encoded, test_size=0.5, random_state=42, stratify=y_temp_encoded)
@@ -194,9 +181,6 @@ def call_component():
     train_df.to_csv('train_set.csv', index=False)
     test_df.to_csv('test_set.csv', index=False)
     val_df.to_csv('validation_set.csv', index=False)
-
-    import pathlib
-
 
     pathlib.Path(
         os.path.join(
@@ -224,7 +208,6 @@ def call_component():
             'test.csv'
         )
     )
-
 
 if __name__ == '__main__':
     call_component()

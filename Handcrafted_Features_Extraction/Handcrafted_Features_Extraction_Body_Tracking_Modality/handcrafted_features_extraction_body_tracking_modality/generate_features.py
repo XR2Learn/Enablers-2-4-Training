@@ -17,7 +17,6 @@ warnings.filterwarnings('ignore')
 def call_component():
 
     specified_labels = list(EMOTION_TO_LABEL.keys())
-
     data_folder_path = DATA_PATH
 
     # Aggregate data from multiple CSV files within a subfolder based on file name pattern
@@ -75,7 +74,6 @@ def call_component():
             row['rcontroller_rotW'] = row['lcontroller_rotW']
             row['lcontroller_rotW'] = matched_values[1]
         elif len(matched_values) == 1:
-            # Only one number found, assign it to 'head_rotW'
             row['head_rotW'] = matched_values[0]
         return row
 
@@ -141,7 +139,7 @@ def call_component():
     #----------------------------------------------------------------------------------------
 
     # 3.Range of Motion 
-    window_size = 10  # Define the size of the window for the local range of motion
+    window_size = CUSTOM_SETTINGS["handcrafted_feature_extraction"]["rom_win_size"]  # Define the size of the window for the local range of motion
     # store motion features with the same length as vr_data
     motion_features = pd.DataFrame(index=vr_data.index)
     # Calculate time intervals
@@ -161,7 +159,7 @@ def call_component():
         velocity = pos_data.diff().fillna(0)
         acceleration = velocity.diff().fillna(0)
         jerk = acceleration.diff().fillna(0)
-        return jerk / (time_intervals ** 2)
+        return jerk / (time_intervals ** CUSTOM_SETTINGS["handcrafted_feature_extraction"]["jerk_time_interval"])
     # 5.Difference over time using positional data
     def calculate_difference_over_time(pos_data):
         diffs = pos_data.diff().fillna(0)
@@ -183,7 +181,7 @@ def call_component():
     # correlation over time between different sets of positional data
     def calculate_correlation(pos_data1, pos_data2):
         # Using rolling window to calculate dynamic correlation over time
-        window_size = 10  
+        window_size = CUSTOM_SETTINGS["handcrafted_feature_extraction"]["correlation_win_size"]  
         correlation_over_time = pos_data1.rolling(window=window_size).corr(pos_data2)
         return correlation_over_time
     # Compute correlation for each combination of body parts and axes
@@ -564,7 +562,7 @@ def call_component():
         return segmented_features, np.array(segmented_labels)
 
     # Segment size
-    segment_size = CUSTOM_SETTINGS["pre_processing_config"]["seq_len"]*CUSTOM_SETTINGS["pre_processing_config"]["frequency"]
+    segment_size = CUSTOM_SETTINGS["handcrafted_feature_extraction"]["segment_size"]
 
     # Applying the function to segment X and y_encoded
     X_segmented, y_segmented = create_fixed_size_segments(X, y_encoded, segment_size)
