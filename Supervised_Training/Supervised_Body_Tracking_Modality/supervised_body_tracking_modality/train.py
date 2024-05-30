@@ -123,7 +123,7 @@ def example_run():
 
         # Save the model weights
         model.save_weights(weights_path)
-        print(f"Weights have been saved to {weights_path}")
+        print(f"Weights have been saved to {weights_path}") 
 
         # Save the full model checkpoint
         model.save(checkpoint_path)
