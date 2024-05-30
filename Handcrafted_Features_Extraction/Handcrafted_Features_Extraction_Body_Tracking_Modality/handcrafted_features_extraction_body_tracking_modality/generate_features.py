@@ -609,10 +609,11 @@ def call_component():
     test_df['Label'] = y_test_decoded  # Add decoded labels
     val_df = pd.DataFrame(X_val)
     val_df['Label'] = y_val_decoded  # Add decoded labels
+
     # Save the DataFrames to CSV files
-    train_df.to_csv('train_set.csv', index=False)
-    test_df.to_csv('test_set.csv', index=False)
-    val_df.to_csv('validation_set.csv', index=False)
+    # train_df.to_csv('train_set.csv', index=False)
+    # test_df.to_csv('test_set.csv', index=False)
+    # val_df.to_csv('validation_set.csv', index=False)
 
     pathlib.Path(
         os.path.join(

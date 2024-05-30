@@ -71,11 +71,26 @@ def example_run():
     # Evaluate the Model
     test_loss, test_accuracy = model.evaluate(X_test, y_test_encoded, verbose=0)
 
+<<<<<<< HEAD
+=======
+    # # Predict classes on the test set
+    # predictions = model.predict(X_test)
+    # predicted_classes = np.argmax(predictions, axis=1)
+    # class_names = ['BORED', 'ENGAGED', 'FRUSTRATED', 'UNLABELED']
+    # # Print reports
+    # print("Classification Report:")
+    # print(classification_report(y_test_encoded, predicted_classes, target_names=class_names))
+    # print("Confusion Matrix:")
+    # cm = confusion_matrix(y_test_encoded, predicted_classes)
+    # print(pd.DataFrame(cm, index=class_names, columns=class_names))
+
+>>>>>>> 5971aec (lopo2)
     # Predict classes on the test set
     predictions = model.predict(X_test)
     predicted_classes = np.argmax(predictions, axis=1)
-    class_names = ['BORED', 'ENGAGED', 'FRUSTRATED', 'UNLABELED']
-
+    # Automatically determine class names from y_test_encoded
+    unique_classes = np.unique(y_test_encoded)
+    class_names = [f"Class {label}" for label in unique_classes]
     # Print reports
     print("Classification Report:")
     print(classification_report(y_test_encoded, predicted_classes, target_names=class_names))
