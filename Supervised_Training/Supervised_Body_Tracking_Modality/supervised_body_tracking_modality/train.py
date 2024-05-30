@@ -71,8 +71,6 @@ def example_run():
     # Evaluate the Model
     test_loss, test_accuracy = model.evaluate(X_test, y_test_encoded, verbose=0)
 
-<<<<<<< HEAD
-=======
     # # Predict classes on the test set
     # predictions = model.predict(X_test)
     # predicted_classes = np.argmax(predictions, axis=1)
@@ -84,7 +82,6 @@ def example_run():
     # cm = confusion_matrix(y_test_encoded, predicted_classes)
     # print(pd.DataFrame(cm, index=class_names, columns=class_names))
 
->>>>>>> 5971aec (lopo2)
     # Predict classes on the test set
     predictions = model.predict(X_test)
     predicted_classes = np.argmax(predictions, axis=1)
