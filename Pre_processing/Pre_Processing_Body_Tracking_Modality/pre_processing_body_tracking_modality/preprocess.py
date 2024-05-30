@@ -135,7 +135,7 @@ def call_component():
         X_flattened = X_segmented.reshape(X_segmented.shape[0], -1)
         return X_flattened, label_encoder, y_encoded, y_segmented, decoded_labels
 
-    # Drop the first column from each DataFrame
+    # Drop the timestamp from the training data
     participant1_data = participant1_data.iloc[:, 1:]
     participant2_data = participant2_data.iloc[:, 1:]
     rest_participants_data = rest_participants_data.iloc[:, 1:]
@@ -145,7 +145,6 @@ def call_component():
     participant2_flattened, participant2_label_encoder, participant2_y_encoded, participant2_y_segmented, participant2_decoded_labels = prepare_data(participant2_data)
     rest_flattened, rest_label_encoder, rest_y_encoded, rest_y_segmented, rest_decoded_labels = prepare_data(rest_participants_data)
 
-    # Process and store each set of data
     val = participant2_flattened
     test = participant1_flattened  
     train = rest_flattened
@@ -162,7 +161,7 @@ def call_component():
     train = scaler.fit_transform(stacked_data3)
     # ------------------------------------------------------------------------------------
 
-    # Add the corresponding labels with actual names to the data
+    # Add the corresponding labels to the data
     val_labels = participant2_decoded_labels
     test_labels = participant1_decoded_labels
     train_labels = rest_decoded_labels
@@ -176,7 +175,7 @@ def call_component():
     train_df = pd.DataFrame(train)
     train_df['label'] = train_labels
 
-    # Save the DataFrames to CSV files in the current directory
+    # Save as CSV files 
     pathlib.Path(
         os.path.join(
             MODALITY_FOLDER,
