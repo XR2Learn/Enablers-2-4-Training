@@ -5,106 +5,39 @@
     "number_of_labels": 3
   },
   "pre_processing_config": {
-    "process": "standardize",
-    "create_splits": true,
-    "get_stats": true,
-    "get_ssl": true,
-    "use_sensors": [
-      "gsr",
-      "ppg"
-    ],
-    "seq_len": 5,
-    "frequency": 10,
-    "overlap": 0.0,
-    "resample_freq": 10
+    "segment_size": 10,
+    "test_size": 0.3
   },
-  "encoder_config": {
-    "from_module": "encoders.cnn1d",
-    "input_type": "standardize",
-    "class_name": "CNN1D",
-    "kwargs": {
-      "in_channels": 2,
-      "len_seq": 50,
-      "out_channels": [
-        16,
-        32,
-        64
-      ],
-      "kernel_sizes": [
-        3,
-        3,
-        3
-      ],
-      "stride": 1
-    },
-    "pretrained_same_experiment": true
-  },
-  "ssl_config": {
-    "from_module": "ssl_methods.SimCLR",
-    "ssl_framework": "SimCLR",
-    "input_type": "standardize",
-    "save_last_encoder": false,
-    "epochs": 100,
-    "batch_size": 64,
-    "kwargs": {
-      "lr": 0.0001,
-      "n_views": 2,
-      "temperature": 0.05,
-      "optimizer_name_ssl": "adam"
-    }
+  "handcrafted_feature_extraction": {
+    "frame_segment_size": 10,    
+    "rom_win_size": 10,
+    "jerk_time_interval":2,
+    "correlation_win_size":10,
+    "psd_sample_per_segment":64,
+    "psd_sample_segment_overlap":32,
+    "psd_win_len":100,
+    "psd_win_len_overlap":50,
+    "stat_win_size":100,
+    "stat_win_size_overlap":50,
+    "fft_win_size":100,
+    "fft_win_size_overlap":50,
+    "sym_win_size":100,
+    "sym_win_size_overlap":50, 
+    "harmo_win_size":100,
+    "harmo_win_size_overlap":50,
+    "test_size": 0.3
   },
   "sup_config": {
-    "input_type": "standardize",
-    "epochs": 50,
-    "batch_size": 32,
-    "use_augmentations_in_sup": false,
-    "kwargs": {
-      "lr": 0.0001,
-      "optimizer_name": "adam",
-      "freeze_encoder": true
-    }
-  },
-  "augmentations": {
-    "gaussian_noise": {
-      "probability": 0.5,
-      "kwargs": {
-        "mean": 0,
-        "std": 0.2
-      }
-    },
-    "scale": {
-      "probability": 0.5,
-      "kwargs": {
-        "max_scale": 1.3
-      }
-    }
-  },
-  "transforms": [
-    {
-      "class_name": "ToTensor",
-      "from_module": "general_transforms",
-      "transform_name": "to_tensor",
-      "in_test": true
-    },
-    {
-      "class_name": "Permute",
-      "from_module": "general_transforms",
-      "transform_name": "permutation",
-      "in_test": true,
-      "kwargs": {
-        "shape": [
-          1,
-          0
-        ]
-      }
-    },
-    {
-      "class_name": "ToFloat",
-      "from_module": "general_transforms",
-      "transform_name": "to_float",
-      "in_test": true
-    }
-  ]
+    "epochs": 5,
+    "batch_size": 10,
+    "filters": 64,
+    "kernel_size": 3,
+    "pool_size": 2,
+    "activation": "relu",
+    "dense_neurons": 50,
+    "dropout": 0.5,
+    "optimizer_name": "adam"
+  }
 }
 
 
