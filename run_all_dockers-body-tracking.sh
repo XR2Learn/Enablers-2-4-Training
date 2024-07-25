@@ -14,14 +14,14 @@ echo "Handcrafted-features-generation-body-tracking"
 echo "--------------------"
 CONFIG_FILE_PATH=$CONFIG_FILE_PATH docker compose run --rm handcrafted-features-generation-body-tracking
 echo "--------------------"
-echo "SSL-training-body-tracking"
-echo "--------------------"
-CONFIG_FILE_PATH=$CONFIG_FILE_PATH docker compose run --rm ssl-body-tracking
-echo "--------------------"
-echo "SSL-features-extraction-body-tracking"
-echo "--------------------"
-CONFIG_FILE_PATH=$CONFIG_FILE_PATH docker compose run --rm ssl-features-generation-body-tracking
-echo "--------------------"
+#echo "SSL-training-body-tracking"
+#echo "--------------------"
+#CONFIG_FILE_PATH=$CONFIG_FILE_PATH docker compose run --rm ssl-body-tracking
+#echo "--------------------"
+#echo "SSL-features-extraction-body-tracking"
+#echo "--------------------"
+#CONFIG_FILE_PATH=$CONFIG_FILE_PATH docker compose run --rm ssl-features-generation-body-tracking
+#echo "--------------------"
 echo "Supervised-training-body-tracking"
 echo "--------------------"
 CONFIG_FILE_PATH=$CONFIG_FILE_PATH docker compose run --rm ed-training-body-tracking
