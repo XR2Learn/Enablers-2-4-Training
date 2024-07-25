@@ -1,19 +1,20 @@
+import os
+import pathlib
+import re
+import warnings
+from collections import Counter
+
+import numpy as np
+import pandas as pd
+from sklearn.preprocessing import LabelEncoder
+from sklearn.preprocessing import StandardScaler
+
 from conf import CUSTOM_SETTINGS, DATA_PATH, MODALITY_FOLDER, EMOTION_TO_LABEL
 
-import os
-import pandas as pd
-import numpy as np
-from sklearn.preprocessing import LabelEncoder
-from collections import Counter
-import re
-from sklearn.preprocessing import StandardScaler
-from sklearn.model_selection import train_test_split
-import pathlib
-import warnings
 warnings.filterwarnings('ignore')
 
-def call_component():
 
+def call_component():
     specified_labels = list(EMOTION_TO_LABEL.keys())
 
     data_folder_path = DATA_PATH
@@ -87,7 +88,8 @@ def call_component():
 
     participant1_data['lcontroller_rotW'] = pd.to_numeric(participant1_data['lcontroller_rotW'], errors='coerce')
     participant2_data['lcontroller_rotW'] = pd.to_numeric(participant2_data['lcontroller_rotW'], errors='coerce')
-    rest_participants_data['lcontroller_rotW'] = pd.to_numeric(rest_participants_data['lcontroller_rotW'], errors='coerce')
+    rest_participants_data['lcontroller_rotW'] = pd.to_numeric(rest_participants_data['lcontroller_rotW'],
+                                                               errors='coerce')
 
     participant1_data['head_rotW'].fillna(participant1_data['head_rotW'].mean(), inplace=True)
     participant2_data['head_rotW'].fillna(participant2_data['head_rotW'].mean(), inplace=True)
@@ -108,7 +110,7 @@ def call_component():
         y_encoded = label_encoder.fit_transform(y)
 
         segment_size = CUSTOM_SETTINGS["pre_processing_config"]["segment_size"]
-        
+
         def create_fixed_size_segments(features, labels, segment_size):
             max_index = len(features) // segment_size * segment_size
             features_truncated = features.iloc[:max_index]
@@ -123,15 +125,15 @@ def call_component():
 
         print("Shape of segmented features:", X_segmented.shape)
         print("Shape of segmented labels:", y_segmented.shape)
-        
+
         decoded_labels = label_encoder.inverse_transform(y_segmented)
         label_counts = Counter(decoded_labels)
         sorted_label_counts = sorted(label_counts.items(), key=lambda x: x[1], reverse=True)
-        
+
         print("Number of samples per class after segmentation:")
         for label, count in sorted_label_counts:
             print(f"{label}: {count} samples")
-        
+
         X_flattened = X_segmented.reshape(X_segmented.shape[0], -1)
         return X_flattened, label_encoder, y_encoded, y_segmented, decoded_labels
 
@@ -141,12 +143,15 @@ def call_component():
     rest_participants_data = rest_participants_data.iloc[:, 1:]
 
     # Process and store each set of data
-    participant1_flattened, participant1_label_encoder, participant1_y_encoded, participant1_y_segmented, participant1_decoded_labels = prepare_data(participant1_data)
-    participant2_flattened, participant2_label_encoder, participant2_y_encoded, participant2_y_segmented, participant2_decoded_labels = prepare_data(participant2_data)
-    rest_flattened, rest_label_encoder, rest_y_encoded, rest_y_segmented, rest_decoded_labels = prepare_data(rest_participants_data)
+    participant1_flattened, participant1_label_encoder, participant1_y_encoded, participant1_y_segmented, participant1_decoded_labels = prepare_data(
+        participant1_data)
+    participant2_flattened, participant2_label_encoder, participant2_y_encoded, participant2_y_segmented, participant2_decoded_labels = prepare_data(
+        participant2_data)
+    rest_flattened, rest_label_encoder, rest_y_encoded, rest_y_segmented, rest_decoded_labels = prepare_data(
+        rest_participants_data)
 
     val = participant2_flattened
-    test = participant1_flattened  
+    test = participant1_flattened
     train = rest_flattened
     print("Data preparation and segmentation complete.")
 
@@ -167,7 +172,7 @@ def call_component():
     train_labels = rest_decoded_labels
 
     val_df = pd.DataFrame(val)
-    val_df['label'] = val_labels 
+    val_df['label'] = val_labels
 
     test_df = pd.DataFrame(test)
     test_df['label'] = test_labels
