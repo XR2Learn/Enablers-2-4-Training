@@ -170,3 +170,5 @@ Example of Categories to use in each release
 [0.4.0]: https://github.com/XR2Learn/Enablers-2-4-Training/releases/tag/v0.4.0
 
 [0.5.0]: https://github.com/XR2Learn/Enablers-2-4-Training/releases/tag/v0.5.0
+
+[0.6.0]: https://github.com/XR2Learn/Enablers-2-4-Training/releases/tag/v0.6.0
