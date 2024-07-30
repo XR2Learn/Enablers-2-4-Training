@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='ssl_features_extraction_bm_modality',
-    version='0.5.0',
+    version='0.6.0',
     description='SSL Features Extraction for BM Modality',
     author='UM-XR2Learn-Enablers',
     packages=['ssl_features_extraction_bm_modality'],
