@@ -1,33 +1,30 @@
-
-from conf import CUSTOM_SETTINGS, MODALITY_FOLDER, COMPONENT_OUTPUT_FOLDER
-
 import os
-import tensorflow as tf
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Conv1D, MaxPooling1D, Flatten, Dense, Dropout
-import pandas as pd
-import numpy as np
-from sklearn.preprocessing import LabelEncoder
 import shutil
-import torch
-from decouple import config
-import pathlib
-from sklearn.metrics import classification_report, confusion_matrix
-
 import warnings
+
+import numpy as np
+import pandas as pd
+from sklearn.metrics import classification_report, confusion_matrix
+from sklearn.preprocessing import LabelEncoder
+from tensorflow.keras.layers import Conv1D, MaxPooling1D, Flatten, Dense, Dropout
+from tensorflow.keras.models import Sequential
+
+from conf import CUSTOM_SETTINGS, MODALITY_FOLDER, COMPONENT_OUTPUT_FOLDER, EXPERIMENT_ID, modality
+
 warnings.filterwarnings('ignore')
 
-def example_run():
+
+def run_supervised_training():
     # Construct the full paths for each CSV file
     train_data_path = os.path.join(MODALITY_FOLDER, 'train.csv')
     test_data_path = os.path.join(MODALITY_FOLDER, 'test.csv')
     val_data_path = os.path.join(MODALITY_FOLDER, 'val.csv')
-    
+
     # Load data from CSV files using the paths
     train_data = pd.read_csv(train_data_path)
     test_data = pd.read_csv(test_data_path)
     val_data = pd.read_csv(val_data_path)
-    
+
     # Separate features and target labels
     X_train = train_data.iloc[:, :-1].values
     y_train = train_data.iloc[:, -1].values
@@ -53,20 +50,24 @@ def example_run():
     # Build the 1D CNN Model
     activation_fcn = CUSTOM_SETTINGS["sup_config"]["activation"]
     model = Sequential([
-        Conv1D(filters=CUSTOM_SETTINGS["sup_config"]["filters"], kernel_size=CUSTOM_SETTINGS["sup_config"]["kernel_size"], activation='relu', input_shape=(X_train.shape[1], 1)),
+        Conv1D(filters=CUSTOM_SETTINGS["sup_config"]["filters"],
+               kernel_size=CUSTOM_SETTINGS["sup_config"]["kernel_size"], activation='relu',
+               input_shape=(X_train.shape[1], 1)),
         MaxPooling1D(pool_size=2),
         Flatten(),
         Dense(CUSTOM_SETTINGS["sup_config"]["dense_neurons"], activation=CUSTOM_SETTINGS["sup_config"]['activation']),
         Dropout(CUSTOM_SETTINGS["sup_config"]["dropout"]),
         Dense(num_classes, activation='softmax')
     ])
-    model.compile(optimizer=CUSTOM_SETTINGS["sup_config"]['optimizer_name'], loss='sparse_categorical_crossentropy', metrics=['accuracy'])
+    model.compile(optimizer=CUSTOM_SETTINGS["sup_config"]['optimizer_name'], loss='sparse_categorical_crossentropy',
+                  metrics=['accuracy'])
 
     epoch = CUSTOM_SETTINGS["sup_config"]["epochs"]
     batch_size = CUSTOM_SETTINGS["sup_config"]["batch_size"]
 
     # Train the Model
-    history = model.fit(X_train, y_train_encoded, epochs=epoch, batch_size=batch_size, validation_data=(X_val, y_val_encoded), verbose=2)
+    history = model.fit(X_train, y_train_encoded, epochs=epoch, batch_size=batch_size,
+                        validation_data=(X_val, y_val_encoded), verbose=2)
 
     # Evaluate the Model
     test_loss, test_accuracy = model.evaluate(X_test, y_test_encoded, verbose=0)
@@ -102,7 +103,7 @@ def example_run():
     print(f"Validation Accuracy: {history.history['val_accuracy'][-1] * 100:.2f}%")
     print(f"Test Loss: {test_loss:.4f}")
     print(f"Test Accuracy: {test_accuracy * 100:.2f}%")
-    
+
     def clear_directory(directory):
         """Clears the specified directory, removing and recreating it."""
         if os.path.exists(directory):
@@ -114,19 +115,30 @@ def example_run():
         clear_directory(COMPONENT_OUTPUT_FOLDER)
 
         # Path to save the .h5 file for weights only
-        weights_path = os.path.join(COMPONENT_OUTPUT_FOLDER, 'model_weights.h5')
+
+        ckpt_name = (
+            f"{EXPERIMENT_ID}_"
+            f"{CUSTOM_SETTINGS['dataset_config']['dataset_name']}_"
+            f"{modality}"
+            # Because right now Body tracking does not include SSL, the below are SSL related configs
+            # f"{CUSTOM_SETTINGS['sup_config']['input_type']}"
+            # f"{CUSTOM_SETTINGS.get('encoder_config', None)['class_name']}"
+        )
+
+        weights_path = os.path.join(COMPONENT_OUTPUT_FOLDER, f'{ckpt_name}_classifier.h5')
         # Path to save the .ckpt file for full model checkpoint
-        checkpoint_path = os.path.join(COMPONENT_OUTPUT_FOLDER, 'model_checkpoint.ckpt')
+        checkpoint_path = os.path.join(COMPONENT_OUTPUT_FOLDER, f'{ckpt_name}_model.ckpt')
 
         # Save the model weights
         model.save_weights(weights_path)
-        print(f"Weights have been saved to {weights_path}") 
+        print(f"Weights have been saved to {weights_path}")
 
         # Save the full model checkpoint
         model.save(checkpoint_path)
         print(f"Full model checkpoint has been saved to {checkpoint_path}")
 
-    save_model_weights_and_checkpoint(model)    
+    save_model_weights_and_checkpoint(model)
+
 
 if __name__ == '__main__':
-    example_run()
+    run_supervised_training()
