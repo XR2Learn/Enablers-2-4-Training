@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## Added 
+- Pre_processing component for body tracking modality (from Magic XRoom dataset)
+- Handcrafted features extraction component for body tracking modality (from Magic XRoom dataset)
+- Supervised_Training component for body tracking modality (from Magic XRoom dataset)
+
 ## [0.5.0] - 2024-04-09
 ### Added
 
