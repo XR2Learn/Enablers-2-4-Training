@@ -1,4 +1,4 @@
-# [XR2Learn Emotion Recognition] Training Tools
+# [XR2Learn Personalization Enablers] Training Tools
 
 Training tools involve Enablers 2, 3, and 4 with related components, a total of five tools, for pre-training and
 fine-tuning models used in XR2Learn. Each tool is a modularized component with an isolated environment and dependencies
@@ -9,13 +9,13 @@ The components are also separated by modalities, e.g., audio and bio measurement
 deployed using Docker to ensure easy-to-use components, reproducible development and deployment environments, and
 consistent results. Thus, the Training tools support cross-platform use, i.e., Windows, Linux and macOS.
 
-- Pre-processing: Pre-process raw data into an organized time window of data and labels to be used by the other
+- **Pre-processing**: Pre-process raw data into an organized time window of data and labels to be used by the other
   components.
-- Handcrafted Features Extraction: Extracts features derived from the raw data type’s properties instead of using
+- **Handcrafted Features Extraction**: Extracts features derived from the raw data type’s properties instead of using
   Machine Learning for feature extraction.
-- Self-Supervised Learning (SSL) Training (pre-train): Pre-train an encoder (Enabler 2), with no use of labels.
-- SSL Features Extraction: Uses an encoder to generate features (Enabler 3).
-- Supervised Learning Training (fine-tuning): Trains a classification model (Enabler 4) utilizing labels.
+- **Self-Supervised Learning (SSL) Training (pre-train)**: Pre-train an encoder (Enabler 2), with no use of labels.
+- **SSL Features Extraction**: Uses an encoder to generate features (Enabler 3).
+- **Supervised Learning Training (fine-tuning)**: Trains a classification model (Enabler 4) utilizing labels.
 
 Pre-trained encoder and fine-tuned emotion classification models are also available for use.
 
@@ -150,5 +150,8 @@ the [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en)
 comply with the RAVDESS license, as the models are derivative works from this dataset.
 
 Please refer to [LICENSE.md](LICENSE.md) document for more details.
+
+### Contributors 
+- University of Applied Sciences and Arts of Southern Switzerland (SUPSI): Body Tracking modality components
 
 [CHANGELOG.md]: CHANGELOG.md
