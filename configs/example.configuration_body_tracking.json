@@ -32,6 +32,7 @@
     "batch_size": 10,
     "filters": 64,
     "kernel_size": 3,
+    "lr": 0.0003,
     "pool_size": 2,
     "activation": "relu",
     "dense_neurons": 50,
