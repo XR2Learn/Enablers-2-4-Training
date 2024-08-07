@@ -5,8 +5,8 @@
     "number_of_labels": 3
   },
   "pre_processing_config": {
-    "segment_size": 10,
-    "test_size": 0.3
+    "seq_len": 1,
+    "frequency": 10
   },
   "handcrafted_feature_extraction": {
     "frame_segment_size": 10,    
@@ -29,7 +29,7 @@
   },
   "sup_config": {
     "epochs": 5,
-    "batch_size": 10,
+    "batch_size": 16,
     "filters": 64,
     "kernel_size": 3,
     "lr": 0.0003,

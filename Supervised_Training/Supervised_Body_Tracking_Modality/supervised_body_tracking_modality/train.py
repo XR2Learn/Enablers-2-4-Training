@@ -35,9 +35,11 @@ def run_supervised_training():
     y_val = val_data.iloc[:, -1].values
 
     # Reshape data for Conv1D: (num_samples, segment_size, num_features)
-    X_train = X_train.reshape((X_train.shape[0], CUSTOM_SETTINGS["pre_processing_config"]["segment_size"], -1))
-    X_test = X_test.reshape((X_test.shape[0], CUSTOM_SETTINGS["pre_processing_config"]["segment_size"], -1))
-    X_val = X_val.reshape((X_val.shape[0], CUSTOM_SETTINGS["pre_processing_config"]["segment_size"], -1))
+    segment_size = CUSTOM_SETTINGS["pre_processing_config"]["seq_len"] *\
+        CUSTOM_SETTINGS["pre_processing_config"]["frequency"]
+    X_train = X_train.reshape((X_train.shape[0], segment_size, -1))
+    X_test = X_test.reshape((X_test.shape[0], segment_size, -1))
+    X_val = X_val.reshape((X_val.shape[0], segment_size, -1))
 
     # Encode string labels to integers
     label_encoder = LabelEncoder()
