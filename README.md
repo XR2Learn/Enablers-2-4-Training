@@ -5,7 +5,7 @@ fine-tuning models used in XR2Learn. Each tool is a modularized component with a
 that can be used separately, in combination, or as an end-to-end system (together with
 the [Command-Line Interface – CLI](https://github.com/XR2Learn/Enablers-CLI)).
 
-The components are also separated by modalities, e.g., audio and bio measurements (BM) modalities. Each component is
+The components are also separated by modalities, e.g., audio, bio measurements (BM), and body tracking modalities. Each component is
 deployed using Docker to ensure easy-to-use components, reproducible development and deployment environments, and
 consistent results. Thus, the Training tools support cross-platform use, i.e., Windows, Linux and macOS.
 
@@ -65,7 +65,7 @@ version of “configuration.json” is provided and can be changed by the user.
 Run a docker image:
 docker compose run --rm <service-name>
 Note: Service names can be found in the “docker-compose.yml” file in the project’s root folder. Each modality, i.e.,
-audio, bio-measurements (bm), body movements, are deployed in separated docker containers and their service name follow
+audio, bio-measurements (bm), body-tracking, are deployed in separated docker containers and their service name follow
 the structure:
 pre-processing-<modality>
 handcrafted-features-generation-<modality>
@@ -101,9 +101,9 @@ For Windows:
    all
    docker images)
 
-`./run_all_dockers.sh`
+`./run_all_dockers-<modality>.sh`
 
-`CONFIG_FILE_PATH=<path-to-configuration-json> ./run_all_dockers.sh`
+`CONFIG_FILE_PATH=<path-to-configuration-json> ./run_all_dockers-<modality>.sh`
 
 All the outputs produced by any component in the Training domain are saved and can be accessed in the folder ./outputs.
 
