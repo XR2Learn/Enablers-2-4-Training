@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='handcrafted_features_extraction_body_tracking_modality',
-    version='0.6.0',
+    version='0.6.1',
     description='Handcrafted Features Extraction component for the Body Tracking Modality from Magic XRoom data.',
     author='SUPSI',
     packages=['handcrafted_features_extraction_body_tracking_modality'],
