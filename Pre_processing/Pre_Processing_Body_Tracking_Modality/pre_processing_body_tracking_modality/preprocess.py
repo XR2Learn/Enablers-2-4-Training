@@ -109,7 +109,8 @@ def call_component():
         label_encoder = LabelEncoder()
         y_encoded = label_encoder.fit_transform(y)
 
-        segment_size = CUSTOM_SETTINGS["pre_processing_config"]["segment_size"]
+        segment_size = CUSTOM_SETTINGS["pre_processing_config"]["seq_len"] *\
+            CUSTOM_SETTINGS["pre_processing_config"]["frequency"]
 
         def create_fixed_size_segments(features, labels, segment_size):
             max_index = len(features) // segment_size * segment_size
@@ -180,7 +181,7 @@ def call_component():
     train_df = pd.DataFrame(train)
     train_df['label'] = train_labels
 
-    # Save as CSV files 
+    # Save as CSV files
     pathlib.Path(
         os.path.join(
             MODALITY_FOLDER,
