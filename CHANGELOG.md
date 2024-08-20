@@ -6,6 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+##  [0.6.1] - 2024-09-20
 ### Changed
 - Update pre-processing to operate with length of window in seconds and frequency
 - Adjust CNN and data feeding to process two-dimensional inputs (segment_size, num_channels)
@@ -159,7 +160,7 @@ Example of Categories to use in each release
 - Just an example of how to use changelog. -->
 
 
-[unreleased]: https://github.com/XR2Learn/Enablers-2-4-Training/compare/v0.5.0...master
+[unreleased]: https://github.com/XR2Learn/Enablers-2-4-Training/compare/v0.6.1...master
 
 [0.1.0]: https://github.com/XR2Learn/Enablers-2-4-Training/releases/tag/v0.1.0
 
@@ -176,3 +177,5 @@ Example of Categories to use in each release
 [0.5.0]: https://github.com/XR2Learn/Enablers-2-4-Training/releases/tag/v0.5.0
 
 [0.6.0]: https://github.com/XR2Learn/Enablers-2-4-Training/releases/tag/v0.6.0
+
+[0.6.1]: https://github.com/XR2Learn/Enablers-2-4-Training/releases/tag/v0.6.1
