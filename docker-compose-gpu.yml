@@ -52,6 +52,19 @@ services:
             - driver: nvidia
               device_ids: [ '0' ]
               capabilities: [ gpu ]
+  
+  ed-training-body-tracking:
+    image: some.registry.com/xr2learn-enablers/ed-training-body-tracking:latest-gpu
+    build:
+      context: 'Supervised_Training/Supervised_Body_Tracking_Modality'
+      dockerfile: 'Dockerfile-gpu'
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              device_ids: [ '0' ]
+              capabilities: [ gpu ]
 
   ssl-bm:
     image: some.registry.com/xr2learn-enablers/ssl-bm:latest-gpu

@@ -4,13 +4,17 @@ import warnings
 
 import numpy as np
 import pandas as pd
+from pytorch_lightning import Trainer
 from sklearn.metrics import classification_report, confusion_matrix
 from sklearn.preprocessing import LabelEncoder
-from tensorflow.keras.layers import Conv1D, MaxPooling1D, Flatten, Dense, Dropout
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.optimizers import Adam
+import torch
+from torch.utils.data import TensorDataset, DataLoader
 
 from conf import CUSTOM_SETTINGS, MODALITY_FOLDER, COMPONENT_OUTPUT_FOLDER, EXPERIMENT_ID, modality
+from callbacks.setup_callbacks import setup_callbacks
+from classification_model import SupervisedModel
+from classifiers.mlp import MLPClassifier
+from utils.init_utils import init_encoder
 
 warnings.filterwarnings('ignore')
 
@@ -47,112 +51,96 @@ def run_supervised_training():
     y_test_encoded = label_encoder.transform(y_test)
     y_val_encoded = label_encoder.transform(y_val)
 
-    # Get the number of unique classes for the output layer
+    # In SUPSI implementation unknown class is also used to train the model
     num_classes = len(np.unique(y_train_encoded))
 
-    # Build the 1D CNN Model
-    activation_fcn = CUSTOM_SETTINGS["sup_config"]["activation"]
-    model = Sequential([
-        Conv1D(
-            filters=CUSTOM_SETTINGS["sup_config"]["filters"],
-            kernel_size=CUSTOM_SETTINGS["sup_config"]["kernel_size"],
-            activation='relu',
-            input_shape=(X_train.shape[1], X_train.shape[2])
-        ),
-        MaxPooling1D(pool_size=2),
-        Flatten(),
-        Dense(CUSTOM_SETTINGS["sup_config"]["dense_neurons"], activation=CUSTOM_SETTINGS["sup_config"]['activation']),
-        Dropout(CUSTOM_SETTINGS["sup_config"]["dropout"]),
-        Dense(num_classes, activation='softmax')
-    ])
-
-    if CUSTOM_SETTINGS["sup_config"]['optimizer_name'] == "adam":
-        opt = Adam(learning_rate=CUSTOM_SETTINGS["sup_config"].get("lr", 0.0003))
-    else:
-        raise ValueError("Optimizer is not supported.")
-
-    model.compile(
-        optimizer=opt,
-        loss='sparse_categorical_crossentropy',
-        metrics=['accuracy']
+    train_dataset = TensorDataset(torch.permute(torch.tensor(X_train), [0, 2, 1]), torch.tensor(y_train_encoded))
+    train_loader = DataLoader(
+        train_dataset,
+        batch_size=CUSTOM_SETTINGS["sup_config"]["batch_size"],
+        pin_memory=True
     )
 
-    epoch = CUSTOM_SETTINGS["sup_config"]["epochs"] * 5
-    batch_size = CUSTOM_SETTINGS["sup_config"]["batch_size"]
+    val_dataset = TensorDataset(torch.permute(torch.tensor(X_val), [0, 2, 1]), torch.tensor(y_val_encoded))
+    val_loader = DataLoader(
+        val_dataset,
+        batch_size=CUSTOM_SETTINGS["sup_config"]["batch_size"],
+        pin_memory=True
+    )
 
-    # Train the Model
-    history = model.fit(X_train, y_train_encoded, epochs=epoch, batch_size=batch_size,
-                        validation_data=(X_val, y_val_encoded), verbose=2)
+    test_dataset = TensorDataset(torch.permute(torch.tensor(X_test), [0, 2, 1]), torch.tensor(y_test_encoded))
+    test_loader = DataLoader(
+        test_dataset,
+        batch_size=CUSTOM_SETTINGS["sup_config"]["batch_size"],
+        pin_memory=True
+    )
 
-    # Evaluate the Model
-    test_loss, test_accuracy = model.evaluate(X_test, y_test_encoded, verbose=0)
+    # initialise encoder
+    CUSTOM_SETTINGS["encoder_config"]["kwargs"]["len_seq"] = X_train.shape[1]
+    CUSTOM_SETTINGS["encoder_config"]["kwargs"]["in_channels"] = X_train.shape[2]
 
-    # # Predict classes on the test set
-    # predictions = model.predict(X_test)
-    # predicted_classes = np.argmax(predictions, axis=1)
-    # class_names = ['BORED', 'ENGAGED', 'FRUSTRATED', 'UNLABELED']
-    # # Print reports
-    # print("Classification Report:")
-    # print(classification_report(y_test_encoded, predicted_classes, target_names=class_names))
-    # print("Confusion Matrix:")
-    # cm = confusion_matrix(y_test_encoded, predicted_classes)
-    # print(pd.DataFrame(cm, index=class_names, columns=class_names))
+    print(CUSTOM_SETTINGS["encoder_config"])
 
-    # Predict classes on the test set
-    predictions = model.predict(X_test)
-    predicted_classes = np.argmax(predictions, axis=1)
-    # Automatically determine class names from y_test_encoded
-    unique_classes = np.unique(y_test_encoded)
-    class_names = [f"Class {label}" for label in unique_classes]
-    # Print reports
-    print("Classification Report:")
-    print(classification_report(y_test_encoded, predicted_classes, target_names=class_names))
-    print("Confusion Matrix:")
-    cm = confusion_matrix(y_test_encoded, predicted_classes)
-    print(pd.DataFrame(cm, index=class_names, columns=class_names))
+    encoder = init_encoder(
+        model_cfg=CUSTOM_SETTINGS["encoder_config"],
+    )
 
-    # Training and validation losses and accuracies
-    print(f"Training Loss: {history.history['loss'][-1]:.4f}")
-    print(f"Training Accuracy: {history.history['accuracy'][-1] * 100:.2f}%")
-    print(f"Validation Loss: {history.history['val_loss'][-1]:.4f}")
-    print(f"Validation Accuracy: {history.history['val_accuracy'][-1] * 100:.2f}%")
-    print(f"Test Loss: {test_loss:.4f}")
-    print(f"Test Accuracy: {test_accuracy * 100:.2f}%")
+    ckpt_name = (
+        f"{EXPERIMENT_ID}_"
+        f"{CUSTOM_SETTINGS['dataset_config']['dataset_name']}_"
+        f"{modality}_"
+        f"{CUSTOM_SETTINGS['encoder_config']['class_name']}"
+    )
 
-    def clear_directory(directory):
-        """Clears the specified directory, removing and recreating it."""
-        if os.path.exists(directory):
-            shutil.rmtree(directory)
-        os.makedirs(directory)
+    # add classification head to encoder
+    classifier = MLPClassifier(
+        encoder.out_size,
+        num_classes,
+        hidden=CUSTOM_SETTINGS['sup_config'].get("dense_neurons", [64]),
+        p_dropout=CUSTOM_SETTINGS['sup_config'].get("dropout", None)
+    )
+    model = SupervisedModel(encoder=encoder, classifier=classifier, **CUSTOM_SETTINGS['sup_config']['kwargs'])
 
-    def save_model_weights_and_checkpoint(model):
-        """Saves the weights of the provided TensorFlow/Keras model as a .h5 file and full model as .ckpt."""
-        clear_directory(COMPONENT_OUTPUT_FOLDER)
+    checkpoint_filename = f'{ckpt_name}_model'
 
-        # Path to save the .h5 file for weights only
+    # by default lightning does not overwrite checkpoints, but rather creates different versions (v1, v2, etc.)
+    # for the sample checkpoint_filename. Thus, in order to enable overwriting, we delete checkpoint if it exists.
+    if os.path.exists(os.path.join(COMPONENT_OUTPUT_FOLDER, checkpoint_filename + '.ckpt')):
+        os.remove(os.path.join(COMPONENT_OUTPUT_FOLDER, checkpoint_filename + '.ckpt'))
 
-        ckpt_name = (
-            f"{EXPERIMENT_ID}_"
-            f"{CUSTOM_SETTINGS['dataset_config']['dataset_name']}_"
-            f"{modality}"
-            # Because right now Body tracking does not include SSL, the below are SSL related configs
-            # f"{CUSTOM_SETTINGS['sup_config']['input_type']}"
-            # f"{CUSTOM_SETTINGS.get('encoder_config', None)['class_name']}"
-        )
+    # initialize callbacks
+    callbacks = setup_callbacks(
+        early_stopping_metric="val_loss",
+        no_ckpt=False,
+        num_classes=num_classes,
+        patience=10,
+        dirpath=COMPONENT_OUTPUT_FOLDER,
+        monitor=CUSTOM_SETTINGS['sup_config']['monitor'] if 'monitor' in CUSTOM_SETTINGS['sup_config'] else "val_loss",
+        checkpoint_filename=checkpoint_filename
+    )
 
-        weights_path = os.path.join(COMPONENT_OUTPUT_FOLDER, f'{ckpt_name}_classifier.h5')
-        # Path to save the .ckpt file for full model checkpoint
-        checkpoint_path = os.path.join(COMPONENT_OUTPUT_FOLDER, f'{ckpt_name}_model.ckpt')
+    # initialize Pytorch-Lightning Trainer
+    trainer = Trainer(
+        accelerator='gpu' if torch.cuda.is_available() else 'cpu',
+        deterministic=True,
+        default_root_dir=os.path.join(COMPONENT_OUTPUT_FOLDER),
+        callbacks=callbacks,
+        max_epochs=CUSTOM_SETTINGS['sup_config']['epochs']
+    )
 
-        # Save the model weights
-        model.save_weights(weights_path)
-        print(f"Weights have been saved to {weights_path}")
+    # train model and report metrics
+    # the model checkpoints (best and last if provided) will be saved in
+    # /COMPONENT_OUTPUT_FOLDER/{EXPERIMENT_ID}_model_lightning.ckpt
+    trainer.fit(model, train_loader, val_loader)
 
-        # Save the full model checkpoint
-        model.save(checkpoint_path)
-        print(f"Full model checkpoint has been saved to {checkpoint_path}")
+    # evaluate model on the test set, by default the best model
+    trainer.test(model, test_loader, ckpt_path="best")
 
-    save_model_weights_and_checkpoint(model)
+    # save weights of the classifier independently for future use with SSL features
+    torch.save(
+        classifier.state_dict(),
+        os.path.join(COMPONENT_OUTPUT_FOLDER, f'{ckpt_name}_classifier.pt')
+    )
 
 
 if __name__ == '__main__':

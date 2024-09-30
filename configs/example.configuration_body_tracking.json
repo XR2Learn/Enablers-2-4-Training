@@ -27,17 +27,30 @@
     "harmo_win_size_overlap":50,
     "test_size": 0.3
   },
+  "encoder_config": {
+    "from_module": "encoders.cnn1d",
+    "class_name": "CNN1D",
+    "kwargs": {
+      "out_channels": [
+        64
+      ],
+      "kernel_sizes": [
+        3
+      ],
+      "stride": 1
+    },
+    "pretrained_same_experiment": false
+  },
   "sup_config": {
-    "epochs": 5,
+    "epochs": 25,
     "batch_size": 16,
-    "filters": 64,
-    "kernel_size": 3,
-    "lr": 0.0003,
-    "pool_size": 2,
-    "activation": "relu",
-    "dense_neurons": 50,
+    "dense_neurons": [64],
     "dropout": 0.5,
-    "optimizer_name": "adam"
+    "kwargs": {
+      "lr": 0.0003,
+      "optimizer_name": "adam",
+      "freeze_encoder": false
+    }
   }
 }
 
