@@ -1,7 +1,7 @@
 # Python code here
 import os
 
-from conf import CUSTOM_SETTINGS, MODALITY_FOLDER, EXPERIMENT_ID
+from conf import CUSTOM_SETTINGS, MODALITY, MODALITY_FOLDER, EXPERIMENT_ID
 from generate_and_save import generate_and_save
 from utils.init_utils import init_encoder, init_transforms
 
@@ -20,22 +20,18 @@ def generate_ssl_features():
     # currently, use custom train, val, test csv paths
     data_paths = ["train.csv", "val.csv", "test.csv"]
 
-    if "pretrained_path" in CUSTOM_SETTINGS['encoder_config']:
-        ckpt_path = CUSTOM_SETTINGS['encoder_config']['pretrained_path']
+    if "pretrained_path" in CUSTOM_SETTINGS[MODALITY]['encoder_config']:
+        ckpt_path = CUSTOM_SETTINGS[MODALITY]['encoder_config']['pretrained_path']
     elif (
-        "pretrained_same_experiment" in CUSTOM_SETTINGS['encoder_config'] and
-        CUSTOM_SETTINGS['encoder_config']["pretrained_same_experiment"]
+        "pretrained_same_experiment" in CUSTOM_SETTINGS[MODALITY]['encoder_config'] and
+        CUSTOM_SETTINGS[MODALITY]['encoder_config']["pretrained_same_experiment"]
     ):
-        modality = CUSTOM_SETTINGS['dataset_config']['modality'] if (
-            'modality' in CUSTOM_SETTINGS['dataset_config']
-        ) else 'default_modality'
-
         ckpt_name = (
             f"{EXPERIMENT_ID}_"
             f"{CUSTOM_SETTINGS['dataset_config']['dataset_name']}_"
-            f"{modality}_"
-            f"{CUSTOM_SETTINGS['ssl_config']['input_type']}_"
-            f"{CUSTOM_SETTINGS['encoder_config']['class_name']}"
+            f"{MODALITY}_"
+            f"{CUSTOM_SETTINGS[MODALITY]['ssl_config']['input_type']}_"
+            f"{CUSTOM_SETTINGS[MODALITY]['encoder_config']['class_name']}"
         )
         ckpt_path = os.path.join(
             MODALITY_FOLDER,
@@ -47,7 +43,7 @@ def generate_ssl_features():
 
     try:
         encoder = init_encoder(
-            CUSTOM_SETTINGS["encoder_config"],
+            CUSTOM_SETTINGS[MODALITY]["encoder_config"],
             ckpt_path
         )
     except:
@@ -59,8 +55,8 @@ def generate_ssl_features():
     encoder.eval()
     print(encoder)
 
-    if 'transforms' in CUSTOM_SETTINGS.keys():
-        train_transforms, test_transforms = init_transforms(CUSTOM_SETTINGS['transforms'])
+    if 'transforms' in CUSTOM_SETTINGS[MODALITY].keys():
+        train_transforms, test_transforms = init_transforms(CUSTOM_SETTINGS[MODALITY]['transforms'])
         transforms = {
             "train": train_transforms,
             "val": train_transforms,
@@ -72,7 +68,7 @@ def generate_ssl_features():
             encoder,
             path_,
             MODALITY_FOLDER,
-            CUSTOM_SETTINGS["ssl_config"]["input_type"],
+            CUSTOM_SETTINGS[MODALITY]["ssl_config"]["input_type"],
             f"ssl_features_{os.path.basename(ckpt_path).split('.')[0]}",
             transforms
         )

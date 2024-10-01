@@ -38,15 +38,15 @@ DATA_PATH = os.path.join(DATASETS_FOLDER, CUSTOM_SETTINGS["dataset_config"]["dat
 
 DATASET = CUSTOM_SETTINGS["dataset_config"]["dataset_name"]
 
-if "modality" in CUSTOM_SETTINGS["dataset_config"]:
-    modality = CUSTOM_SETTINGS["dataset_config"]["modality"]
-else:
-    modality = "default_modality"
+MODALITY = CUSTOM_SETTINGS["dataset_config"].get("modality", "default_modality")
+
+if type(MODALITY) is list and "shimmer" in MODALITY:
+    MODALITY = "body-tracking"
 
 MODALITY_FOLDER = os.path.join(
     OUTPUTS_FOLDER,
     CUSTOM_SETTINGS["dataset_config"]["dataset_name"],
-    modality,
+    MODALITY,
 )
 
 EMOTION_TO_LABEL = {

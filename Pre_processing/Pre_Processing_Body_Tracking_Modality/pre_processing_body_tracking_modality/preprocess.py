@@ -9,7 +9,7 @@ import pandas as pd
 from sklearn.preprocessing import LabelEncoder
 from sklearn.preprocessing import StandardScaler
 
-from conf import CUSTOM_SETTINGS, DATA_PATH, MODALITY_FOLDER, EMOTION_TO_LABEL
+from conf import CUSTOM_SETTINGS, DATA_PATH, MODALITY_FOLDER, EMOTION_TO_LABEL, MODALITY
 
 warnings.filterwarnings('ignore')
 
@@ -108,8 +108,8 @@ def call_component():
         label_encoder = LabelEncoder()
         y_encoded = label_encoder.fit_transform(y)
 
-        segment_size = CUSTOM_SETTINGS["pre_processing_config"]["seq_len"] *\
-            CUSTOM_SETTINGS["pre_processing_config"]["frequency"]
+        segment_size = CUSTOM_SETTINGS[MODALITY]["pre_processing_config"]["seq_len"] *\
+            CUSTOM_SETTINGS[MODALITY]["pre_processing_config"]["frequency"]
 
         def create_fixed_size_segments(features, labels, segment_size):
             max_index = len(features) // segment_size * segment_size

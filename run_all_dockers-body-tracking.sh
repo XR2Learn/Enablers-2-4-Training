@@ -10,10 +10,10 @@ echo "Pre-processing-body-tracking"
 echo "--------------------"
 CONFIG_FILE_PATH=$CONFIG_FILE_PATH docker compose run --rm pre-processing-body-tracking
 echo "--------------------"
-echo "Handcrafted-features-generation-body-tracking"
-echo "--------------------"
-CONFIG_FILE_PATH=$CONFIG_FILE_PATH docker compose run --rm handcrafted-features-generation-body-tracking
-echo "--------------------"
+# echo "Handcrafted-features-generation-body-tracking"
+# echo "--------------------"
+# CONFIG_FILE_PATH=$CONFIG_FILE_PATH docker compose run --rm handcrafted-features-generation-body-tracking
+# echo "--------------------"
 #echo "SSL-training-body-tracking"
 #echo "--------------------"
 #CONFIG_FILE_PATH=$CONFIG_FILE_PATH docker compose run --rm ssl-body-tracking

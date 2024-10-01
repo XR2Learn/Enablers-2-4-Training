@@ -8,7 +8,7 @@ from sklearn.preprocessing import LabelEncoder
 import torch
 from torch.utils.data import TensorDataset, DataLoader
 
-from conf import CUSTOM_SETTINGS, MODALITY_FOLDER, COMPONENT_OUTPUT_FOLDER, EXPERIMENT_ID, modality
+from conf import CUSTOM_SETTINGS, MODALITY_FOLDER, COMPONENT_OUTPUT_FOLDER, EXPERIMENT_ID, MODALITY
 from callbacks.setup_callbacks import setup_callbacks
 from classification_model import SupervisedModel
 from classifiers.mlp import MLPClassifier
@@ -37,8 +37,8 @@ def run_supervised_training():
     y_val = val_data.iloc[:, -1].values
 
     # Reshape data for Conv1D: (num_samples, segment_size, num_features)
-    segment_size = CUSTOM_SETTINGS["pre_processing_config"]["seq_len"] *\
-        CUSTOM_SETTINGS["pre_processing_config"]["frequency"]
+    segment_size = CUSTOM_SETTINGS[MODALITY]["pre_processing_config"]["seq_len"] *\
+        CUSTOM_SETTINGS[MODALITY]["pre_processing_config"]["frequency"]
     X_train = X_train.reshape((X_train.shape[0], segment_size, -1))
     X_test = X_test.reshape((X_test.shape[0], segment_size, -1))
     X_val = X_val.reshape((X_val.shape[0], segment_size, -1))
@@ -55,49 +55,49 @@ def run_supervised_training():
     train_dataset = TensorDataset(torch.permute(torch.tensor(X_train), [0, 2, 1]), torch.tensor(y_train_encoded))
     train_loader = DataLoader(
         train_dataset,
-        batch_size=CUSTOM_SETTINGS["sup_config"]["batch_size"],
+        batch_size=CUSTOM_SETTINGS[MODALITY]["sup_config"]["batch_size"],
         pin_memory=True
     )
 
     val_dataset = TensorDataset(torch.permute(torch.tensor(X_val), [0, 2, 1]), torch.tensor(y_val_encoded))
     val_loader = DataLoader(
         val_dataset,
-        batch_size=CUSTOM_SETTINGS["sup_config"]["batch_size"],
+        batch_size=CUSTOM_SETTINGS[MODALITY]["sup_config"]["batch_size"],
         pin_memory=True
     )
 
     test_dataset = TensorDataset(torch.permute(torch.tensor(X_test), [0, 2, 1]), torch.tensor(y_test_encoded))
     test_loader = DataLoader(
         test_dataset,
-        batch_size=CUSTOM_SETTINGS["sup_config"]["batch_size"],
+        batch_size=CUSTOM_SETTINGS[MODALITY]["sup_config"]["batch_size"],
         pin_memory=True
     )
 
     # initialise encoder
-    CUSTOM_SETTINGS["encoder_config"]["kwargs"]["len_seq"] = X_train.shape[1]
-    CUSTOM_SETTINGS["encoder_config"]["kwargs"]["in_channels"] = X_train.shape[2]
+    CUSTOM_SETTINGS[MODALITY]["encoder_config"]["kwargs"]["len_seq"] = X_train.shape[1]
+    CUSTOM_SETTINGS[MODALITY]["encoder_config"]["kwargs"]["in_channels"] = X_train.shape[2]
 
-    print(CUSTOM_SETTINGS["encoder_config"])
+    print(CUSTOM_SETTINGS[MODALITY]["encoder_config"])
 
     encoder = init_encoder(
-        model_cfg=CUSTOM_SETTINGS["encoder_config"],
+        model_cfg=CUSTOM_SETTINGS[MODALITY]["encoder_config"],
     )
 
     ckpt_name = (
         f"{EXPERIMENT_ID}_"
         f"{CUSTOM_SETTINGS['dataset_config']['dataset_name']}_"
-        f"{modality}_"
-        f"{CUSTOM_SETTINGS['encoder_config']['class_name']}"
+        f"{MODALITY}_"
+        f"{CUSTOM_SETTINGS[MODALITY]['encoder_config']['class_name']}"
     )
 
     # add classification head to encoder
     classifier = MLPClassifier(
         encoder.out_size,
         num_classes,
-        hidden=CUSTOM_SETTINGS['sup_config'].get("dense_neurons", [64]),
-        p_dropout=CUSTOM_SETTINGS['sup_config'].get("dropout", None)
+        hidden=CUSTOM_SETTINGS[MODALITY]['sup_config'].get("dense_neurons", [64]),
+        p_dropout=CUSTOM_SETTINGS[MODALITY]['sup_config'].get("dropout", None)
     )
-    model = SupervisedModel(encoder=encoder, classifier=classifier, **CUSTOM_SETTINGS['sup_config']['kwargs'])
+    model = SupervisedModel(encoder=encoder, classifier=classifier, **CUSTOM_SETTINGS[MODALITY]['sup_config']['kwargs'])
 
     checkpoint_filename = f'{ckpt_name}_model'
 
@@ -113,7 +113,7 @@ def run_supervised_training():
         num_classes=num_classes,
         patience=10,
         dirpath=COMPONENT_OUTPUT_FOLDER,
-        monitor=CUSTOM_SETTINGS['sup_config']['monitor'] if 'monitor' in CUSTOM_SETTINGS['sup_config'] else "val_loss",
+        monitor=CUSTOM_SETTINGS[MODALITY]['sup_config']['monitor'] if 'monitor' in CUSTOM_SETTINGS[MODALITY]['sup_config'] else "val_loss",
         checkpoint_filename=checkpoint_filename
     )
 
@@ -123,7 +123,7 @@ def run_supervised_training():
         deterministic=True,
         default_root_dir=os.path.join(COMPONENT_OUTPUT_FOLDER),
         callbacks=callbacks,
-        max_epochs=CUSTOM_SETTINGS['sup_config']['epochs']
+        max_epochs=CUSTOM_SETTINGS[MODALITY]['sup_config']['epochs']
     )
 
     # train model and report metrics
