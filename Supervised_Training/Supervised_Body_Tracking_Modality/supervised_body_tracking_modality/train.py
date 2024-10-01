@@ -1,11 +1,9 @@
 import os
-import shutil
 import warnings
 
 import numpy as np
 import pandas as pd
 from pytorch_lightning import Trainer
-from sklearn.metrics import classification_report, confusion_matrix
 from sklearn.preprocessing import LabelEncoder
 import torch
 from torch.utils.data import TensorDataset, DataLoader
