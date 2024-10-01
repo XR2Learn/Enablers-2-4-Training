@@ -45,8 +45,6 @@ def call_component():
             last_timestamp = timestamp
         return VR_df
 
-    all_labeled_VR_data = pd.DataFrame()
-
     # List to hold each participant's data
     participant_data = []
     participants = os.listdir(data_folder_path)
@@ -104,6 +102,7 @@ def call_component():
     print(f"Total rows in labeled VR data for the rest of the participants: {len(rest_participants_data)}")
 
     def prepare_data(data):
+        data = data[data["event_label"] != "UNLABELED"]
         X = data.drop(['event_label'], axis=1)
         y = data['event_label']
         label_encoder = LabelEncoder()
