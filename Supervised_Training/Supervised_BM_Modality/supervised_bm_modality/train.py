@@ -70,7 +70,10 @@ def run_supervised_training():
     )
 
     # add classification head to encoder
-    classifier = LinearClassifier(encoder.out_size, CUSTOM_SETTINGS['dataset_config']['number_of_labels'])
+    num_classes = CUSTOM_SETTINGS['dataset_config'].get("number_of_labels", 3)
+    if isinstance(num_classes, dict):
+        num_classes = num_classes.get(MODALITY, 3)
+    classifier = LinearClassifier(encoder.out_size, num_classes)
     model = SupervisedModel(encoder=encoder, classifier=classifier, **CUSTOM_SETTINGS[MODALITY]['sup_config']['kwargs'])
 
     checkpoint_filename = f'{ckpt_name}_model'
@@ -84,7 +87,7 @@ def run_supervised_training():
     callbacks = setup_callbacks(
         early_stopping_metric="val_loss",
         no_ckpt=False,
-        num_classes=CUSTOM_SETTINGS['dataset_config']['number_of_labels'],
+        num_classes=num_classes,
         patience=50,
         dirpath=COMPONENT_OUTPUT_FOLDER,
         monitor=CUSTOM_SETTINGS[MODALITY]['sup_config']['monitor'] if 'monitor' in CUSTOM_SETTINGS[MODALITY]['sup_config'] else "val_loss",
