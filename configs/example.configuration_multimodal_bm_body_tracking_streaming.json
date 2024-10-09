@@ -132,6 +132,8 @@
       "from_module": "encoders.cnn1d",
       "class_name": "CNN1D",
       "kwargs": {
+        "in_channels": 21,
+        "len_seq": 10,
         "out_channels": [
           64
         ],

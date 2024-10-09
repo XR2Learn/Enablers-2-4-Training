@@ -74,10 +74,6 @@ def run_supervised_training():
     )
 
     # initialise encoder
-    CUSTOM_SETTINGS[MODALITY]["encoder_config"]["kwargs"]["len_seq"] = X_train.shape[1]
-    CUSTOM_SETTINGS[MODALITY]["encoder_config"]["kwargs"]["in_channels"] = X_train.shape[2]
-
-    print(CUSTOM_SETTINGS[MODALITY]["encoder_config"])
 
     encoder = init_encoder(
         model_cfg=CUSTOM_SETTINGS[MODALITY]["encoder_config"],
