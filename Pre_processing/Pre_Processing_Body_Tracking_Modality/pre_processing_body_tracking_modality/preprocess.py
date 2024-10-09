@@ -9,7 +9,7 @@ import pandas as pd
 from sklearn.preprocessing import LabelEncoder
 from sklearn.preprocessing import StandardScaler
 
-from conf import CUSTOM_SETTINGS, DATA_PATH, MODALITY_FOLDER, EMOTION_TO_LABEL
+from conf import CUSTOM_SETTINGS, DATA_PATH, MODALITY_FOLDER, EMOTION_TO_LABEL, MODALITY
 
 warnings.filterwarnings('ignore')
 
@@ -44,8 +44,6 @@ def call_component():
             VR_df.loc[(VR_df['timestamp'] > last_timestamp) & (VR_df['timestamp'] <= timestamp), 'event_label'] = label
             last_timestamp = timestamp
         return VR_df
-
-    all_labeled_VR_data = pd.DataFrame()
 
     # List to hold each participant's data
     participant_data = []
@@ -104,13 +102,14 @@ def call_component():
     print(f"Total rows in labeled VR data for the rest of the participants: {len(rest_participants_data)}")
 
     def prepare_data(data):
+        data = data[data["event_label"] != "UNLABELED"]
         X = data.drop(['event_label'], axis=1)
         y = data['event_label']
         label_encoder = LabelEncoder()
         y_encoded = label_encoder.fit_transform(y)
 
-        segment_size = CUSTOM_SETTINGS["pre_processing_config"]["seq_len"] *\
-            CUSTOM_SETTINGS["pre_processing_config"]["frequency"]
+        segment_size = CUSTOM_SETTINGS[MODALITY]["pre_processing_config"]["seq_len"] *\
+            CUSTOM_SETTINGS[MODALITY]["pre_processing_config"]["frequency"]
 
         def create_fixed_size_segments(features, labels, segment_size):
             max_index = len(features) // segment_size * segment_size

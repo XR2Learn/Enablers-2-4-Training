@@ -1,4 +1,3 @@
-version: '3.8'
 services:
   ed-training-audio:
     image: some.registry.com/xr2learn-enablers/ed-training-audio:latest

@@ -30,3 +30,14 @@ PATH_CUSTOM_SETTINGS = config('PATH_CUSTOM_SETTINGS', default=path_custom_settin
 if os.path.exists(PATH_CUSTOM_SETTINGS):
     with open(PATH_CUSTOM_SETTINGS, 'r') as f:
         CUSTOM_SETTINGS = json.load(f)
+
+MODALITY = CUSTOM_SETTINGS["dataset_config"].get("modality", "default_modality")
+
+if type(MODALITY) is list and "shimmer" in MODALITY:
+    MODALITY = "shimmer"
+
+MODALITY_FOLDER = os.path.join(
+    OUTPUTS_FOLDER,
+    CUSTOM_SETTINGS["dataset_config"]["dataset_name"],
+    MODALITY,
+)

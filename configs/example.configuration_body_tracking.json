@@ -4,40 +4,57 @@
     "modality": "body-tracking",
     "number_of_labels": 3
   },
-  "pre_processing_config": {
-    "seq_len": 1,
-    "frequency": 10
-  },
-  "handcrafted_feature_extraction": {
-    "frame_segment_size": 10,    
-    "rom_win_size": 10,
-    "jerk_time_interval":2,
-    "correlation_win_size":10,
-    "psd_sample_per_segment":64,
-    "psd_sample_segment_overlap":32,
-    "psd_win_len":100,
-    "psd_win_len_overlap":50,
-    "stat_win_size":100,
-    "stat_win_size_overlap":50,
-    "fft_win_size":100,
-    "fft_win_size_overlap":50,
-    "sym_win_size":100,
-    "sym_win_size_overlap":50, 
-    "harmo_win_size":100,
-    "harmo_win_size_overlap":50,
-    "test_size": 0.3
-  },
-  "sup_config": {
-    "epochs": 5,
-    "batch_size": 16,
-    "filters": 64,
-    "kernel_size": 3,
-    "lr": 0.0003,
-    "pool_size": 2,
-    "activation": "relu",
-    "dense_neurons": 50,
-    "dropout": 0.5,
-    "optimizer_name": "adam"
+  "body-tracking": {
+    "pre_processing_config": {
+      "seq_len": 1,
+      "frequency": 10
+    },
+    "handcrafted_feature_extraction": {
+      "frame_segment_size": 10,    
+      "rom_win_size": 10,
+      "jerk_time_interval":2,
+      "correlation_win_size":10,
+      "psd_sample_per_segment":64,
+      "psd_sample_segment_overlap":32,
+      "psd_win_len":100,
+      "psd_win_len_overlap":50,
+      "stat_win_size":100,
+      "stat_win_size_overlap":50,
+      "fft_win_size":100,
+      "fft_win_size_overlap":50,
+      "sym_win_size":100,
+      "sym_win_size_overlap":50, 
+      "harmo_win_size":100,
+      "harmo_win_size_overlap":50,
+      "test_size": 0.3
+    },
+    "encoder_config": {
+      "from_module": "encoders.cnn1d",
+      "class_name": "CNN1D",
+      "kwargs": {
+        "in_channels": 21,
+        "len_seq": 10,
+        "out_channels": [
+          64
+        ],
+        "kernel_sizes": [
+          3
+        ],
+        "stride": 1
+      },
+      "pretrained_same_experiment": false
+    },
+    "sup_config": {
+      "epochs": 25,
+      "batch_size": 16,
+      "dense_neurons": [64],
+      "dropout": 0.5,
+      "kwargs": {
+        "lr": 0.0003,
+        "optimizer_name": "adam",
+        "freeze_encoder": false
+      }
+    }
   }
 }
 
