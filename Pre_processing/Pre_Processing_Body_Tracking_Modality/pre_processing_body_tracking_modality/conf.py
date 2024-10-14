@@ -40,7 +40,7 @@ DATASET = CUSTOM_SETTINGS["dataset_config"]["dataset_name"]
 
 MODALITY = CUSTOM_SETTINGS["dataset_config"].get("modality", "default_modality")
 
-if type(MODALITY) is list and "shimmer" in MODALITY:
+if type(MODALITY) is list and "body-tracking" in MODALITY:
     MODALITY = "body-tracking"
 
 MODALITY_FOLDER = os.path.join(
