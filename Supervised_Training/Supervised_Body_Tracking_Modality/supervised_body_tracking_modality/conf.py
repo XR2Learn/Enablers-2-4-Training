@@ -1,4 +1,3 @@
-
 """
 File to include global variables across the python package and configuration.
 All the other files inside the python package can access these variables.
@@ -29,18 +28,17 @@ if os.path.exists(PATH_CUSTOM_SETTINGS):
     with open(PATH_CUSTOM_SETTINGS, 'r') as f:
         CUSTOM_SETTINGS = json.load(f)
 
-
 DATA_PATH = os.path.join(DATASETS_FOLDER, CUSTOM_SETTINGS["dataset_config"]["dataset_name"])
 
-#DATA_PATH = os.path.join(MAIN_FOLDER_DEFAULT, 'datasets')
+# DATA_PATH = os.path.join(MAIN_FOLDER_DEFAULT, 'datasets')
 
 # Define components outputs folder
 
-#DATASET = CUSTOM_SETTINGS["dataset_config"]["dataset_name"]
+# DATASET = CUSTOM_SETTINGS["dataset_config"]["dataset_name"]
 
 MODALITY = CUSTOM_SETTINGS["dataset_config"].get("modality", "default_modality")
 
-if type(MODALITY) is list and "shimmer" in MODALITY:
+if type(MODALITY) is list and "body-tracking" in MODALITY:
     MODALITY = "body-tracking"
 
 MODALITY_FOLDER = os.path.join(
