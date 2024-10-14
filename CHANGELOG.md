@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Convert body-tracking training pipeline to pytorch
   - Minor adjustments in body-tracking pre-processing
   - Updates in config structure
+  - Some refactoring
 
 ##  [0.6.1] - 2024-08-20
 ### Changed
