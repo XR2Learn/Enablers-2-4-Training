@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
   - GPU support for body-tracking modality.
+  - Support for data from Magic Room 1.2 (map continuous values to categories at pre-processing step)
 
 ### Changed
   
