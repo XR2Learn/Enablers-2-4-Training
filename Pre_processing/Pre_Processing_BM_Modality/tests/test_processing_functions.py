@@ -12,7 +12,8 @@ from pre_processing_bm_modality.preprocessing_utils import (
     standardize,
     process_session,
     segment_processed_session,
-    segment_processed_session_ssl
+    segment_processed_session_ssl,
+    continious_to_categorical
 )
 
 
@@ -92,6 +93,35 @@ class PreprocessingUtilsTestCase(unittest.TestCase):
             signal_resampled_standardized[:, 1] * signal_resampled[:, 1].std() + signal_resampled[:, 1].mean(),
             err_msg="Standardization (z-norm): cannot reconstruct input"
         )
+    
+    def test_continuous_to_categorical(self):
+        # Test with default categories
+        self.assertEqual(continious_to_categorical("0.0"), "BORED")
+        self.assertEqual(continious_to_categorical("0.33"), "BORED")
+        self.assertEqual(continious_to_categorical("0.34"), "ENGAGED")
+        self.assertEqual(continious_to_categorical("0.66"), "ENGAGED")
+        self.assertEqual(continious_to_categorical("0.67"), "FRUSTRATED")
+        self.assertEqual(continious_to_categorical("1.0"), "FRUSTRATED")
+
+        # Test with custom categories
+        custom_categories = ["LOW", "MEDIUM", "HIGH", "VERY_HIGH"]
+        self.assertEqual(continious_to_categorical("0.0", custom_categories), "LOW")
+        self.assertEqual(continious_to_categorical("0.24", custom_categories), "LOW")
+        self.assertEqual(continious_to_categorical("0.25", custom_categories), "MEDIUM")
+        self.assertEqual(continious_to_categorical("0.49", custom_categories), "MEDIUM")
+        self.assertEqual(continious_to_categorical("0.5", custom_categories), "HIGH")
+        self.assertEqual(continious_to_categorical("0.74", custom_categories), "HIGH")
+        self.assertEqual(continious_to_categorical("0.75", custom_categories), "VERY_HIGH")
+        self.assertEqual(continious_to_categorical("1.0", custom_categories), "VERY_HIGH")
+
+        # Test edge cases
+        self.assertEqual(continious_to_categorical("0"), "BORED")
+        self.assertEqual(continious_to_categorical("1"), "FRUSTRATED")
+
+        # Test invalid inputs
+        self.assertEqual(continious_to_categorical("-0.1"), "INVALID")
+        self.assertEqual(continious_to_categorical("1.1"), "INVALID")
+        self.assertEqual(continious_to_categorical("not a number"), "INVALID")
 
 
 class PreprocessingMagicXRoomTestCase(unittest.TestCase):
