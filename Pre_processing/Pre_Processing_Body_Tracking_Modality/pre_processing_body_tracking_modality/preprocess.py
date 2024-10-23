@@ -14,6 +14,30 @@ from conf import CUSTOM_SETTINGS, DATA_PATH, MODALITY_FOLDER, EMOTION_TO_LABEL, 
 warnings.filterwarnings('ignore')
 
 
+def continious_to_categorical(info: str, categories=["BORED", "ENGAGED", "FRUSTRATED"]) -> str:
+    """
+    Maps a continuous value in the range [0, 1] to a discrete category.
+
+    Args:
+        info: A string containing a float value between 0 and 1.
+        categories: Categories to map continuous values to.
+
+    """
+    num_categories = len(categories)
+    try:
+        value = float(info)
+        if not 0 <= value <= 1:
+            raise ValueError("Value must be between 0 and 1")
+        
+        category_size = 1. / num_categories
+        category = categories[min(int(value // category_size), num_categories - 1)]
+        
+        return str(category)
+    except ValueError:
+        print(f"Invalid input: {info}. Expected a float between 0 and 1.")
+        return "INVALID"
+
+
 def call_component():
     specified_labels = list(EMOTION_TO_LABEL.keys())
 
@@ -30,17 +54,23 @@ def call_component():
             print(f"No data aggregated for pattern '{file_contains}' in {folder_path}")
         return all_data
 
-    def label_VR_data(VR_df, event_df):
+    def label_VR_data(VR_df, event_df, cont_to_cat: bool = True):
         if 'event_type' not in event_df.columns:
             print("Error: 'event_type' column not found in event data.")
             return VR_df
-        filtered_event_df = event_df[event_df['event_type'].isin(specified_labels)]
+        filtered_event_df = event_df[
+            (event_df['event_type'].isin(specified_labels)) | (event_df['event_type'] == "FEEDBACK_RECEIVED")
+        ]
         VR_df.sort_values('timestamp', inplace=True)
         filtered_event_df.sort_values('timestamp', inplace=True)
         VR_df['event_label'] = 'UNLABELED'
         last_timestamp = 0
         for _, event_row in filtered_event_df.iterrows():
-            timestamp, label = event_row['timestamp'], event_row['event_type']
+            if event_row["event_type"] != "FEEDBACK_RECEIVED":
+                label = event_row["event_type"]
+            else:
+                label = continious_to_categorical(event_row["info"]) if cont_to_cat else event_row["info"]
+            timestamp, label = event_row['timestamp'], label
             VR_df.loc[(VR_df['timestamp'] > last_timestamp) & (VR_df['timestamp'] <= timestamp), 'event_label'] = label
             last_timestamp = timestamp
         return VR_df
@@ -49,10 +79,26 @@ def call_component():
     participant_data = []
     participants = os.listdir(data_folder_path)
 
+    def standardize_column_names(df):
+        """ In different versions of Magic XRoom, column names can be slightly different.
+            These differences have been spotted between versions 1.0 and 1.2,
+            for Y position of the controllers:
+                - lcontroller_pposY -> lcontroller_posY
+                - rcontroller_pposY -> rcontroller_posY
+        """
+        rename_dict = {}
+        for col in df.columns:
+            # Remove 'p' from 'pposX', 'pposY', 'pposZ' if present
+            new_col = re.sub(r'p(pos[XYZ])', r'\1', col)
+            if new_col != col:
+                rename_dict[col] = new_col
+        return df.rename(columns=rename_dict)
+
     # Process each participant's data
     for participant in participants:
         participant_folder_path = os.path.join(data_folder_path, participant)
         aggregated_VR_data = aggregate_data_from_subfolder(participant_folder_path, 'VR_')
+        aggregated_VR_data = standardize_column_names(aggregated_VR_data)
         aggregated_event_data = aggregate_data_from_subfolder(participant_folder_path, 'EVENT_')
         if not aggregated_event_data.empty and 'event_type' in aggregated_event_data.columns:
             labeled_VR_data = label_VR_data(aggregated_VR_data, aggregated_event_data)

@@ -226,7 +226,8 @@ def process_session(
     offset_hours_data: int = 1,
     get_ssl: bool = False,
     get_stats: bool = False,
-    use_sensors: Optional[List[str]] = None
+    use_sensors: Optional[List[str]] = None,
+    cont_to_cat: bool = True,
 ) -> Tuple[pd.DataFrame, Dict[str, Any]]:
     """
     Extracts session data from Shimmer and Progress Events from Magic XRoom and assigns labels to sensor recordings.
@@ -297,6 +298,7 @@ def process_session(
     # iterate through annotations file to assign labels to level timestamps
     for _, row in annotations.iterrows():
         event_type = row["event_type"]
+        info = row["info"]
         if event_type == "LEVEL_STARTED":
             # it is not expected to have LEVEL_STARTED two times in a row
             start_ts = row["timestamp_dt"]
@@ -305,7 +307,7 @@ def process_session(
             # save interval to stack if level_started
             stack_level_ts.append((start_ts, row['timestamp_dt']))
 
-        elif event_type in ["BORED", "ENGAGED", "FRUSTRATED", "SKIP"]:
+        elif event_type in ["BORED", "ENGAGED", "FRUSTRATED", "SKIP", "FEEDBACK_RECEIVED"]:
             last_finished_level_start, last_finished_level_end = stack_level_ts.pop() if (
                 stack_level_ts
             ) else (None, None)
@@ -319,9 +321,18 @@ def process_session(
                 event_type != "SKIP" and
                 last_finished_level_end is not None and
                 (row["timestamp_dt"] - last_finished_level_end).total_seconds() < threshold
-            ):
+            ):  
+                if event_type != "FEEDBACK_RECEIVED":
+                    label = event_type
+                else:
+                    label = continious_to_categorical(info) if cont_to_cat else info
                 labeled_intervals.append(
-                    (last_finished_level_start, last_finished_level_end, event_type, row["timestamp_dt"])
+                    (
+                        last_finished_level_start,
+                        last_finished_level_end,
+                        label,
+                        row["timestamp_dt"]
+                    )
                 )
 
     sensor_first_entry = min(data['timestamp_dt'])
@@ -544,3 +555,27 @@ def resample_bm(
     number_of_samples = round(len(bm_segment) * float(target_rate) / sample_rate)
     resampled = scipy.signal.resample(bm_segment, number_of_samples, axis=0)
     return resampled
+
+
+def continious_to_categorical(info: str, categories=["BORED", "ENGAGED", "FRUSTRATED"]) -> str:
+    """
+    Maps a continuous value in the range [0, 1] to a discrete category.
+
+    Args:
+        info: A string containing a float value between 0 and 1.
+        categories: Categories to map continuous values to.
+
+    """
+    num_categories = len(categories)
+    try:
+        value = float(info)
+        if not 0 <= value <= 1:
+            raise ValueError("Value must be between 0 and 1")
+        
+        category_size = 1. / num_categories
+        category = categories[min(int(value // category_size), num_categories - 1)]
+        
+        return str(category)
+    except ValueError:
+        print(f"Invalid input: {info}. Expected a float between 0 and 1.")
+        return "INVALID"
