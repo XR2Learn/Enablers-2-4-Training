@@ -1,7 +1,7 @@
 version: '3.8'
 services:
   ed-training-audio:
-    image: some.registry.com/xr2learn-enablers/ed-training-audio:latest-gpu
+    image: ghcr.io/xr2learn-enablers/ed-training-audio:latest-gpu
     build:
       context: 'Supervised_Training/Supervised_Audio_Modality'
       dockerfile: 'Dockerfile-gpu'
@@ -14,7 +14,7 @@ services:
               capabilities: [ gpu ]
 
   ssl-audio:
-    image: some.registry.com/xr2learn-enablers/ssl-audio:latest-gpu
+    image: ghcr.io/xr2learn-enablers/ssl-audio:latest-gpu
     build:
       context: 'SSL_Training/SSL_Audio_Modality'
       dockerfile: 'Dockerfile-gpu'
@@ -28,7 +28,7 @@ services:
 
 
   ssl-features-generation-audio:
-    image: some.registry.com/xr2learn-enablers/ssl-features-generation-audio:latest-gpu
+    image: ghcr.io/xr2learn-enablers/ssl-features-generation-audio:latest-gpu
     build:
       context: 'SSL_Features_Extraction/SSL_Features_Extraction_Audio_Modality'
       dockerfile: 'Dockerfile-gpu'
@@ -41,7 +41,7 @@ services:
               capabilities: [ gpu ]
   
   ed-training-bm:
-    image: some.registry.com/xr2learn-enablers/ed-training-bm:latest-gpu
+    image: ghcr.io/xr2learn-enablers/ed-training-bm:latest-gpu
     build:
       context: 'Supervised_Training/Supervised_BM_Modality'
       dockerfile: 'Dockerfile-gpu'
@@ -54,7 +54,7 @@ services:
               capabilities: [ gpu ]
   
   ed-training-body-tracking:
-    image: some.registry.com/xr2learn-enablers/ed-training-body-tracking:latest-gpu
+    image: ghcr.io/xr2learn-enablers/ed-training-body-tracking:latest-gpu
     build:
       context: 'Supervised_Training/Supervised_Body_Tracking_Modality'
       dockerfile: 'Dockerfile-gpu'
@@ -67,7 +67,7 @@ services:
               capabilities: [ gpu ]
 
   ssl-bm:
-    image: some.registry.com/xr2learn-enablers/ssl-bm:latest-gpu
+    image: ghcr.io/xr2learn-enablers/ssl-bm:latest-gpu
     build:
       context: 'SSL_Training/SSL_BM_Modality'
       dockerfile: 'Dockerfile-gpu'
@@ -80,7 +80,7 @@ services:
               capabilities: [ gpu ]
 
   ssl-features-generation-bm:
-    image: some.registry.com/xr2learn-enablers/ssl-features-generation-bm:latest-gpu
+    image: ghcr.io/xr2learn-enablers/ssl-features-generation-bm:latest-gpu
     build:
       context: 'SSL_Features_Extraction/SSL_Features_Extraction_BM_Modality'
       dockerfile: 'Dockerfile-gpu'
