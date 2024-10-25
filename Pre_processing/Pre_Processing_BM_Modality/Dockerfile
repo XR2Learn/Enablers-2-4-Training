@@ -18,4 +18,4 @@ RUN pip install -r requirements.txt && \
     rm -rf /tmp/pip* /root/.cache/pip
 ADD ./ /app
 RUN pip install -e . && \
-    rm -rf /tmp/pip* /root/.cache/pip
+    rm -rf /tmp/pip* /root/.cache/pip \
