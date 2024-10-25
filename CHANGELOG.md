@@ -6,12 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
 ##  [1.0.0] - 2024-10-25
 ### Added
 
   - GPU support for body-tracking modality.
   - Support for data from Magic Room 1.2 (map continuous values to categories at pre-processing step)
   - Docker containers registry
+  - Issues template for bug report and feature request
 
 ### Changed
   - Convert body-tracking training pipeline to pytorch
