@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='supervised_bm_modality',
-    version='0.6.1',
+    version='1.0.0',
     description='Supervised training for BM modality',
     author='UM-XR2Learn-Enablers',
     packages=['supervised_bm_modality'],
