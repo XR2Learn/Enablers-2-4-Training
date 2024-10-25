@@ -65,7 +65,7 @@ version of “configuration.json” is provided and can be changed by the user.
 Run a docker image:
 docker compose run --rm <service-name>
 Note: Service names can be found in the “docker-compose.yml” file in the project’s root folder. Each modality, i.e.,
-audio, bio-measurements (bm), body-tracking, are deployed in separated docker containers and their service name follow
+audio, bm (bio-measurements), body-tracking, are deployed in separated docker containers and their service name follow
 the structure:
 pre-processing-<modality>
 handcrafted-features-generation-<modality>
@@ -74,8 +74,8 @@ ssl-features-generation-<modality>
 ed-training-<modality>
 There is an additional script to run all the docker images from a given modality, which will use the available
 ‘configuration.json’ file:
-For Unix-based OS, MacOS and Linux
-./run_all_dockers.sh
+For Unix-based OS, macOS and Linux
+./run_all_dockers-<modality>.sh
 For Windows:
 ./run_all_dockers.ps1
 
