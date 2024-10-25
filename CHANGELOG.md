@@ -6,17 +6,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+##  [1.0.0] - 2024-10-25
 ### Added
 
   - GPU support for body-tracking modality.
   - Support for data from Magic Room 1.2 (map continuous values to categories at pre-processing step)
+  - Docker containers registry
 
 ### Changed
-  
   - Convert body-tracking training pipeline to pytorch
   - Minor adjustments in body-tracking pre-processing
   - Updates in config structure
   - Some refactoring
+
 
 ##  [0.6.1] - 2024-08-20
 ### Changed
@@ -191,3 +193,5 @@ Example of Categories to use in each release
 [0.6.0]: https://github.com/XR2Learn/Enablers-2-4-Training/releases/tag/v0.6.0
 
 [0.6.1]: https://github.com/XR2Learn/Enablers-2-4-Training/releases/tag/v0.6.1
+
+[1.0.0]: https://github.com/XR2Learn/Enablers-2-4-Training/releases/tag/v1.0.0
