@@ -25,7 +25,7 @@ class SupervisedModel(LightningModule):
 
         self.optimizer_name = optimizer_name
         self.lr = lr
-        self.loss = torch.nn.CrossEntropyLoss(weight=torch.tensor(class_weights))
+        self.loss = torch.nn.CrossEntropyLoss(weight=torch.tensor(class_weights) if class_weights is not None else None)
 
         if freeze_encoder:
             for param in self.encoder.parameters():
