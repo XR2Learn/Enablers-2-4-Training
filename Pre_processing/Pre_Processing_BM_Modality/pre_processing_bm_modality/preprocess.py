@@ -22,15 +22,15 @@ def preprocess():
         all_subject_dirs,
         CUSTOM_SETTINGS[MODALITY]["pre_processing_config"],
         MODALITY_FOLDER,
-        seq_len=CUSTOM_SETTINGS[MODALITY]["pre_processing_config"]["seq_len"],  # in seconds
-        overlap=CUSTOM_SETTINGS[MODALITY]["pre_processing_config"]["overlap"],  # between 0 and 1 (proportion)
-        frequency=CUSTOM_SETTINGS[MODALITY]["pre_processing_config"]["frequency"],  # in Hz
-        resample_freq=CUSTOM_SETTINGS[MODALITY]["pre_processing_config"]["resample_freq"] if (
-            "resample_freq" in CUSTOM_SETTINGS[MODALITY]["pre_processing_config"]
-            ) else CUSTOM_SETTINGS[MODALITY]["pre_processing_config"]["frequency"],  # resampling if needed
-        use_sensors=CUSTOM_SETTINGS[MODALITY]["pre_processing_config"]["use_sensors"] if (
-            "use_sensors" in CUSTOM_SETTINGS[MODALITY]["pre_processing_config"]
-            ) else None,  # select sensors to be used for a model
+        seq_len=CUSTOM_SETTINGS[MODALITY]["pre_processing_config"].get("seq_len", 5),  # in seconds
+        overlap=CUSTOM_SETTINGS[MODALITY]["pre_processing_config"].get("overlap", 0.),  # between 0 and 1 (proportion)
+        frequency=CUSTOM_SETTINGS[MODALITY]["pre_processing_config"].get("frequency", 10),  # in Hz
+        resample_freq=CUSTOM_SETTINGS[MODALITY]["pre_processing_config"].get(
+            "resample_freq",
+            CUSTOM_SETTINGS[MODALITY]["pre_processing_config"].get("frequency", 10)
+        ),  # resampling if needed
+        use_sensors=CUSTOM_SETTINGS[MODALITY]["pre_processing_config"].get("use_sensors", ["gsr"]),
+        borders=CUSTOM_SETTINGS[MODALITY]["pre_processing_config"].get("borders", None)
     )
 
     if stats is not None:

@@ -21,6 +21,7 @@ def process_dataset(
         frequency: int = 10,
         resample_freq: int = 10,
         use_sensors: Optional[List[str]] = None,
+        borders: Optional[List[float]] = None,
 ):
     """
     Preprocesses the dataset with bio-measurements in Magic XRoom format.
@@ -34,7 +35,7 @@ def process_dataset(
         seq_len: sequence length in seconds
         overlap: overlapping proportion between segments in [0, 1)
         frequency: frequency of the raw signal
-
+        borders: list of float values defining the borders for each category
     Returns:
         train_split: a dictionary containing the 'files' and 'labels' for training
         val_split: a dictionary containing the 'files' and 'labels' for validation
@@ -124,7 +125,8 @@ def process_dataset(
                     session=session,
                     get_ssl=get_ssl,
                     get_stats=get_stats,
-                    use_sensors=use_sensors
+                    use_sensors=use_sensors,
+                    borders=borders
                 )
                 if get_stats:
                     if stats:
@@ -139,7 +141,8 @@ def process_dataset(
                         overlap,
                         frequency=frequency
                     )
-                except ValueError:
+                except ValueError as e:
+                    print(f"Error segmenting session: {str(e)}")
                     segmented_session = None
 
                 if segmented_session is not None:
@@ -202,7 +205,7 @@ def process_dataset(
                 if segmented_session is None:
                     print(f"""Skipping subject {subject_path} session {session}.
                             Error in pre-processing labeled data: Not enough labeled data""")
-                if get_ssl and segment_processed_session_ssl is None:
+                if get_ssl and segmented_session_ssl is None:
                     print(f"""Skipping subject {subject_path} session {session}.
                             Error in pre-processing unlabeled data: Not enough unlabeled data""")
 
@@ -222,12 +225,13 @@ def process_session(
     session_annot_file: str,
     subject: str,
     session: str,
-    threshold: float = 10,
+    threshold: float = 30,
     offset_hours_data: int = 1,
     get_ssl: bool = False,
     get_stats: bool = False,
     use_sensors: Optional[List[str]] = None,
     cont_to_cat: bool = True,
+    borders: Optional[List[float]] = None,
 ) -> Tuple[pd.DataFrame, Dict[str, Any]]:
     """
     Extracts session data from Shimmer and Progress Events from Magic XRoom and assigns labels to sensor recordings.
@@ -244,6 +248,7 @@ def process_session(
         offset_hours_data: delay in Shimmer data recording in hours caused by different time-zones
         get_ssl: return unlabeled dataframe together with annotated dataframe
         get_stats: flag for generating stats csv (for labeled data)
+        borders: list of float values defining the borders for each category
 
     Returns:
         labeled_data: dataframe consisting labeled sensor recordings
@@ -251,6 +256,11 @@ def process_session(
     """
     # Timestamp format: C# ticks
     annotations = pd.read_csv(session_annot_file)
+    # Check if file has headers by looking at first row
+    if not any(col in annotations.columns for col in ["timestamp", "event_type", "info"]):
+        # Reset the DataFrame with proper column names
+        annotations = pd.read_csv(session_annot_file, names=["timestamp", "event_type", "info"])
+        
     annotations["timestamp_dt"] = (
         annotations["timestamp"]
         .apply(lambda x: datetime.datetime(1, 1, 1) + datetime.timedelta(microseconds=x // 10))
@@ -305,6 +315,8 @@ def process_session(
 
         elif event_type in ["LEVEL_COMPLETED", "LEVEL_FAILED"]:
             # save interval to stack if level_started
+            if 'start_ts' not in locals():
+                continue
             stack_level_ts.append((start_ts, row['timestamp_dt']))
 
         elif event_type in ["BORED", "ENGAGED", "FRUSTRATED", "SKIP", "FEEDBACK_RECEIVED"]:
@@ -321,11 +333,11 @@ def process_session(
                 event_type != "SKIP" and
                 last_finished_level_end is not None and
                 (row["timestamp_dt"] - last_finished_level_end).total_seconds() < threshold
-            ):  
+            ):
                 if event_type != "FEEDBACK_RECEIVED":
                     label = event_type
                 else:
-                    label = continious_to_categorical(info) if cont_to_cat else info
+                    label = continious_to_categorical(info, borders=borders) if cont_to_cat else info
                 labeled_intervals.append(
                     (
                         last_finished_level_start,
@@ -557,13 +569,15 @@ def resample_bm(
     return resampled
 
 
-def continious_to_categorical(info: str, categories=["BORED", "ENGAGED", "FRUSTRATED"]) -> str:
+def continious_to_categorical(info: str, categories=["BORED", "ENGAGED", "FRUSTRATED"], borders=None) -> str:
     """
     Maps a continuous value in the range [0, 1] to a discrete category.
 
     Args:
         info: A string containing a float value between 0 and 1.
         categories: Categories to map continuous values to.
+        borders: A list of float values defining the borders for each category.
+                 Must be in ascending order and have len(categories) - 1 elements.
 
     """
     num_categories = len(categories)
@@ -571,10 +585,17 @@ def continious_to_categorical(info: str, categories=["BORED", "ENGAGED", "FRUSTR
         value = float(info)
         if not 0 <= value <= 1:
             raise ValueError("Value must be between 0 and 1")
-        
-        category_size = 1. / num_categories
-        category = categories[min(int(value // category_size), num_categories - 1)]
-        
+
+        if borders is None:
+            category_size = 1. / num_categories
+            category_index = min(int(value // category_size), num_categories - 1)
+        else:
+            if len(borders) != num_categories - 1:
+                raise ValueError("Borders list must have len(categories) - 1 elements.")
+            category_index = next((i for i, border in enumerate(borders) if value < border), num_categories - 1)
+
+        category = categories[category_index]
+
         return str(category)
     except ValueError:
         print(f"Invalid input: {info}. Expected a float between 0 and 1.")
