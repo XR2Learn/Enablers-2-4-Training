@@ -21,6 +21,10 @@ Pre-trained encoder and fine-tuned emotion classification models are also availa
 
 [Diagram with Architecture Overview](https://drive.google.com/file/d/1k3yLi9Y8tasFMJFNxIwKY-nRJzPdKPLw/view?usp=sharing)
 
+## Modalities 
+- Bio-measurements and Body Tracking modalities use [Magic XRoom](https://github.com/XR2Learn/magic-xroom) data format. 
+- Audio modality uses RAVDESS data format. 
+
 ## Pre-requisites:
 
 The Training Tools support the three main Operational Systems (OS): Linux, macOS, and Windows, as well as CPU and GPU
