@@ -7,7 +7,9 @@
   "body-tracking": {
     "pre_processing_config": {
       "seq_len": 1,
-      "frequency": 10
+      "frequency": 10,
+      "overlap": 0.5,
+      "borders": [0.4, 0.6]
     },
     "handcrafted_feature_extraction": {
       "frame_segment_size": 10,    
@@ -35,9 +37,13 @@
         "in_channels": 21,
         "len_seq": 10,
         "out_channels": [
-          64
+          128,
+          256,
+          512
         ],
         "kernel_sizes": [
+          3,
+          3,
           3
         ],
         "stride": 1
@@ -46,13 +52,14 @@
     },
     "sup_config": {
       "epochs": 25,
-      "batch_size": 16,
+      "batch_size": 128,
       "dense_neurons": [64],
-      "dropout": 0.5,
+      "dropout": 0.2,
       "kwargs": {
         "lr": 0.0003,
         "optimizer_name": "adam",
-        "freeze_encoder": false
+        "freeze_encoder": false,
+        "class_weights": [1.0, 0.1, 1.0]
       }
     }
   }
