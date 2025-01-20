@@ -68,6 +68,7 @@ class SupervisedModel(LightningModule):
         loss = self.loss(out, Y)
         self.log(f"{prefix}loss", loss, prog_bar=True)
         preds = torch.argmax(out, dim=1)
+        print(preds)
         return {f"{prefix}loss": loss, "preds": preds}
 
     def configure_optimizers(self):
