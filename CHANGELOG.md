@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- Adjust the pre-processing pipeline to label data based on started and finished/failed levels
+- Add an option for overlapping segments in the pre-processing pipeline
+- Manually set borders for pre-processing continuous values into categories in body-tracking modality
+- Class weights for supervised loss in bio-measurements modality
+
+### Changed
+- Minor fixes in body-tracking pre-processing to account for some data format issues from Magic XRoom
 ##  [1.1.0] - 2025-01-13
 ### Added
 

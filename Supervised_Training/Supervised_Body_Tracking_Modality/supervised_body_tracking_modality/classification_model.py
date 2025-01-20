@@ -1,4 +1,4 @@
-from typing import Union
+from typing import List, Optional, Union
 
 import torch
 from pytorch_lightning import LightningModule
@@ -14,6 +14,7 @@ class SupervisedModel(LightningModule):
             optimizer_name: str = 'adam',
             lr: float = 0.001,
             freeze_encoder: bool = True,
+            class_weights: Optional[List[float]] = None,
             **kwargs
     ):
         super().__init__()
@@ -24,7 +25,7 @@ class SupervisedModel(LightningModule):
 
         self.optimizer_name = optimizer_name
         self.lr = lr
-        self.loss = torch.nn.CrossEntropyLoss()
+        self.loss = torch.nn.CrossEntropyLoss(weight=torch.tensor(class_weights) if class_weights is not None else None)
 
         if freeze_encoder:
             for param in self.encoder.parameters():
@@ -65,8 +66,9 @@ class SupervisedModel(LightningModule):
         X, Y = batch[0], batch[1]
         out = self(X)
         loss = self.loss(out, Y)
-        self.log(f"{prefix}loss", loss)
+        self.log(f"{prefix}loss", loss, prog_bar=True)
         preds = torch.argmax(out, dim=1)
+        print(preds)
         return {f"{prefix}loss": loss, "preds": preds}
 
     def configure_optimizers(self):
