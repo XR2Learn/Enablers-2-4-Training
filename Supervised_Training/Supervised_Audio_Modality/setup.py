@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='supervised_audio_modality',
-    version='1.1.0',
+    version='1.2.0',
     description='Training an ED model using audio data input type.',
     author='UM-XR2Learn-Enablers',
     packages=['supervised_audio_modality'],
