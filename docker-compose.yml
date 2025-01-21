@@ -1,6 +1,6 @@
 services:
   ed-training-audio:
-    image: ghcr.io/xr2learn/ed-training-audio:latest
+    image: ghcr.io/xr2learn/ed-training-audio:v1.2.0
     build:
       context: 'Supervised_Training/Supervised_Audio_Modality'
       dockerfile: 'Dockerfile'
@@ -15,7 +15,7 @@ services:
     command: python supervised_audio_modality/train.py
 
   ed-training-body-tracking:
-    image: ghcr.io/xr2learn/ed-training-body-tracking:latest
+    image: ghcr.io/xr2learn/ed-training-body-tracking:v1.2.0
     build:
       context: 'Supervised_Training/Supervised_Body_Tracking_Modality'
       dockerfile: 'Dockerfile'
@@ -30,7 +30,7 @@ services:
     command: python supervised_body_tracking_modality/train.py
 
   ssl-audio:
-    image: ghcr.io/xr2learn/ssl-audio:latest
+    image: ghcr.io/xr2learn/ssl-audio:v1.2.0
     build:
       context: 'SSL_Training/SSL_Audio_Modality'
       dockerfile: 'Dockerfile'
@@ -45,7 +45,7 @@ services:
     command: python ssl_audio_modality/pre_train.py
 
   ssl-body-tracking:
-    image: ghcr.io/xr2learn/ssl-body-tracking:latest
+    image: ghcr.io/xr2learn/ssl-body-tracking:v1.2.0
     build:
       context: 'SSL_Training/SSL_Body_Tracking_Modality'
       dockerfile: 'Dockerfile'
@@ -60,7 +60,7 @@ services:
     command: python ssl_body_tracking_modality/pre_train.py
 
   pre-processing-audio:
-    image: ghcr.io/xr2learn/pre-processing-audio:latest
+    image: ghcr.io/xr2learn/pre-processing-audio:v1.2.0
     build:
       context: 'Pre_processing/Pre_processing_Audio_Modality'
       dockerfile: 'Dockerfile'
@@ -75,7 +75,7 @@ services:
     command: python pre_processing_audio_modality/preprocess.py
 
   pre-processing-body-tracking:
-    image: ghcr.io/xr2learn/pre-processing-body-tracking:latest
+    image: ghcr.io/xr2learn/pre-processing-body-tracking:v1.2.0
     build:
       context: 'Pre_processing/Pre_Processing_Body_Tracking_Modality'
       dockerfile: 'Dockerfile'
@@ -90,7 +90,7 @@ services:
     command: python pre_processing_body_tracking_modality/preprocess.py
 
   ssl-features-generation-audio:
-    image: ghcr.io/xr2learn/ssl-features-generation-audio:latest
+    image: ghcr.io/xr2learn/ssl-features-generation-audio:v1.2.0
     build:
       context: 'SSL_Features_Extraction/SSL_Features_Extraction_Audio_Modality'
       dockerfile: 'Dockerfile'
@@ -105,7 +105,7 @@ services:
     command: python ssl_features_extraction_audio_modality/generate_features.py
 
   ssl-features-generation-body-tracking:
-    image: ghcr.io/xr2learn/ssl-features-generation-body-tracking:latest
+    image: ghcr.io/xr2learn/ssl-features-generation-body-tracking:v1.2.0
     build:
       context: 'SSL_Features_Extraction/SSL_Features_Extraction_Body_Tracking_Modality'
       dockerfile: 'Dockerfile'
@@ -120,7 +120,7 @@ services:
     command: python ssl_features_extraction_body_tracking_modality/generate_features.py
 
   handcrafted-features-generation-audio:
-    image: ghcr.io/xr2learn/handcrafted-features-generation-audio:latest
+    image: ghcr.io/xr2learn/handcrafted-features-generation-audio:v1.2.0
     build:
       context: 'Handcrafted_Features_Extraction/Handcrafted_Features_Extraction_Audio_modality'
       dockerfile: 'Dockerfile'
@@ -135,7 +135,7 @@ services:
     command: python handcrafted_features_extraction_audio_modality/generate_features.py
 
   handcrafted-features-generation-body-tracking:
-    image: ghcr.io/xr2learn/handcrafted-features-generation-body-tracking:latest
+    image: ghcr.io/xr2learn/handcrafted-features-generation-body-tracking:v1.2.0
     build:
       context: 'Handcrafted_Features_Extraction/Handcrafted_Features_Extraction_Body_Tracking_Modality'
       dockerfile: 'Dockerfile'
@@ -150,7 +150,7 @@ services:
     command: python handcrafted_features_extraction_body_tracking_modality/generate_features.py
 
   pre-processing-bm:
-    image: ghcr.io/xr2learn/pre-processing-bm:latest
+    image: ghcr.io/xr2learn/pre-processing-bm:v1.2.0
     build:
       context: 'Pre_processing/Pre_Processing_BM_Modality'
       dockerfile: 'Dockerfile'
@@ -165,7 +165,7 @@ services:
     command: python pre_processing_bm_modality/preprocess.py
 
   handcrafted-features-generation-bm:
-    image: ghcr.io/xr2learn/handcrafted-features-generation-bm:latest
+    image: ghcr.io/xr2learn/handcrafted-features-generation-bm:v1.2.0
     build:
       context: 'Handcrafted_Features_Extraction/Handcrafted_Features_Extraction_BM_Modality'
       dockerfile: 'Dockerfile'
@@ -180,7 +180,7 @@ services:
     command: python handcrafted_features_extraction_bm_modality/generate_features.py
 
   ssl-bm:
-    image: ghcr.io/xr2learn/ssl-bm:latest
+    image: ghcr.io/xr2learn/ssl-bm:v1.2.0
     build:
       context: 'SSL_Training/SSL_BM_Modality'
       dockerfile: 'Dockerfile'
@@ -195,7 +195,7 @@ services:
     command: python ssl_bm_modality/pre_train.py
 
   ed-training-bm:
-    image: ghcr.io/xr2learn/ed-training-bm:latest
+    image: ghcr.io/xr2learn/ed-training-bm:v1.2.0
     build:
       context: 'Supervised_Training/Supervised_BM_Modality'
       dockerfile: 'Dockerfile'
@@ -210,7 +210,7 @@ services:
     command: python supervised_bm_modality/train.py
 
   ssl-features-generation-bm:
-    image: ghcr.io/xr2learn/ssl-features-generation-bm:latest
+    image: ghcr.io/xr2learn/ssl-features-generation-bm:v1.2.0
     build:
       context: 'SSL_Features_Extraction/SSL_Features_Extraction_BM_Modality'
       dockerfile: 'Dockerfile'

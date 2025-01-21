@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+##  [1.2.0] - 2025-01-21
+
 ### Added
 - Adjust the pre-processing pipeline to label data based on started and finished/failed levels
 - Add an option for overlapping segments in the pre-processing pipeline
@@ -14,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - Minor fixes in body-tracking pre-processing to account for some data format issues from Magic XRoom
+
 ##  [1.1.0] - 2025-01-13
 ### Added
 
@@ -215,3 +219,5 @@ Example of Categories to use in each release
 [1.0.0]: https://github.com/XR2Learn/Enablers-2-4-Training/releases/tag/v1.0.0
 
 [1.1.0]: https://github.com/XR2Learn/Enablers-2-4-Training/releases/tag/v1.1.0
+
+[1.2.0]: https://github.com/XR2Learn/Enablers-2-4-Training/releases/tag/v1.2.0
