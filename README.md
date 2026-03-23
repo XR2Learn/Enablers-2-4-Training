@@ -158,4 +158,7 @@ Please refer to [LICENSE.md](LICENSE.md) document for more details.
 ### Contributors 
 - University of Applied Sciences and Arts of Southern Switzerland (SUPSI): Body Tracking modality components
 
+### Relevant Wiki pages
+- [https://github.com/XR2Learn/.github/wiki/Personalization-Enablers:-Training-Tools](https://github.com/XR2Learn/.github/wiki/Personalization-Enablers:-Training-Tools)
+
 [CHANGELOG.md]: CHANGELOG.md
